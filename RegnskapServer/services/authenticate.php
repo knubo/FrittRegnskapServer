@@ -23,7 +23,7 @@ include_once("../classes/auth/RegnSession.php");
     if($auth->authenticate($user, $password) == User::AUTH_OK) {
     	session_start();
     	$_SESSION["username"] = $user;
-		$arr = array('url' => 'RegnskapClient/www/no.knubo.accounting.AccountingGWT/AccountingGWT.html');
+		$arr = array('url' => '/RegnskapClient/www/no.knubo.accounting.AccountingGWT/AccountingGWT.html');
 		
     } else {
     	$arr = array('error' => 'Ulovlig brukernavn eller passord.');

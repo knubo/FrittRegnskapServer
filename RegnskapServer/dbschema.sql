@@ -25,19 +25,19 @@ CREATE TABLE IF NOT EXISTS regn_possessions (
 
 CREATE TABLE IF NOT EXISTS regn_grouping (
   owner INTEGER(6) UNSIGNED,
-  regn_line INTEGER(8) UNSIGNED,
+  regn_line INTEGER(8) UNSIGNED
 );
 
 CREATE TABLE IF NOT EXISTS regn_fordring (
   regn_line INT(8) UNSIGNED,
-  debet ENUM('-1', '1'),
+  debet ENUM('-1', '1')
 );
 
 
 CREATE TABLE IF NOT EXISTS regn_happening (
    name VARCHAR(50) PRIMARY KEY,
    creditPost INTEGER(8),
-   debetPost INTEGER(8),
+   debetPost INTEGER(8)
 );
 
 
@@ -104,13 +104,13 @@ CREATE TABLE IF NOT EXISTS regn_post_type (
    coll_post INT(5) UNSIGNED,
    detail_post INT(3),
    description VARCHAR(100),
-   tinyint in_use
+   in_use tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_coll_post_type (
    id INTEGER(5) UNSIGNED NOT NULL PRIMARY KEY,
    display_order INT(5) UNSIGNED,
-   name VARCHAR(80),
+   name VARCHAR(80)
 );
 
 CREATE TABLE IF NOT EXISTS regn_detail_post_type (

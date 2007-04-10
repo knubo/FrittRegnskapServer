@@ -8,6 +8,10 @@ class DB {
 
 	private $link;
 
+	function link() {
+		return $this->link;
+	}
+
     function __construct() {
        $this->link = mysqli_connect("127.0.0.1","root","","knubo");
        if (mysqli_connect_errno()) {
@@ -15,15 +19,30 @@ class DB {
       	  exit;
        }
     }
+	
+	function table_exists($table) {
+		$result = $this->link->query("show tables like '".$table."'");
+
+		$match = $result->num_rows;
+		
+		$result->close();
+
+		return $match > 0;
+	}
 
 	function prepare($query) {
 		$mysqli = mysqli_prepare($this->link, $query);
 	
 		if (!$mysqli) {
-			die('Invalid query: ' . $mysqli->error);
+			die('Invalid query: ' . $this->link->error);
 		}
 		
+		
 		return $mysqli;
+	}
+	
+	function action($query) {
+		mysqli_query($this->link, $query);
 	}
 	
 	function execute($handle) {
@@ -31,11 +50,18 @@ class DB {
 		if(!$handle->execute()) {
 			die("Klarte ikke kj¿re query.");
 		}
+				
+		$metadata = $handle->result_metadata();
+
+		# No rows, no result, no action.
+		if($metadata == FALSE) {
+			return;
+		}		
 		
-   	    $nof = mysqli_num_fields( mysqli_stmt_result_metadata($handle) );
+   	    $nof = $metadata->field_count;
 
         # The metadata of all fields
-        $fieldMeta = mysqli_fetch_fields( mysqli_stmt_result_metadata($handle) );
+        $fieldMeta = $metadata->fetch_fields();
        
 		# convert it to a normal array just containing the field names
 		$fields = array();
@@ -74,5 +100,54 @@ class DB {
 		}
 		return $myall;
 	}
+	
+	
+function backtrace()
+{
+    $output = "<div style='text-align: left; font-family: monospace;'>\n";
+    $output .= "<b>Backtrace:</b><br />\n";
+    $backtrace = debug_backtrace();
+
+    foreach ($backtrace as $bt) {
+        $args = '';
+        foreach ($bt['args'] as $a) {
+            if (!empty($args)) {
+                $args .= ', ';
+            }
+            switch (gettype($a)) {
+            case 'integer':
+            case 'double':
+                $args .= $a;
+                break;
+            case 'string':
+                $a = htmlspecialchars(substr($a, 0, 64)).((strlen($a) > 64) ? '...' : '');
+                $args .= "\"$a\"";
+                break;
+            case 'array':
+                $args .= 'Array('.count($a).')';
+                break;
+            case 'object':
+                $args .= 'Object('.get_class($a).')';
+                break;
+            case 'resource':
+                $args .= 'Resource('.strstr($a, '#').')';
+                break;
+            case 'boolean':
+                $args .= $a ? 'True' : 'False';
+                break;
+            case 'NULL':
+                $args .= 'Null';
+                break;
+            default:
+                $args .= 'Unknown';
+            }
+        }
+        $output .= "<br />\n";
+        $output .= "<b>file:</b> {$bt['line']} - {$bt['file']}<br />\n";
+        $output .= "<b>call:</b> {$bt['class']}{$bt['type']}{$bt['function']}($args)<br />\n";
+    }
+    $output .= "</div>\n";
+    return $output;
+}
 }
 ?>

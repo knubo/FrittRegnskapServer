@@ -1,17 +1,15 @@
 <?php
-include_once("../../conf/AppConfig.php");
 
 /*
  * Created on Apr 5, 2007
  */
-
 class RegnSession {
 	private $db;
-				
+
 	function __construct($db) {
 		$this->db = $db;
-
-		if(!mysql_table_exists("sessions",$db)) {
+ 
+		if(!$db->table_exists("sessions")) {
             $query = 'CREATE TABLE sessions (
                   SessionID     char(255)   not null,
                   LastUpdated   datetime    not null,
@@ -19,17 +17,20 @@ class RegnSession {
                   PRIMARY KEY ( SessionID ),
                   INDEX ( LastUpdated )
                  )';
-            $db->action($query);
+            $this->db->action($query);
         }
-        session_set_save_handler("sessao_open", "sessao_close", "sessao_read", "sessao_write", "sessao_destroy", "sessao_gc");
-	}	
-		
-                            
+        session_set_save_handler(
+        	array($this,"sessao_open"), 
+			array($this,"sessao_close"), 
+			array($this,"sessao_read"), 
+			array($this,"sessao_write"), 
+			array($this,"sessao_destroy"), 
+			array($this,"sessao_gc"));
+	}
 
 	function sessao_open($aSavaPath, $aSessionName) {
        global $aTime;
 
-       sessao_gc( $aTime );
        return TRUE;
     }
 
@@ -39,40 +40,46 @@ class RegnSession {
 
     function sessao_read( $aKey ) {
 	
-	   $aKey = mysql_escape_string($aKey);
-	   
-       $query = "SELECT DataValue FROM sessions WHERE SessionID='$aKey'";
-       $busca = mysql_query($query);
-       if(mysql_num_rows($busca) == 1)
-       {
-             $r = mysql_fetch_array($busca);
-             return $r['DataValue'];
+	   $prep = $this->db->prepare("SELECT DataValue FROM sessions WHERE SessionID=?");
+       
+       $prep->bind_param("s", $aKey);
+       
+       $res = $this->db->execute($prep);
+       
+       if(sizeof($res) > 0) {
+           return $res[0]['DataValue'];
        } else {
-             $query = "INSERT INTO sessions (SessionID, LastUpdated, DataValue)
-                       VALUES ('$aKey', NOW(), '')";
-             mysql_query($query);
-             return "";
+		   $prep = $this->db->prepare       	
+             ("INSERT INTO sessions (SessionID, LastUpdated, DataValue)
+                       VALUES (?, NOW(), '')");
+           $prep->bind_param("s", $aKey);
+           
+           $this->db->execute($prep);
+           return "";
        }
 	}
 
 	function sessao_write( $aKey, $aVal ) {
-       $aVal = mysql_escape_string( $aVal );
-       $query = "UPDATE sessions SET DataValue = '$aVal', LastUpdated = NOW() WHERE SessionID = '$aKey'";
-       mysql_query($query);
+       $prep = $this->db->prepare       	
+             ("UPDATE sessions SET DataValue = ?, LastUpdated = NOW() WHERE SessionID = ?");
+       $prep->bind_param("ss", $aVal, $aKey);
+       $this->db->execute($prep);
        return TRUE;
 	}
 
 	function sessao_destroy( $aKey ) {
-       $aKey = mysql_escape_string( $aKey );				
-       $query = "DELETE FROM sessions WHERE SessionID = '$aKey'";
-       mysql_query($query);
+       $prep = $this->db->prepare       	
+             ("DELETE FROM sessions WHERE SessionID = ?");
+       $prep->bind_param("s", $aKey);
+       $this->db->execute($prep);
        return TRUE;
  	}
 
 	function sessao_gc( $aMaxLifeTime ) {
-    	$aMaxLifeTime = mysql_escape_string($aMaxLifeTime);
-       $query = "DELETE FROM sessions WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(LastUpdated) > $aMaxLifeTime";
-       mysql_query($query);
+       $prep = $this->db->prepare       	
+             ("DELETE FROM sessions WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(LastUpdated) > ?");
+       $prep->bind_param("i", $aMaxLifeTime);
+       $this->db->execute($prep);
        return TRUE;
 	}
 
@@ -116,5 +123,4 @@ class RegnSession {
         exit;     
     }
 }
-
 ?>

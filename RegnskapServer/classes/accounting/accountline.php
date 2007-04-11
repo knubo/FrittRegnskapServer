@@ -249,8 +249,20 @@ class AccountLine {
   	  	 	 		} 	 		
   	  	 	 	}
   	  	 	 }
+  	  	 	 
+  	  	 	 /* After this, we format the numbers to make them look nice in the client. */
+  	  		foreach(array_keys($one->groupDebetMonth) as $k) {
+  	  			$val = $one->groupDebetMonth[$k];
+  	  			
+  	  			$one->groupDebetMonth[$k] = number_format($val, 2);
+  	  		}
+
+  	  		foreach(array_keys($one->groupKredMonth) as $k) {
+  	  			$val = $one->groupKredMonth[$k];
+  	  			
+  	  			$one->groupKredMonth[$k] = number_format($val, 2);
+  	  		}
   	  	 }
-  	  	 
   	  }
   }
 

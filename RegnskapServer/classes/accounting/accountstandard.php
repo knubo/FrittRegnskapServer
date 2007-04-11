@@ -1,37 +1,42 @@
-<?
-include_once( "classes/ezdb.php" );
+<?php
+
+include_once( "../util/DB.php" );
 
 class eZAccountStandard {
   
-  function eZAccountStandard() {
-    $this->IsConnected = false;
+  private $db;
+  
+  function eZAccountStandard($db) {
+    $this->db = $db;
   }
   
   function setValue($id, $value) {
-    $this->dbInit();
     
-    $insId = addslashes($id);
-    $insValue = addslashes($value);
-
-    $this->Database->array_query($query_array, "select * from regn_standard where id='$insId'");
+    $prep = $this->db->prepare("select * from regn_standard where id=?");
+    $prep->bind_params("s", $id);
+    $query_array = $prep->execute();
 
     if(count($query_array) > 0) {
-      $this->Database->query("update regn_standard set value='$insValue' where id='$insId'");
+		$prep = $this->db->prepare("update regn_standard set value=? where id=?");    	
+		$prep->bind_params("ss", $value, $id);
+		$prep->execute();
     } else {
-      $this->Database->query("insert into regn_standard (id, value) values ('$insId', '$insValue')");
+		$prep = $this->db->prepare("insert into regn_standard (id, value) values (?,?)");    	
+		$prep->bind_params("ss", $id, $value);
+		$prep->execute();
     }
   }
 
   function getValue($id) {
-    $this->dbInit();
-
-    $qId = addslashes($id);
+	$prep = $this->db->prepare("select value from regn_standard where id=?");
+	$prep->bind_params("s", $id);
+	
     $return_array = array();
 
-    $this->Database->array_query($query_array, "select value from regn_standard where id='$qId'");
+	$query_array = $prep->execute();
     if( count( $query_array ) >= 0 ) {
-      for( $i=0; $i < count ( query_array ); $i++ ) {
-	$return_array[$i] = $query_array[$i]["value"];
+      for( $i=0; $i < count ( $query_array ); $i++ ) {
+	     $return_array[$i] = $query_array[$i]["value"];
       }
     }
 
@@ -45,15 +50,6 @@ class eZAccountStandard {
       return $res[0];
     }
   }
-
-
-  function dbInit() {
-    if ( $this->IsConnected == false ) {
-      $this->Database = eZDB::globalDatabase();
-      $this->IsConnected = true;
-    }
-  }
-
 }
 
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 
 include_once( "../util/db.php" );
 include_once("../util/ezdate.php");
@@ -42,8 +42,8 @@ class eZAccountLine {
   }
 
   function readLineAndPosts($ids) {
-	$params = implode(",", array_fill(0, sizeof($ids), "?"));
 	
+	$params = implode(",", array_fill(0, sizeof($ids), "?"));
 	$prep = $this->db->prepare("select L.id, L.attachnmb, L.occured, L.postnmb, L.description, P.debet, P.post_type, P.amount, PT.description as postdesc FROM regn_line L, regn_post P, regn_post_type PT where L.id = P.line and L.id IN (".$params.") and PT.post_type = P.post_type order by L.id, P.debet");
 
 	$prep->bind_array_params($prep, str_repeat("i", sizeof($ids)), $ids);

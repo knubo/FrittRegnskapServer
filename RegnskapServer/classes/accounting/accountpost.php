@@ -1,17 +1,18 @@
-<?
-include_once( "classes/ezdb.php" );
+<?php
+include_once( "../util/DB.php" );
 
 
 class eZAccountPost {
-  var $Id;
-  var $Line;
-  var $Debet;
-  var $Post_type;
-  var $Amount;
-  var $Project;
-  var $Person;
+  private $Id;
+  private $Line;
+  private $Debet;
+  private $Post_type;
+  private $Amount;
+  private $Project;
+  private $Person;
 
-  function eZAccountPost($line =0, $debet=0, $post_type=0, $amount=0, $id = 0, $project = 0, $person = 0) {
+  function eZAccountPost($db, $line =0, $debet=0, $post_type=0, $amount=0, $id = 0, $project = 0, $person = 0) {
+    $this->db = $db;
     $this->Line = $line;
     $this->Debet = $debet;
     $this->Post_type = $post_type;
@@ -47,39 +48,26 @@ class eZAccountPost {
   }
   
   function store() {
-    $this->dbInit();
 
-    $line = addslashes($this->Line);
-    $debet = addslashes($this->Debet);
-    $post_type = addslashes($this->Post_type);
-    $amount = addslashes($this->Amount);
-    $person = addslashes($this->Person);
-    $project = addslashes($this->Project);
+	$prep = $this->db->prepare("insert into regn_post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?");
+	
+	$prep->bind_params("isiiii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
 
-    if(!$person) {
-      $person = 0;
-    }
-    if(!$project) {
-      $project = 0;
-    }
-
-    $this->Database->query("insert into regn_post set id=null, line=$line, debet='$debet',post_type=$post_type, amount=$amount, person=$person, project=$project");
+	$prep->execute();
   }
 
   function getRange($start, $stop) {
-    $this->dbInit();
+	$prep = $this->db->prepare("SELECT * FROM regn_post where line >= ? and line <= ?");
+	$prep->bind_params("ii", $start, $stop);
 
-    $this->Database->array_query( $group_array, "SELECT * FROM regn_post where line >= $start and line <= $stop" );
-
-    return $this->filled_result($group_array);    
+    return $this->filled_result($prep->execute());    
   }
 
   function getAll($parent) {
-    $this->dbInit();
-
-    $this->Database->array_query( $group_array, "SELECT * FROM regn_post where line=$parent" );
-    
-    return $this->filled_result($group_array);
+	$prep = $this->db->prepare("SELECT * FROM regn_post where line=?");
+	$prep->bind_params("i", $parent);
+	
+    return $this->filled_result($prep->execute());
   }
   
   function filled_result($group_array) {
@@ -87,8 +75,8 @@ class eZAccountPost {
 
     if( count( $group_array ) >= 0 ) {
       for( $i=0; $i < count ( $group_array ); $i++ ) {
-	$return_array[$i] = 
-	  new eZAccountPost($group_array[$i]["line"],
+	    $return_array[$i] = 
+	       new eZAccountPost($this->db, $group_array[$i]["line"],
 			    $group_array[$i]["debet"],
 			    $group_array[$i]["post_type"],
 			    $group_array[$i]["amount"],
@@ -102,23 +90,9 @@ class eZAccountPost {
   }
 
   function delete($lineId, $postId) {
-    $this->dbInit();
-
-    $l = addslashes($linedId);    
-    $p = addslashes($postId);    
-    
-    $this->Database->query("delete from regn_post where line=$lineId and id=$postId");
+	$prep = $this->db->prepare("delete from regn_post where line=? and id=?");
+	$prep->bind_params("ii", $lineId, $postId);
   }
-
-  function dbInit() {
-    if ( $this->IsConnected == false ) {
-      $this->Database = eZDB::globalDatabase();
-      $this->IsConnected = true;
-    }
-  }
-
-
-  
 }
 
 ?>

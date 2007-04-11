@@ -1,19 +1,19 @@
-<?
+<?php
 
-include_once( "classes/ezdb.php" );
+include_once( "../util/DB.php" );
+include_once( "../../conf/AppConfig.php" );
 
 class eZAccountPostType {
 
-  var $PostType;
-  var $CollPost;
-  var $Description;
-  var $DetailPost;
-  var $InUse;
-  var $AllEntries;
+  private $PostType;
+  private $CollPost;
+  private $Description;
+  private $DetailPost;
+  private $InUse;
+  private $AllEntries;
 
-  function eZAccountPostType($a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
-    $this->IsConnected = false;
-        
+  function eZAccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
+	$this->db = $db;        
     $this->PostType =& $a;
     $this->CollPost =& $b;
     $this->Description =& $c;
@@ -53,31 +53,30 @@ class eZAccountPostType {
   }
 
   function store() {
-    $this->dbInit();
+	$prep = $this->db->prepare("insert into regn_post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1)");
 
-    $safePostType = addslashes($this->PostType);
-    $safeCollPost = addslashes($this->CollPost);
-    $safeDescription = addslashes($this->Description);
-    $safeDetailPost = addslashes($this->DetailPost);
-    
-    $this->Database->query("insert into regn_post_type (post_type, coll_post, detail_post, description, in_use) values ($safePostType, $safeCollPost, $safeDetailPost, '$safeDescription', 1)");    
+	$prep->bind_params("iisi", $this->PostType, $this->CollPost, $this->Description,$this->DetailPost);
+	$prep->execute();
   }
 
   function getSome($ids, $from = 0 , $to = 0) {
-    $this->dbInit();
 
     $return_array = array();
 
     $where = 0;
-
+	$prep = 0;
+	
     if($from && $to) {
-      $where = "SELECT * FROM regn_post_type WHERE post_type >= $from and post_type <= $to order by post_type";
+ 	    $prep = $this->db->prepare("SELECT * FROM regn_post_type WHERE post_type >= ? and post_type <= ? order by post_type");
+	    $prep->bind_params("ii", $from, $to);
     } else {
-      $where = "SELECT * FROM regn_post_type where post_type IN (".
-	implode($ids,",").")";
+    	$params = implode(",", array_fill(0, sizeof($ids), "?"));
+        $prep = $this->db->prepare("SELECT * FROM regn_post_type where post_type IN ($params)");
+       
+		$prep->bind_array_params($prep, str_repeat("i", sizeof($ids)), $ids);
     }
 
-    $this->Database->array_query( $group_array, $where);
+	$group_array = $prep->execute();
 
     if( count( $group_array ) >= 0 ) {
 
@@ -86,12 +85,12 @@ class eZAccountPostType {
 	$pt = $group_array[$i]["post_type"];
 
 	$one =
-	  new eZAccountPostType($pt,
+	  new eZAccountPostType($this->db, $pt,
 				$group_array[$i]["coll_post"],
 				$group_array[$i]["description"],
 				$group_array[$i]["detail_post"]
 				);
-	$return_array[$i] = $one;
+		$return_array[$i] = $one;
       }
     }
 
@@ -99,16 +98,10 @@ class eZAccountPostType {
   }
 
   function getAllFordringer() {
-    $ini = new INIFIle( "site.ini" );
-    
-    $postIds = $ini->read_array("eZAccountMain", "FordringPosts");
-    
-    return $this->getSome($postIds);
+    return $this->getSome(AppConfig::FordingPosts);
   }
 
   function getAll($disableFilter = 0) {
-
-    $this->dbInit();
 
     $return_array = array();
 
@@ -121,25 +114,25 @@ class eZAccountPostType {
     } else {
       $q = "SELECT * FROM regn_post_type where in_use = 1 order by description";
     }
-
-    $this->Database->array_query( $group_array, $q);
+	$prep = $this->db->prepare($q);
+	$group_array = $prep->execute();
 
     if( count( $group_array ) >= 0 ) {
 
       for( $i=0; $i < count ( $group_array ); $i++ ) {
 
-	$pt = $group_array[$i]["post_type"];
+		$pt = $group_array[$i]["post_type"];
 
-	$one =
-	  new eZAccountPostType($pt,
+		$one =
+		  new eZAccountPostType($this->db, $pt,
 				$group_array[$i]["coll_post"],
 				$group_array[$i]["description"],
 				$group_array[$i]["detail_post"],
 				$group_array[$i]["in_use"]
 
 				);
-	$return_array[$i] = $one;
-	$this->AllEntries[$pt] = $one;
+		$return_array[$i] = $one;
+		$this->AllEntries[$pt] = $one;
       }
     }
 
@@ -152,49 +145,33 @@ class eZAccountPostType {
   }
 
   function getYearEndTransferPost() {
-    $ini = new INIFIle( "site.ini" );
-    
-    return $ini->read_var("eZAccountMain", "EndPostYearTransferPost");
+	return AppConfig::EndPostYearTransferPost;
   }
 
   function aktiver($posts) {
-    $this->dbInit();
-
-    $this->Database->query("update regn_post_type set in_use = 1 where post_type IN(".
-			   implode(",", $posts).")");
+  	
+    $params = implode(",", array_fill(0, sizeof($posts), "?"));
+    $prep = $this->db->prepare("update regn_post_type set in_use = 1 where post_type IN($params)");
+    $prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
+ 	$prep->execute();
     
   }
 
   function slett($posts) {
-    $this->dbInit();
-
-    $this->Database->query("update regn_post_type set in_use = 0 where post_type IN(".
-			   implode(",", $posts).")");
+    $params = implode(",", array_fill(0, sizeof($posts), "?"));
+    $prep = $this->db->prepare("update regn_post_type set in_use = 0 where post_type IN($params)");
+    $prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
+ 	$prep->execute();
     
   }
 
 
   function getEndTransferPost() {
-    $ini = new INIFIle( "site.ini" );
-    
-    return $ini->read_var("eZAccountMain", "EndPostTransferPost");
-
+	return AppConfig::EndPostTransferPost;
   }
 
   function getEndPosts() {
-    $ini = new INIFIle( "site.ini" );
-    
-    return $ini->read_array("eZAccountMain", "EndPosts");
+	return AppConfig::EndPosts;
   }
-
-  /*! Private function. Open the database for read and write. Gets
-    all the database information from site.ini.  */
-
-  function dbInit() {
-    if ( $this->IsConnected == false ) {
-      $this->Database = eZDB::globalDatabase();
-      $this->IsConnected = true;
-    }
-  }  
 }
 ?>

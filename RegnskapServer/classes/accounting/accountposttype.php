@@ -1,8 +1,6 @@
 <?php
-include_once ("../util/DB.php");
-include_once ("../../conf/AppConfig.php");
 
-class eZAccountPostType {
+class AccountPostType {
 
 	private $PostType;
 	private $CollPost;
@@ -11,7 +9,7 @@ class eZAccountPostType {
 	private $InUse;
 	private $AllEntries;
 
-	function eZAccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
+	function AccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
 		$this->db = $db;
 		$this->PostType = & $a;
 		$this->CollPost = & $b;
@@ -83,7 +81,7 @@ class eZAccountPostType {
 
 				$pt = $group_array[$i]["post_type"];
 
-				$one = new eZAccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"]);
+				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"]);
 				$return_array[$i] = $one;
 			}
 		}
@@ -92,7 +90,7 @@ class eZAccountPostType {
 	}
 
 	function getAllFordringer() {
-		return $this->getSome(AppConfig :: FordingPosts);
+		return $this->getSome(AppConfig :: FordingPosts());
 	}
 
 	function getAll($disableFilter = 0) {
@@ -117,7 +115,7 @@ class eZAccountPostType {
 
 				$pt = $group_array[$i]["post_type"];
 
-				$one = new eZAccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"]);
+				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"]);
 				$return_array[$i] = $one;
 				$this->AllEntries[$pt] = $one;
 			}
@@ -157,7 +155,7 @@ class eZAccountPostType {
 	}
 
 	function getEndPosts() {
-		return AppConfig :: EndPosts;
+		return AppConfig :: EndPosts();
 	}
 }
 ?>

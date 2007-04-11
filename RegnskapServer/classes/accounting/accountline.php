@@ -1,12 +1,6 @@
 <?php
 
-include_once( "../util/db.php" );
-include_once("../util/ezdate.php");
-include_once( "accountpost.php" );
-include_once( "accountstandard.php" );
-include_once( "accountposttype.php" );
-
-class eZAccountLine {
+class AccountLine {
   private $Id;
   private $Description;
   private $Attachment;
@@ -18,7 +12,7 @@ class eZAccountLine {
   private $Posts;
   private $PostsArray;
   
-  function eZAccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id=0, $occured = 0) {
+  function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id=0, $occured = 0) {
 	$this->db = $db;
     $this->Postnmb = $postnmb;
     $this->Attachment = $attachment;
@@ -28,9 +22,9 @@ class eZAccountLine {
       $this->Occured = $occured;
 
     } else if($day) {
-      $ezStandard = new eZAccountStandard($db);
-      $month = $ezStandard->getOneValue("STD_MONTH");
-      $year = $ezStandard->getOneValue("STD_YEAR");
+      $standard = new AccountStandard($db);
+      $month = $standard->getOneValue("STD_MONTH");
+      $year = $standard->getOneValue("STD_YEAR");
 
       $this->Occured =& new eZDate();
       $this->Occured->setDay($day);
@@ -142,9 +136,9 @@ class eZAccountLine {
   
   function store() {
 
-    $ezStandard = new eZAccountStandard($this->db);
-    $month = $ezStandard->getOneValue("STD_MONTH");
-    $year = $ezStandard->getOneValue("STD_YEAR");
+    $standard = new AccountStandard($this->db);
+    $month = $standard->getOneValue("STD_MONTH");
+    $year = $standard->getOneValue("STD_YEAR");
     
     $prep = $this->db->prepare("insert into regn_line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?");
     $prep->bind_params("iisiis", $this->Attachment, $this->Postnmb, $this->Description, $month, $year, $this->Occured->mySQLDate());
@@ -153,17 +147,17 @@ class eZAccountLine {
   }
 
   function addPostDebKred($line, $post_type, $amount) {
-    $post = new eZAccountPost($this->db, $line, "1", $post_type, $amount);
+    $post = new AccountPost($this->db, $line, "1", $post_type, $amount);
     $post->store();
 
-    $post = new eZAccountPost($this->db, $line, "-1", $post_type, $amount);
+    $post = new AccountPost($this->db, $line, "-1", $post_type, $amount);
     $post->store();
 
   }
 
   function addPostSingleAmount($line, $debet, $post_type, $amount, $project = 0, $person = 0) {
 
-    $post = new eZAccountPost($this->db, $line, $debet, $post_type, $amount, 0, $project, $person);
+    $post = new AccountPost($this->db, $line, $debet, $post_type, $amount, 0, $project, $person);
 
     $post->store();
 
@@ -180,8 +174,8 @@ class eZAccountLine {
   }
 
   function getMonthSimple($month) {
-    $ezStandard = new eZAccountStandard($this->db);
-    $year = $ezStandard->getOneValue("STD_YEAR");
+    $standard = new AccountStandard($this->db);
+    $year = $standard->getOneValue("STD_YEAR");
 
 	$prep = $this->db->prepare("select id, attachnmb, occured, description from regn_line where year = ? and month = ? order by postnmb");
 	$prep->bind_params("ii", $month, $year);
@@ -193,29 +187,28 @@ class eZAccountLine {
     foreach($line_query as $one) {
   	   $occured = new eZDate();
    	   $occured->setMySQLDate($one["occured"]);
-	   $res[] = new eZAccountLine($this->db, 0, $one["attachnmb"], $one["description"], 0, $one["id"], $occured);
+	   $res[] = new AccountLine($this->db, 0, $one["attachnmb"], $one["description"], 0, $one["id"], $occured);
     }
     return $res;
   }
 
 
-  /*! Returns all posts in a month. On the ezaccountlines that are
+  /*! Returns all posts in a month. On the accountlines that are
     returned, the posts are cached for better access */
   function getMonth($year, $month, $fromline = 0, $toline = 0) {
 
-    $yearQ = addslashes($year);
-    $monthQ = addslashes($month);
-    
-
     $query = 0;
-
+	$prep = 0;
+	
     if($fromline && $toline) {
-      $query = "select id, attachnmb, occured, postnmb, description from regn_line where month=$monthQ and year=$yearQ and id >= $fromline and id <= $toline order by postnmb";
+    	$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from regn_line where month=? and year=? and id >= ? and id <= ? order by postnmb");
+    	$prep->bind_params("iiii", $year, $month, $fromline, $toline);
     } else {
-      $query = "select id, attachnmb, occured, postnmb, description from regn_line where month=$monthQ and year=$yearQ order by postnmb";
+    	$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from regn_line where month=? and year=? order by postnmb");
+    	$prep->bind_params("ii", $month, $year);
     }
 
-    return $this->getLines($query);
+    return $this->getLines($prep->execute());
   }
 
   function getByKonto($year, $konto, $project, $person) {
@@ -252,33 +245,33 @@ class eZAccountLine {
   /*! Expects a query done on regn_line*/
   function getLines($line_query) {
 
-     $return_array = array();
+     $result_array = array();
      $sortedById = array();
 
      if( count( $line_query ) >= 0 ) {
       
-        $accAccountPostType = new eZAccountPostType($this->db);
+        $accAccountPostType = new AccountPostType($this->db);
 
         /* Init cache in accAccountPostType */
         $accAccountPostType->getAll(1);      
       
         $minId = 999999999;
         $maxId = 0;
-        for( $i=0; $i < count ( $line_query ); $i++ ) {
+        foreach($line_query as $line) {
 
-           $id = $line_query[$i]["id"];
+           $id = $line["id"];
 
 	       $occured = new eZDate();
-	       $occured->setMySQLDate($line_query[$i]["occured"]);
+	       $occured->setMySQLDate($line["occured"]);
 	       $day = $occured->day();
 
-	       $line =& new eZAccountLine($this->db, $line_query[$i]["postnmb"],
-				  $line_query[$i]["attachnmb"],
-				  $line_query[$i]["description"],
+	       $line =& new AccountLine($this->db, $line["postnmb"],
+				  $line["attachnmb"],
+				  $line["description"],
 				  0,
 				  $id,
 				  $occured);
- 	       $result_array[$i] =& $line;
+ 	       $result_array[] =& $line;
 	       $sortedById[$id] =& $line;
 	
 	      if($id < $minId) {
@@ -293,16 +286,16 @@ class eZAccountLine {
        * that most posts are registered linearly so we will not fetch
        * a lot of columns we do not need. And then we add the posts to
        * their respective lines */
-      $ezAccountPostAcc = new eZAccountPost($this->db);
+      $accountPostAcc = new AccountPost($this->db);
 
-      $allPosts = $ezAccountPostAcc->getRange($minId, $maxId);
+      $allPosts = $accountPostAcc->getRange($minId, $maxId);
 
       foreach($allPosts as $onePost) {
 	     $type = $onePost->getPost_type();
 
 	     $collectionPost = $accAccountPostType->getAccountPostType($type);
 
-	     if($sortedById[$onePost->getLine()]) {
+	     if(is_object($sortedById[$onePost->getLine()])) {
 	        $sortedById[$onePost->getLine()]->addCachedPost($collectionPost->getCollectionPost(), $onePost);
 	     }
       }
@@ -400,7 +393,7 @@ class eZAccountLine {
       return array();
     }
 
-    $accessor = new eZAccountPost($this->db, $this->Id);
+    $accessor = new AccountPost($this->db, $this->Id);
 
     return $accessor->getAll($this->Id);
   }
@@ -417,7 +410,7 @@ class eZAccountLine {
       $occ = new eZDate();
       $occ->setMySQLDate($one["occured"]);
       
-      $result[] = new eZAccountLine($this->db, $one["postnmb"],
+      $result[] = new AccountLine($this->db, $one["postnmb"],
 				    $one["attachnmb"],
 				    $one["description"],
 				    0,

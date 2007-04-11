@@ -1,11 +1,10 @@
 <?php
-include_once ("../util/DB.php");
 
-class eZAccountStandard {
+class AccountStandard {
 
 	private $db;
 
-	function eZAccountStandard($db) {
+	function AccountStandard($db) {
 		$this->db = $db;
 	}
 

@@ -1,12 +1,11 @@
-<?
-include_once ("../util/DB.php");
+<?php
 
-class eZAccountColumn {
+class AccountColumn {
 	private $Name;
 	private $Id;
 	private $DisplayOrder;
 
-	function eZAccountColumn($db, $name = 0, $id = 0) {
+	function AccountColumn($db, $name = 0, $id = 0) {
 		$this->db = $db;
 		$this->Name = $name;
 		$this->Id = $id;
@@ -46,7 +45,7 @@ class eZAccountColumn {
 
 		if (count($query_arr) >= 0) {
 			for ($i = 0; $i < count($query_arr); $i++) {
-				$return_array[$i] = new eZAccountColumn($this->db, $query_arr[$i]["name"], $query_arr[$i]["id"]);
+				$return_array[$i] = new AccountColumn($this->db, $query_arr[$i]["name"], $query_arr[$i]["id"]);
 			}
 		}
 

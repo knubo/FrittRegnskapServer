@@ -1,7 +1,6 @@
 <?php
-include_once ("../util/DB.php");
 
-class eZAccountPost {
+class AccountPost {
 	private $Id;
 	private $Line;
 	private $Debet;
@@ -10,7 +9,7 @@ class eZAccountPost {
 	private $Project;
 	private $Person;
 
-	function eZAccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0) {
+	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0) {
 		$this->db = $db;
 		$this->Line = $line;
 		$this->Debet = $debet;
@@ -74,7 +73,7 @@ class eZAccountPost {
 
 		if (count($group_array) >= 0) {
 			for ($i = 0; $i < count($group_array); $i++) {
-				$return_array[$i] = new eZAccountPost($this->db, $group_array[$i]["line"], $group_array[$i]["debet"], $group_array[$i]["post_type"], $group_array[$i]["amount"], $group_array[$i]["id"], $group_array[$i]["project"], $group_array[$i]["person"]);
+				$return_array[$i] = new AccountPost($this->db, $group_array[$i]["line"], $group_array[$i]["debet"], $group_array[$i]["post_type"], $group_array[$i]["amount"], $group_array[$i]["id"], $group_array[$i]["project"], $group_array[$i]["person"]);
 			}
 		}
 		return $return_array;

@@ -1,10 +1,11 @@
 <?php
-
 class AccountColumn {
-	private $Name;
-	private $Id;
-	private $DisplayOrder;
 
+	# Please don't access directly - required to do easy json encoding.
+	public $Id;
+	public $Name;
+	private $db;
+	
 	function AccountColumn($db, $name = 0, $id = 0) {
 		$this->db = $db;
 		$this->Name = $name;
@@ -44,8 +45,8 @@ class AccountColumn {
 		$query_arr = $prep->execute();
 
 		if (count($query_arr) >= 0) {
-			for ($i = 0; $i < count($query_arr); $i++) {
-				$return_array[$i] = new AccountColumn($this->db, $query_arr[$i]["name"], $query_arr[$i]["id"]);
+			foreach ($query_arr as $one) {
+				$return_array[]= new AccountColumn(0, $one["name"], $one["id"]);
 			}
 		}
 

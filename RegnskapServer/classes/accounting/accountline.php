@@ -1,16 +1,19 @@
 <?php
 
 class AccountLine {
-  private $Id;
-  private $Description;
-  private $Attachment;
-  private $Postnmb;
+  public $Id;
+  public $Description;
+  public $Attachment;
+  public $Postnmb;
   private $Occured;
   private $db;
 
   /*! Used in getMonth */
   private $Posts;
-  private $PostsArray;
+  public $PostsArray;
+  public $groupDebetMonth;
+  public $groupKredMonth;
+  public $date;
   
   function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id=0, $occured = 0) {
 	$this->db = $db;
@@ -20,6 +23,7 @@ class AccountLine {
 
     if($occured) {
       $this->Occured = $occured;
+      $this->date = $occured->displayAccount();
 
     } else if($day) {
       $standard = new AccountStandard($db);
@@ -195,7 +199,7 @@ class AccountLine {
 
   /*! Returns all posts in a month. On the accountlines that are
     returned, the posts are cached for better access */
-  function getMonth($year, $month, $fromline = 0, $toline = 0) {
+  function getMonth($year, $month, $fromline = 0, $toline = 0, $fillGrouped = 0) {
 
     $query = 0;
 	$prep = 0;
@@ -208,7 +212,46 @@ class AccountLine {
     	$prep->bind_params("ii", $month, $year);
     }
 
-    return $this->getLines($prep->execute());
+    $lines = $this->getLines($prep->execute());
+    
+    if($fillGrouped) {
+    	$this->fill_grouped($lines);
+    }
+    
+    return $lines;
+  }
+  /*!
+   * Removes the postArray data here as I don't want it when requesting overview data.
+   * Sums up the collection post data making it ready for wire.
+   */
+  function fill_grouped($lines) {
+  	  foreach($lines as $one) {
+  	  	 $one->PostsArray = null;
+	
+		 $one->groupDebetMonth = array();
+		 $one->groupKredMonth = array(); 	 
+  	  	 
+  	  	 foreach(array_keys($one->Posts) as $groupid) {
+  	  	 	 $posts = $one->Posts[$groupid];
+  	  	 	 
+  	  	 	 foreach($posts as $post) {
+  	  	 	 	if($post->getDebet() == "1") {
+ 					if(array_key_exists($groupid, $one->groupDebetMonth)) {
+  	  	 	 		   $one->groupDebetMonth[$groupid] += $post->getAmount();
+ 					} else {
+  	  	 	 		   $one->groupDebetMonth[$groupid] = $post->getAmount(); 						
+ 					}
+  	  	 	 	} else {
+  	  	 	 		if(array_key_exists($groupid, $one->groupKredMonth)) {
+  	  	 	 		   $one->groupKredMonth[$groupid] += $post->getAmount();  	  
+  	  	 	 		} else {
+  	  	 	 		   $one->groupKredMonth[$groupid] = $post->getAmount();  	    	  	 	 			
+  	  	 	 		} 	 		
+  	  	 	 	}
+  	  	 	 }
+  	  	 }
+  	  	 
+  	  }
   }
 
   function getByKonto($year, $konto, $project, $person) {
@@ -265,14 +308,14 @@ class AccountLine {
 	       $occured->setMySQLDate($line["occured"]);
 	       $day = $occured->day();
 
-	       $line =& new AccountLine($this->db, $line["postnmb"],
+	       $line = new AccountLine($this->db, $line["postnmb"],
 				  $line["attachnmb"],
 				  $line["description"],
 				  0,
 				  $id,
 				  $occured);
- 	       $result_array[] =& $line;
-	       $sortedById[$id] =& $line;
+ 	       $result_array[] = $line;
+	       $sortedById[$id] = $line;
 	
 	      if($id < $minId) {
 	         $minId = $id;
@@ -281,6 +324,7 @@ class AccountLine {
 	         $maxId = $id;
 	      }
       }
+      
 
       /* Then, fetch all posts based on min and max number. Assume
        * that most posts are registered linearly so we will not fetch
@@ -290,12 +334,11 @@ class AccountLine {
 
       $allPosts = $accountPostAcc->getRange($minId, $maxId);
 
+	
       foreach($allPosts as $onePost) {
 	     $type = $onePost->getPost_type();
-
 	     $collectionPost = $accAccountPostType->getAccountPostType($type);
-
-	     if(is_object($sortedById[$onePost->getLine()])) {
+	     if(array_key_exists($onePost->getLine(), $sortedById)) {
 	        $sortedById[$onePost->getLine()]->addCachedPost($collectionPost->getCollectionPost(), $onePost);
 	     }
       }
@@ -373,7 +416,7 @@ class AccountLine {
       $this->Posts = array();
       $this->PostsArray = array();
     }
-    if(!$this->Posts[$colposttype]) {
+    if(!array_key_exists($colposttype, $this->Posts)) {
       $this->Posts[$colposttype] = array();
     }
 
@@ -383,7 +426,6 @@ class AccountLine {
 
   /*! Returns all posts for a given account line. If first cached by
     getMonth, then the items are indexed by their collection post type. */
-
   function getAllPosts($onlycache = 0) {
     if($this->Posts) {
       return $this->Posts;

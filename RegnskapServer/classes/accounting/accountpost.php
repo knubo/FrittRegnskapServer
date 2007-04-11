@@ -1,13 +1,13 @@
 <?php
-
 class AccountPost {
-	private $Id;
-	private $Line;
-	private $Debet;
-	private $Post_type;
-	private $Amount;
-	private $Project;
-	private $Person;
+	public $Id;
+	public $Line;
+	public $Debet;
+	public $Post_type;
+	public $Amount;
+	public $Project;
+	public $Person;
+	private $db;
 
 	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0) {
 		$this->db = $db;
@@ -71,10 +71,8 @@ class AccountPost {
 	function filled_result($group_array) {
 		$return_array = array ();
 
-		if (count($group_array) >= 0) {
-			for ($i = 0; $i < count($group_array); $i++) {
-				$return_array[$i] = new AccountPost($this->db, $group_array[$i]["line"], $group_array[$i]["debet"], $group_array[$i]["post_type"], $group_array[$i]["amount"], $group_array[$i]["id"], $group_array[$i]["project"], $group_array[$i]["person"]);
-			}
+		foreach ($group_array as $one) {
+			$return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"]);
 		}
 		return $return_array;
 	}
@@ -82,6 +80,7 @@ class AccountPost {
 	function delete($lineId, $postId) {
 		$prep = $this->db->prepare("delete from regn_post where line=? and id=?");
 		$prep->bind_params("ii", $lineId, $postId);
+		$prep->execute();
 	}
 }
 ?>

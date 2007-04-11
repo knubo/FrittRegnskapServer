@@ -5,9 +5,18 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
+include_once ("../../classes/accounting/accountcolumn.php");
 
-$month = $_GET["month"]; 
-$year = $_GET["year"];
+if(array_key_exists("month", $_GET)) {
+   $month = $_GET["month"]; 
+} else {
+	$month = 0;
+}
+if(array_key_exists("year", $_GET)) { 
+   $year = $_GET["year"];
+} else {
+	$year = 0;
+}
 
 $db = new DB();
 
@@ -19,14 +28,15 @@ if (!$month) {
 
 $accLines = new AccountLine($db);
 
-$monthsLine = $accLines->getMonth($year, $month);
+$monthsLine = $accLines->getMonth($year, $month, 0,0, 1);
 
 $result = array (
 	"year" => $year,
 	"month" => $month,
-	"lines" => $monthsLine
+	"lines" => $monthsLine,
 );
 
 echo json_encode($result);
+
 ?>
 

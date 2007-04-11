@@ -557,5 +557,6 @@ class eZDate
     private $Year;
     private $Month;
     private $Day;
+    
 }
 ?>

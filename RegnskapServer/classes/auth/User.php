@@ -19,9 +19,9 @@ class User {
 
 		$toBind = $this->db->prepare("select pass from " . (AppConfig :: DB_PREFIX) . "user where username = ?");
 		
-		$toBind->bind_param("s", $username);
+		$toBind->bind_params("s", $username);
 		
-		$result = $this->db->execute($toBind);
+		$result = $toBind->execute($toBind);
 
 		if (!$result && !sizeof($result)) {
 			return User::AUTH_FAILED;

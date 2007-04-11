@@ -42,9 +42,9 @@ class RegnSession {
 	
 	   $prep = $this->db->prepare("SELECT DataValue FROM sessions WHERE SessionID=?");
        
-       $prep->bind_param("s", $aKey);
+       $prep->bind_params("s", $aKey);
        
-       $res = $this->db->execute($prep);
+       $res = $prep->execute($prep);
        
        if(sizeof($res) > 0) {
            return $res[0]['DataValue'];
@@ -52,9 +52,9 @@ class RegnSession {
 		   $prep = $this->db->prepare       	
              ("INSERT INTO sessions (SessionID, LastUpdated, DataValue)
                        VALUES (?, NOW(), '')");
-           $prep->bind_param("s", $aKey);
+           $prep->bind_params("s", $aKey);
            
-           $this->db->execute($prep);
+           $prep->execute($prep);
            return "";
        }
 	}
@@ -62,24 +62,24 @@ class RegnSession {
 	function sessao_write( $aKey, $aVal ) {
        $prep = $this->db->prepare       	
              ("UPDATE sessions SET DataValue = ?, LastUpdated = NOW() WHERE SessionID = ?");
-       $prep->bind_param("ss", $aVal, $aKey);
-       $this->db->execute($prep);
+       $prep->bind_params("ss", $aVal, $aKey);
+       $prep->execute($prep);
        return TRUE;
 	}
 
 	function sessao_destroy( $aKey ) {
        $prep = $this->db->prepare       	
              ("DELETE FROM sessions WHERE SessionID = ?");
-       $prep->bind_param("s", $aKey);
-       $this->db->execute($prep);
+       $prep->bind_params("s", $aKey);
+       $prep->execute($prep);
        return TRUE;
  	}
 
 	function sessao_gc( $aMaxLifeTime ) {
        $prep = $this->db->prepare       	
              ("DELETE FROM sessions WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(LastUpdated) > ?");
-       $prep->bind_param("i", $aMaxLifeTime);
-       $this->db->execute($prep);
+       $prep->bind_params("i", $aMaxLifeTime);
+       $prep->execute($prep);
        return TRUE;
 	}
 

@@ -60,6 +60,7 @@ class AccountLine {
       $this->Attachment = $one["attachnmb"];
       $this->Occured = new eZDate();
       $this->Occured->setMySQLDate($one["occured"]);
+      $this->date = $this->Occured->displayAccount();
       $this->Postnmb = $one["postnmb"];
       $this->Description = $one["description"];
     }

@@ -20,7 +20,7 @@ if(array_key_exists("year", $_GET)) {
 
 $db = new DB();
 
-if (!$month) {
+if (!$month || !$year) {
 	$standard = new AccountStandard($db);
 	$year = $standard->getOneValue("STD_YEAR");
 	$month = $standard->getOneValue("STD_MONTH");

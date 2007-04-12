@@ -44,7 +44,7 @@ class AccountLine {
 	$params = implode(",", array_fill(0, sizeof($ids), "?"));
 	$prep = $this->db->prepare("select L.id, L.attachnmb, L.occured, L.postnmb, L.description, P.debet, P.post_type, P.amount, PT.description as postdesc FROM regn_line L, regn_post P, regn_post_type PT where L.id = P.line and L.id IN (".$params.") and PT.post_type = P.post_type order by L.id, P.debet");
 
-	$prep->bind_array_params($prep, str_repeat("i", sizeof($ids)), $ids);
+	$prep->bind_array_params(str_repeat("i", sizeof($ids)), $ids);
 
 	return $prep->execute($prep);
   }
@@ -52,7 +52,7 @@ class AccountLine {
 
   function read($id) {
     $prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from regn_line where id = ?");
-	$prep->bind_params($prep, "i", $id);
+	$prep->bind_params("i", $id);
 	$line_query = $prep->execute($prep);
 
     foreach($line_query as $one) {
@@ -67,7 +67,7 @@ class AccountLine {
 
   function sumOneLinePosts($lineId, $debkred) {
 	$prep = $this->db->prepare("select sum(regn_post.amount) as s from regn_post where line=? and debet=?");
-	$prep->bind_params($prep, "is", $lineId, $debkred);
+	$prep->bind_params("is", $lineId, $debkred);
 	$result_lines = $prep->execute($prep);
 	
     if(count($result_lines) == 0) {
@@ -84,7 +84,7 @@ class AccountLine {
          "and regn_line.year=? ".
          "and regn_line.id = regn_post.line");
          
-    $prep->bind_params($prep, "isi", $posttype, $debkred, $year);
+    $prep->bind_params("isi", $posttype, $debkred, $year);
     $result_lines = $prep->execute($prep);
 
     if(count($result_lines) == 0) {
@@ -226,7 +226,6 @@ class AccountLine {
    */
   function fill_grouped($lines) {
   	  foreach($lines as $one) {
-  	  	 $one->PostsArray = null;
 	
 		 $one->groupDebetMonth = array();
 		 $one->groupKredMonth = array(); 	 
@@ -249,20 +248,8 @@ class AccountLine {
   	  	 	 		} 	 		
   	  	 	 	}
   	  	 	 }
-  	  	 	 
-  	  	 	 /* After this, we format the numbers to make them look nice in the client. */
-  	  		foreach(array_keys($one->groupDebetMonth) as $k) {
-  	  			$val = $one->groupDebetMonth[$k];
-  	  			
-  	  			$one->groupDebetMonth[$k] = number_format($val, 2);
-  	  		}
-
-  	  		foreach(array_keys($one->groupKredMonth) as $k) {
-  	  			$val = $one->groupKredMonth[$k];
-  	  			
-  	  			$one->groupKredMonth[$k] = number_format($val, 2);
-  	  		}
   	  	 }
+  	  	 $one->PostsArray = null;
   	  }
   }
 
@@ -422,6 +409,10 @@ class AccountLine {
   function getPosts() {
     return $this->PostsArray;
   }
+  
+  function fetchAllPosts() {
+  	$this->postArray = $this->getAllPosts();
+  }
 
   function addCachedPost($colposttype, $post) {
     if(!$this->Posts) {
@@ -473,7 +464,7 @@ class AccountLine {
     }
     return $result;
   }
-
+  
   function getId() {
     return $this->Id;
   }

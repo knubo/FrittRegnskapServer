@@ -6,12 +6,12 @@
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
 include_once ("../../classes/util/DB.php");
-include_once ("../../classes/accounting/accountcolumn.php");
+include_once ("../../classes/accounting/accountposttype.php");
  
 $db = new DB(); 
-$acCols = new AccountColumn($db);
+$acc = new AccountPostType($db);
 
-$columnList = $acCols->getAllColumns();
+$columnList = $acc->getAll();
 
 echo json_encode($columnList);
  

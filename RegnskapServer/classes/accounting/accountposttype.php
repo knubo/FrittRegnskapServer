@@ -2,13 +2,14 @@
 
 class AccountPostType {
 
-	private $PostType;
-	private $CollPost;
-	private $Description;
-	private $DetailPost;
-	private $InUse;
+	public $PostType;
+	public $CollPost;
+	public $Description;
+	public $DetailPost;
+	public $InUse;
 	private $AllEntries;
-
+	private $db;
+	
 	function AccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
 		$this->db = $db;
 		$this->PostType = & $a;

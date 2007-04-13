@@ -95,8 +95,12 @@ create table if not exists regn_project (
    description VARCHAR(100)
 );
 
-create table if not exists regn_people (
-   people INT(11) unsigned
+create table if not exists regn_person (
+   id INT(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   firstname varchar(50),
+   lastname varchar(50),
+   email varchar(50),
+   employee tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_post_type (

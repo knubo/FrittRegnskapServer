@@ -39,7 +39,7 @@ switch ($action) {
 		}
 		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
 		$insertAC->store();
-		echo json_encode($insertAC->getId());
+		echo $insertAC->getId();
 		break;
 
 	case "update" :

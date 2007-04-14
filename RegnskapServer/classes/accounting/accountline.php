@@ -130,6 +130,7 @@ class AccountLine {
   	$prep->bind_params("iissi", $this->Attachment, $this->Postnmb, $this->Occured->mySQLDate(), $this->Description,$this->Id);
 		  	
 	$prep->execute();
+	return $this->db->affected_rows();
   }
 
   function updateAttachment($id, $attachment) {

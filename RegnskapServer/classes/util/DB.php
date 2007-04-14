@@ -95,6 +95,9 @@ class DB {
 		$output .= "</div>\n";
 		return $output;
 	}
+	function affected_rows() {
+		return $this->link->affected_rows;
+	}
 }
 
 class PrepWrapper {
@@ -178,5 +181,8 @@ class PrepWrapper {
 		call_user_func_array('mysqli_stmt_bind_param', 
 		   array_merge(array ($this->Mysqli), $args));
 	}
+	
+	
+
 }
 ?>

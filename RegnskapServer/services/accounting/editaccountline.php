@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * Created on Apr 13, 2007
  * 
@@ -13,21 +12,21 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 
-$action = array_key_exists("action", $_GET) ? $_GET["action"] : "query";
-$line = array_key_exists("line", $_GET) ? $_GET["line"] : 1;
-$desc = array_key_exists("desc", $_GET) ? $_GET["desc"] : 1;
-$day = array_key_exists("day", $_GET) ? $_GET["day"] : 1;
-$year = array_key_exists("year", $_GET) ? $_GET["year"] : 1;
-$month = array_key_exists("month", $_GET) ? $_GET["month"] : 1;
-$attachment = array_key_exists("attachment", $_GET) ? $_GET["attachment"] : 1;
-$postnmb = array_key_exists("postnmb", $_GET) ? $_GET["postnmb"] : 1;
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "query";
+$line = array_key_exists("line", $_REQUEST) ? $_REQUEST["line"] : 1;
+$desc = array_key_exists("desc", $_REQUEST) ? $_REQUEST["desc"] : 0;
+$day = array_key_exists("day", $_REQUEST) ? $_REQUEST["day"] : 0;
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
+$month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 0;
+$attachment = array_key_exists("attachment", $_REQUEST) ? $_REQUEST["attachment"] : 0;
+$postnmb = array_key_exists("postnmb", $_REQUEST) ? $_REQUEST["postnmb"] : 0;
 
 $db = new DB();
 $accLine = new AccountLine($db);
 
-if($day && $month && $year) {
+if ($day && $month && $year) {
 	$occured = new eZDate($year, $month, $day);
-} 
+}
 switch ($action) {
 	case "query" :
 		$accLine->read($line);
@@ -35,14 +34,24 @@ switch ($action) {
 		echo json_encode($accLine);
 		break;
 	case "insert" :
-		$updateAcc = new AccountLine($db, $postnmb, $desc, $day, $line, $occured);
-		$accLine->store();
+		if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
+			die("Missing params for insert of accountline.");
+		}
+		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
+		$insertAC->store();
+		echo json_encode($insertAC->getId());
 		break;
 
 	case "update" :
-		$updateAcc = new AccountLine($db, $postnmb, $desc, $day, $line, $occured);
-		$accLine->update();
+		if (!$postnmb || !$day ||  !$desc || !$line || !$occured || !$attachment) {
+			die("Missing params for update of accountline.");
+		}
+		$updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
+		
+		echo $updateAcc->update();
 		break;
+	default:
+		die("Missing action");
 }
 ?>
 

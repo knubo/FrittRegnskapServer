@@ -52,6 +52,7 @@ class AccountPost {
 		$prep->bind_params("isiiii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
 
 		$prep->execute();
+	    $this->Id = $this->db->insert_id();
 	}
 
 	function getRange($start, $stop) {
@@ -81,6 +82,7 @@ class AccountPost {
 		$prep = $this->db->prepare("delete from regn_post where line=? and id=?");
 		$prep->bind_params("ii", $lineId, $postId);
 		$prep->execute();
+    	return $this->db->affected_rows();
 	}
 }
 ?>

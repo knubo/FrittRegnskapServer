@@ -232,9 +232,13 @@ class AccountLine {
 		 $one->groupDebetMonth = array();
 		 $one->groupKredMonth = array(); 	 
   	  	 
+  	  	 if(! ($one->Posts)) {
+  	  	 	$one->Posts = array();
+  	  	 }
+  	  	 
   	  	 foreach(array_keys($one->Posts) as $groupid) {
   	  	 	 $posts = $one->Posts[$groupid];
-  	  	 	 
+
   	  	 	 foreach($posts as $post) {
   	  	 	 	if($post->getDebet() == "1") {
  					if(array_key_exists($groupid, $one->groupDebetMonth)) {

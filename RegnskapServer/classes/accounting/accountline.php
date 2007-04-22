@@ -14,6 +14,7 @@ class AccountLine {
   public $groupDebetMonth;
   public $groupKredMonth;
   public $date;
+  public $sum;
   
   function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id=0, $occured = 0) {
 	$this->db = $db;
@@ -418,6 +419,16 @@ class AccountLine {
   
   function fetchAllPosts() {
   	$this->postArray = $this->getAllPosts();
+  	
+  	$sum = 0;
+  	foreach($this->postArray as $post) {
+  		if($post->getDebet() == 1) {
+  			$sum+= $post->getAmount();
+  		} else {
+  			$sum-= $post->getAmount();
+  		}
+  	}
+  	$this->sum = $sum;
   }
 
   function addCachedPost($colposttype, $post) {

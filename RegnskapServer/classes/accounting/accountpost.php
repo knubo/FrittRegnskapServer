@@ -49,7 +49,7 @@ class AccountPost {
 
 		$prep = $this->db->prepare("insert into regn_post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?");
 
-		$prep->bind_params("isiiii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
+		$prep->bind_params("isidii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
 
 		$prep->execute();
 	    $this->Id = $this->db->insert_id();
@@ -83,6 +83,32 @@ class AccountPost {
 		$prep->bind_params("ii", $lineId, $postId);
 		$prep->execute();
     	return $this->db->affected_rows();
+	}
+	
+	function sumForLine($lineId) {
+		$prep = $this->db->prepare("select sum(amount) as D from regn_post where line=? and debet='1'");
+		$prep->bind_params("d", $lineId);
+		$debet = $prep->execute();
+
+		$prep = $this->db->prepare("select sum(amount) as K from regn_post where line=? and debet='-1'");
+		$prep->bind_params("d", $lineId);
+		$prep->execute();
+		$kredit=$prep->execute();
+		
+		$result = 0;
+		
+		if(sizeof($debet)) {
+			foreach($debet as $one) {
+			    $result += $one["D"];
+			}
+		}
+		
+		if(sizeof($kredit)) {
+			foreach($kredit as $one) {
+			    $result -= $one["K"];
+			}
+		}
+		return $result;
 	}
 }
 ?>

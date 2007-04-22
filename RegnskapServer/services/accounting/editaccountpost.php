@@ -24,11 +24,21 @@ $accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $projec
 
 switch ($action) {
 	case "delete" :
-		echo $accPost->delete($line, $id);
+		$res = $accPost->delete($line, $id);
+		
+	 	if($res) {
+	 		echo $res.":".$accPost->sumForLine($line);
+	 	} else {
+	 		echo "0";
+	 	}
 		break;
 	case "insert" :
 		$accPost->store();
-		echo $accPost->getId();
+		if($accPost->getId()) {
+		   echo $accPost->getId().":".$accPost->sumForLine($line);
+		} else {
+			echo "0";
+		}
 		break;
 	default :
 		die("Missing action");

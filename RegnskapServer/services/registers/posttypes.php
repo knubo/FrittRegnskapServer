@@ -12,7 +12,6 @@ $db = new DB();
 $acc = new AccountPostType($db);
 
 $columnList = $acc->getAll();
-
 echo json_encode($columnList);
  
 ?>

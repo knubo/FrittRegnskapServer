@@ -502,7 +502,12 @@ class AccountLine {
 
   function getOccured() {
     return $this->Occured->displayAccount();
-  }  
+  }
+  
+  function listOfYearMonths() {
+  	$prep = $this->db->prepare("select year,month from regn_line group by year,month order by year,month;");
+	return $prep->execute();
+  }
 }
 
 ?>

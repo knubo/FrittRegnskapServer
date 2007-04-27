@@ -99,7 +99,13 @@ create table if not exists regn_person (
    id INT(11) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
    firstname varchar(50),
    lastname varchar(50),
-   email varchar(50),
+   email varchar(100),
+   address varchar(80),
+   postnmb varchar(4),
+   city varchar(20),
+   country varchar(2),
+   phone varchar(13),
+   cellphone varchar(13),
    employee tinyint
 );
 

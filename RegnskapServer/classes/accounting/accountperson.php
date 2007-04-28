@@ -2,10 +2,11 @@
 class AccountPerson {
 	public $Id;
 	public $FirstName;
-	public $LasttName;
+	public $LastName;
 	public $IsEmpoyee;
 	public $Address;
 	public $PostNmb;
+	public $City;
 	public $Phone;
 	public $Cellphone;
 	public $Email;
@@ -30,7 +31,9 @@ class AccountPerson {
 	function setAddress($address) {
 		$this->Address = $address;
 	}
-
+	function setCity($city) {
+		$this->City = $city;
+	}
 	function setPostnmb($postNmb) {
 		$this->PostNmb = $postNmb;
 	}
@@ -42,7 +45,7 @@ class AccountPerson {
 	function setCellphone($cellphone) {
 		$this->Cellphone = $cellphone;
 	}
-	
+
 	function setEmail($email) {
 		$this->Email = $email;
 	}
@@ -62,8 +65,14 @@ class AccountPerson {
 
 		return $res;
 	}
-	
+
 	function save() {
-		
+		if ($this->Id) {
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? where id=?");
+			$prep->bind_params("ssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee, $this->Id);
+		} else {
+
+		}
+
 	}
 }

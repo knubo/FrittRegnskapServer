@@ -1,4 +1,5 @@
 <?php
+include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");

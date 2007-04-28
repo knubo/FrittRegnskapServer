@@ -51,7 +51,7 @@ class AccountPostType {
 	}
 
 	function store() {
-		$prep = $this->db->prepare("insert into regn_post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1)");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1)");
 
 		$prep->bind_params("iisi", $this->PostType, $this->CollPost, $this->Description, $this->DetailPost);
 		$prep->execute();
@@ -65,11 +65,11 @@ class AccountPostType {
 		$prep = 0;
 
 		if ($from && $to) {
-			$prep = $this->db->prepare("SELECT * FROM regn_post_type WHERE post_type >= ? and post_type <= ? order by post_type");
+			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type WHERE post_type >= ? and post_type <= ? order by post_type");
 			$prep->bind_params("ii", $from, $to);
 		} else {
 			$params = implode(",", array_fill(0, sizeof($ids), "?"));
-			$prep = $this->db->prepare("SELECT * FROM regn_post_type where post_type IN ($params)");
+			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type where post_type IN ($params)");
 
 			$prep->bind_array_params($prep, str_repeat("i", sizeof($ids)), $ids);
 		}
@@ -103,9 +103,9 @@ class AccountPostType {
 		$q = 0;
 
 		if ($disableFilter) {
-			$q = "SELECT * FROM regn_post_type order by in_use DESC, post_type, description";
+			$q = "SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type order by in_use DESC, post_type, description";
 		} else {
-			$q = "SELECT * FROM regn_post_type where in_use = 1 order by description";
+			$q = "SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type where in_use = 1 order by description";
 		}
 		$prep = $this->db->prepare($q);
 		$group_array = $prep->execute();
@@ -137,7 +137,7 @@ class AccountPostType {
 	function aktiver($posts) {
 
 		$params = implode(",", array_fill(0, sizeof($posts), "?"));
-		$prep = $this->db->prepare("update regn_post_type set in_use = 1 where post_type IN($params)");
+		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = 1 where post_type IN($params)");
 		$prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
 		$prep->execute();
 
@@ -145,7 +145,7 @@ class AccountPostType {
 
 	function slett($posts) {
 		$params = implode(",", array_fill(0, sizeof($posts), "?"));
-		$prep = $this->db->prepare("update regn_post_type set in_use = 0 where post_type IN($params)");
+		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = 0 where post_type IN($params)");
 		$prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
 		$prep->execute();
 

@@ -10,23 +10,23 @@ class AccountStandard {
 
 	function setValue($id, $value) {
 
-		$prep = $this->db->prepare("select * from regn_standard where id=?");
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "standard where id=?");
 		$prep->bind_params("s", $id);
 		$query_array = $prep->execute();
 
 		if (count($query_array) > 0) {
-			$prep = $this->db->prepare("update regn_standard set value=? where id=?");
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "standard set value=? where id=?");
 			$prep->bind_params("ss", $value, $id);
 			$prep->execute();
 		} else {
-			$prep = $this->db->prepare("insert into regn_standard (id, value) values (?,?)");
+			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "standard (id, value) values (?,?)");
 			$prep->bind_params("ss", $id, $value);
 			$prep->execute();
 		}
 	}
 
 	function getValue($id) {
-		$prep = $this->db->prepare("select value from regn_standard where id=?");
+		$prep = $this->db->prepare("select value from " . AppConfig :: DB_PREFIX . "standard where id=?");
 		$prep->bind_params("s", $id);
 
 		$return_array = array ();

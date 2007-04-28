@@ -47,7 +47,7 @@ class AccountPost {
 
 	function store() {
 
-		$prep = $this->db->prepare("insert into regn_post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?");
 
 		$prep->bind_params("isidii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
 
@@ -56,14 +56,14 @@ class AccountPost {
 	}
 
 	function getRange($start, $stop) {
-		$prep = $this->db->prepare("SELECT * FROM regn_post where line >= ? and line <= ?");
+		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line >= ? and line <= ?");
 		$prep->bind_params("ii", $start, $stop);
 
 		return $this->filled_result($prep->execute());
 	}
 
 	function getAll($parent) {
-		$prep = $this->db->prepare("SELECT * FROM regn_post where line=?");
+		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line=?");
 		$prep->bind_params("i", $parent);
 
 		return $this->filled_result($prep->execute());
@@ -79,18 +79,18 @@ class AccountPost {
 	}
 
 	function delete($lineId, $postId) {
-		$prep = $this->db->prepare("delete from regn_post where line=? and id=?");
+		$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "post where line=? and id=?");
 		$prep->bind_params("ii", $lineId, $postId);
 		$prep->execute();
     	return $this->db->affected_rows();
 	}
 	
 	function sumForLine($lineId) {
-		$prep = $this->db->prepare("select sum(amount) as D from regn_post where line=? and debet='1'");
+		$prep = $this->db->prepare("select sum(amount) as D from " . AppConfig :: DB_PREFIX . "post where line=? and debet='1'");
 		$prep->bind_params("d", $lineId);
 		$debet = $prep->execute();
 
-		$prep = $this->db->prepare("select sum(amount) as K from regn_post where line=? and debet='-1'");
+		$prep = $this->db->prepare("select sum(amount) as K from " . AppConfig :: DB_PREFIX . "post where line=? and debet='-1'");
 		$prep->bind_params("d", $lineId);
 		$prep->execute();
 		$kredit=$prep->execute();

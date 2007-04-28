@@ -13,8 +13,8 @@
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
-include_once ("../../classes/util/DB.php");
 include_once ("../../conf/AppConfig.php");
+include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountproject.php");
 
 $db = new DB(); 

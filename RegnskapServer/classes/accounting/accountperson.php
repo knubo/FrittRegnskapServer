@@ -34,6 +34,10 @@ class AccountPerson {
 	function setCity($city) {
 		$this->City = $city;
 	}
+	
+	function setCountry($country) {
+		$this->Country = $country;
+	}
 	function setPostnmb($postNmb) {
 		$this->PostNmb = $postNmb;
 	}
@@ -58,6 +62,15 @@ class AccountPerson {
 		return $this->Id;
 	}
 
+	function getOne($id) {
+		$sql = "select * from " . AppConfig :: DB_PREFIX . "person where id = ?";
+		$prep = $this->db->prepare($sql);
+		$prep->bind_params("i", $id);
+		$res = $prep->execute();
+
+		return $res;
+	}
+
 	function getAll($isEmpoyee = 0) {
 		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
 		$prep = $this->db->prepare($sql);
@@ -67,12 +80,20 @@ class AccountPerson {
 	}
 
 	function save() {
-		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? where id=?");
-			$prep->bind_params("ssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee, $this->Id);
-		} else {
 
+		if ($this->Id) {
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? where id = ?");
+			$prep->bind_params("ssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee, $this->Id);
+			$prep->execute();
+			return $this->db->affected_rows();
 		}
+		
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? ");
+		$prep->bind_params("ssssssssss", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee);
+		$prep->execute();
+
+		$this->id = $this->db->insert_id();
+		return $this->id;
 
 	}
 }

@@ -7,18 +7,43 @@ class AccountPerson {
 	public $Address;
 	public $PostNmb;
 	public $Phone;
+	public $Cellphone;
 	public $Email;
 	private $db;
 
-	function AccountPerson($db, $id = 0, $firstname = 0, $lastname = 0, $isEmployee = 0, $address = 0, $postNmb = 0, $phone = 0, $email = 0) {
+	function AccountPerson($db) {
 		$this->db = $db;
+	}
+	function setId($id) {
 		$this->Id = $id;
+	}
+	function setFirstname($firstname) {
 		$this->FirstName = $firstname;
+	}
+	function setLastname($lastname) {
 		$this->LastName = $lastname;
-		$this->IsEmpoyee = $isEmployee;
+	}
+	function setIsEmployee($isEmpoyee) {
+		$this->IsEmpoyee = $isEmpoyee;
+	}
+
+	function setAddress($address) {
 		$this->Address = $address;
+	}
+
+	function setPostnmb($postNmb) {
 		$this->PostNmb = $postNmb;
+	}
+
+	function setPhone($phone) {
 		$this->Phone = $phone;
+	}
+
+	function setCellphone($cellphone) {
+		$this->Cellphone = $cellphone;
+	}
+	
+	function setEmail($email) {
 		$this->Email = $email;
 	}
 
@@ -31,10 +56,14 @@ class AccountPerson {
 	}
 
 	function getAll($isEmpoyee = 0) {
-		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "")." order by lastname, firstname";
+		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
 		$prep = $this->db->prepare($sql);
 		$res = $prep->execute();
 
 		return $res;
+	}
+	
+	function save() {
+		
 	}
 }

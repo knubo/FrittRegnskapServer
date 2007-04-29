@@ -33,10 +33,25 @@ switch ($action) {
 		$columnList = $accPers->getAll($onlyEmp);
 		echo json_encode($columnList);
 		break;
-	case "query" :
+	case "get" :
 		$accPers = new AccountPerson($db);
 		$columnList = $accPers->getOne($id);
 		echo json_encode($columnList);
+		break;
+	case "search" :
+		$accPers = new AccountPerson($db);
+		$accPers->setId($id);
+		$accPers->setFirstname($firstname);
+		$accPers->setLastname($lastname);
+		$accPers->setIsEmployee($employee);
+		$accPers->setAddress($address);
+		$accPers->setPostnmb($postnmb);
+		$accPers->setCity($city);
+		$accPers->setCountry($country);
+		$accPers->setPhone($phone);
+		$accPers->setEmail($email);
+		$accPers->setCellphone($cellphone);
+		echo json_encode($accPers->search());
 		break;
 	case "save" :
 		$accPers = new AccountPerson($db);

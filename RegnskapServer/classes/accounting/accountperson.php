@@ -34,7 +34,7 @@ class AccountPerson {
 	function setCity($city) {
 		$this->City = $city;
 	}
-	
+
 	function setCountry($country) {
 		$this->Country = $country;
 	}
@@ -87,13 +87,29 @@ class AccountPerson {
 			$prep->execute();
 			return $this->db->affected_rows();
 		}
-		
+
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? ");
 		$prep->bind_params("ssssssssss", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee);
 		$prep->execute();
 
 		$this->id = $this->db->insert_id();
 		return $this->id;
+	}
 
+	function search() {
+		$searchWrap = $this->db->search("select * from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
+
+		$searchWrap->addAndParam("s", "firstname", $this->FirstName);
+		$searchWrap->addAndParam("s", "lastname", $this->LastName);
+		$searchWrap->addAndParam("i", "employee", $this->IsEmpoyee);
+		$searchWrap->addAndParam("s", "address", $this->Address);
+		$searchWrap->addAndParam("s", "postnmb", $this->PostNmb);
+		$searchWrap->addAndParam("s", "city", $this->City);
+		$searchWrap->addAndParam("s", "country", $this->Country);
+		$searchWrap->addAndParam("s", "phone", $this->Phone);
+		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
+		$searchWrap->addAndParam("s", "email", $this->Email);
+		
+		return $searchWrap->execute();
 	}
 }

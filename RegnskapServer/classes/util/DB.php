@@ -45,6 +45,10 @@ class DB {
 		return new PrepWrapper($mysqli);
 	}
 
+	function search($prequery, $orderby = "") {
+		return new SearchWrapper($this, $prequery, $orderby);
+	}
+
 	function action($query) {
 		mysqli_query($this->link, $query);
 	}
@@ -181,8 +185,50 @@ class PrepWrapper {
 		call_user_func_array('mysqli_stmt_bind_param', 
 		   array_merge(array ($this->Mysqli), $args));
 	}
-	
-	
+}
 
+class SearchWrapper {
+	private $Db;
+	private $Prequery;	
+	private $Type;
+	private $Params;
+	
+	function SearchWrapper($db, $prequery, $orderby) {
+		$this->Db = $db;
+		$this->Prequery = $prequery;
+		$this->Params = array();
+		$this->Type = "";
+		$this->OrderBy = $orderby;
+	}
+		
+	function addAndParam($type, $name, $param, $allowNull = 0) {
+		if($param == "" && !$allowNull) {
+			return;
+		}
+		
+		$this->Type .=$type;
+		
+		if(sizeof($this->Params) > 0) {
+			$this->Query .=" and ";
+		}
+		
+		$this->Params[] = $param;
+		if($type == "s") {
+			$this->Query .="$name like ?";
+		} else {
+			$this->Query .="$name = ?";			
+		}
+	}
+	
+	function execute() {
+		if(sizeof($this->Params) == 0) {
+			$prep = $this->Db->prepare($this->Prequery. " ".$this->OrderBy);
+			return $prep->execute();			
+		}		
+		
+		$prep = $this->Db->prepare($this->Prequery." where ".$this->Query. " ".$this->OrderBy);
+		$prep->bind_array_params($this->Type, $this->Params);
+		return $prep->execute();
+	}
 }
 ?>

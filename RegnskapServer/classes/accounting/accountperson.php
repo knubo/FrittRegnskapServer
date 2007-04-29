@@ -68,7 +68,10 @@ class AccountPerson {
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
 
-		return $res;
+		foreach($res as $one) {
+			return $one;
+		}
+		return 0;
 	}
 
 	function getAll($isEmpoyee = 0) {

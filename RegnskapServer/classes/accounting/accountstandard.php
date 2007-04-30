@@ -1,5 +1,4 @@
 <?php
-
 class AccountStandard {
 
 	private $db;
@@ -18,10 +17,14 @@ class AccountStandard {
 			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "standard set value=? where id=?");
 			$prep->bind_params("ss", $value, $id);
 			$prep->execute();
+
+			return $this->db->affected_rows();
 		} else {
 			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "standard (id, value) values (?,?)");
 			$prep->bind_params("ss", $id, $value);
 			$prep->execute();
+
+			return $this->db->affected_rows();
 		}
 	}
 

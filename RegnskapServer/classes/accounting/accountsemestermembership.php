@@ -15,14 +15,14 @@ class AccountSemesterMembership {
 	}
 
 	function addCreditPost($line, $amount) {
-		
-		switch($this->Type) {
-			case "course":
-				$postType = AppConfig::CourseMembershipCreditPost;
+
+		switch ($this->Type) {
+			case "course" :
+				$postType = AppConfig :: CourseMembershipCreditPost;
 				break;
-			case "train":
-				$postType = AppConfig::TrainMembershipCreditPost;
-				break;			
+			case "train" :
+				$postType = AppConfig :: TrainMembershipCreditPost;
+				break;
 		}
 
 		$post = new AccountPost($line, "-1", $postType, $amount);
@@ -36,22 +36,22 @@ class AccountSemesterMembership {
 	}
 
 	function getAllMemberNames($semester) {
-		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . $this->Type."_membership C where C.memberid = P.id and semester=? order by lastname, firstname");
+		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . $this->Type . "_membership C where C.memberid = P.id and semester=? order by lastname, firstname");
 		$prep->bind_params("i", $semester);
 		$query_array = $prep->execute();
 
 		$result = array ();
 
 		foreach ($query_array as $one) {
-			$result[] = $one["FirstName"] . "," . $one["LastName"];
+			$result[] = array($one["firstname"] , $one["lastname"]);
 		}
 		return $result;
 
 	}
 
 	function getUserMemberships($user) {
-	
-		$prep = $this->db->prepare("select memberid, semester, regn_line from " . AppConfig :: DB_PREFIX . $this->Type."_membership where memberid = ? order by semester");
+
+		$prep = $this->db->prepare("select memberid, semester, regn_line from " . AppConfig :: DB_PREFIX . $this->Type . "_membership where memberid = ? order by semester");
 
 		$query_array = $prep->execute();
 
@@ -64,7 +64,15 @@ class AccountSemesterMembership {
 	}
 
 	function store() {
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . $this->Type."_membership set semester = ?, memberid=?, regn_line=?");
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . $this->Type . "_membership where semester = ? and memberid=?");
+		$prep->bind_params("ii", $this->Semester, $this->User);
+		$res = $prep->execute();
+
+		if (sizeof($res)) {
+			return;
+		}
+
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . $this->Type . "_membership set semester = ?, memberid=?, regn_line=?");
 
 		$prep->bind_params("iii", $this->Semester, $this->User, $this->Regn_line);
 

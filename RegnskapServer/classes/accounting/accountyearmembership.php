@@ -26,14 +26,17 @@ class AccountyearMembership {
 	}
 
 	function getAllMemberNames($year) {
-		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and year=? order by lastname, firstname");
+		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? order by P.lastname, P.firstname");
 		$prep->bind_params("i", $year);
 		$query_array = $prep->execute();
 
 		$result = array ();
 
 		foreach ($query_array as $one) {
-			$result[] = $one["FirstName"] . "," . $one["LastName"];
+			$result[] = array (
+				$one["lastname"],
+				$one["firstname"]
+			);
 		}
 		return $result;
 
@@ -54,9 +57,17 @@ class AccountyearMembership {
 	}
 
 	function store() {
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_membership where year = ? and memberid=?");
+		$prep->bind_params("ii", $this->Year, $this->User);
+		$res = $prep->execute();
+	
+		if(sizeof($res)) {
+			return;
+		}
+	
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_membership set year = ?, memberid=?, regn_line=?");
 
-		$prep->bind_params("iii", $this->year, $this->User, $this->Regn_line);
+		$prep->bind_params("iii", $this->Year, $this->User, $this->Regn_line);
 
 		$prep->execute();
 

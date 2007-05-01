@@ -26,7 +26,8 @@ class AccountyearMembership {
 	}
 
 	function getAllMemberNames($year) {
-		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? order by P.lastname, P.firstname");
+		/* Using group by here due to previous bug which added duplicate entries. */	
+		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
 		$prep->bind_params("i", $year);
 		$query_array = $prep->execute();
 
@@ -44,7 +45,7 @@ class AccountyearMembership {
 
 	function getUserMemberships($user) {
 
-		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? order by year");
+		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
 
 		$query_array = $prep->execute();
 

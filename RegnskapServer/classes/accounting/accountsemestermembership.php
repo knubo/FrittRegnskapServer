@@ -37,7 +37,7 @@ class AccountSemesterMembership {
 
 	function getAllMemberNames($semester) {
 		/* Using group by here due to previous bug which added duplicate entries. */
-		$prep = $this->db->prepare("select firstname, lastname from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . $this->Type . "_membership C where C.memberid = P.id and semester=? group by lastname, firstname order by lastname, firstname");
+		$prep = $this->db->prepare("select firstname, lastname, id from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . $this->Type . "_membership C where C.memberid = P.id and semester=? group by lastname, firstname,id order by lastname, firstname");
 		$prep->bind_params("i", $semester);
 		$query_array = $prep->execute();
 
@@ -46,7 +46,8 @@ class AccountSemesterMembership {
 		foreach ($query_array as $one) {
 			$result[] = array (
 				$one["firstname"],
-				$one["lastname"]
+				$one["lastname"],
+				$one["id"]
 			);
 		}
 		return $result;

@@ -16,7 +16,6 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountproject.php");
-
 $db = new DB(); 
 $accProj = new AccountProject($db);
 

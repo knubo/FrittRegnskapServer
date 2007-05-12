@@ -132,8 +132,9 @@ class PrepWrapper {
 
 		# convert it to a normal array just containing the field names
 		$fields = array ();
-		for ($i = 0; $i < $nof; $i++)
+		for ($i = 0; $i < $nof; $i++) {
 			$fields[$i] = $fieldMeta[$i]->name;
+		}
 
 		# The idea is to get an array with the result values just as in mysql_fetch_assoc();
 		# But we have to use call_user_func_array to pass the right number of args ($nof+1)
@@ -192,6 +193,9 @@ class SearchWrapper {
 	private $Prequery;	
 	private $Type;
 	private $Params;
+	private $Query;
+	private $OuterJoin;
+	private $SqlWhere;
 	
 	function SearchWrapper($db, $prequery, $orderby) {
 		$this->Db = $db;
@@ -199,8 +203,25 @@ class SearchWrapper {
 		$this->Params = array();
 		$this->Type = "";
 		$this->OrderBy = $orderby;
+		$this->OuterJoin = "";
+		$this->Query = "";
+		$this->SqlWhere = "";
 	}
-		
+	
+	function addOuterJoin($table, $condA, $condB) {
+		$this->OuterJoin .= " left join $table on $condA = $condB ";
+	}
+
+	function addAndSQL($type, $bind, $sql) {
+		if(sizeof($this->Params) > 0) {
+			$this->Query .=" and ";
+		}
+
+		$this->Type .=$type;
+		$this->Params[] = $bind;
+		$this->Query .= $sql;
+	}
+	
 	function addAndParam($type, $name, $param, $allowNull = 0) {
 		if($param == "" && !$allowNull) {
 			return;
@@ -222,11 +243,13 @@ class SearchWrapper {
 	
 	function execute() {
 		if(sizeof($this->Params) == 0) {
-			$prep = $this->Db->prepare($this->Prequery. " ".$this->OrderBy);
+			$sql = $this->Prequery. " ".$this->OuterJoin." ".$this->SqlWhere." ".$this->OrderBy;
+			$prep = $this->Db->prepare($sql);
 			return $prep->execute();			
 		}		
 		
-		$prep = $this->Db->prepare($this->Prequery." where ".$this->Query. " ".$this->OrderBy);
+		$sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
+		$prep = $this->Db->prepare($sql);
 		$prep->bind_array_params($this->Type, $this->Params);
 		return $prep->execute();
 	}

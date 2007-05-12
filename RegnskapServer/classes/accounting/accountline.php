@@ -21,7 +21,6 @@ class AccountLine {
     $this->Postnmb = $postnmb;
     $this->Attachment = $attachment;
     $this->Description = $description;
-
     if($occured) {
       $this->Occured = $occured;
       $this->date = $occured->displayAccount();

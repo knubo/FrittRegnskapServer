@@ -68,7 +68,7 @@ class AccountPerson {
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
 
-		foreach($res as $one) {
+		foreach ($res as $one) {
 			return $one;
 		}
 		return 0;
@@ -99,8 +99,19 @@ class AccountPerson {
 		return $this->id;
 	}
 
-	function search() {
-		$searchWrap = $this->db->search("select * from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
+	function search($incMemberInfo) {
+		$cols = "*";
+		if ($incMemberInfo) {
+			$accStandard = new AccountStandard($this->db);
+			$accSemester = new AccountSemester($this->db);
+			$active_semester = $accStandard->getOneValue("STD_SEMESTER");
+			$active_year = $accStandard->getOneValue("STD_YEAR");
+			$cols = "*, (select distinct 1 from regn_train_membership where memberid=id and semester=$active_semester) as train".
+			", (select distinct 1 from regn_course_membership where memberid=id and semester=$active_semester) as course".
+			", (select distinct 1 from regn_year_membership where memberid=id and year=$active_year) as year";
+		}
+
+		$searchWrap = $this->db->search("select $cols from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
 
 		$searchWrap->addAndParam("s", "firstname", $this->FirstName);
 		$searchWrap->addAndParam("s", "lastname", $this->LastName);
@@ -112,7 +123,8 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "phone", $this->Phone);
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
-		
+
 		return $searchWrap->execute();
 	}
+
 }

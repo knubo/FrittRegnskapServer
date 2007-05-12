@@ -10,8 +10,9 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountperson.php");
-
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
+include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/accounting/accountsemester.php");
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "search";
 $firstname = array_key_exists("firstname", $_REQUEST) ? $_REQUEST["firstname"] : "";
 $lastname = array_key_exists("lastname", $_REQUEST) ? $_REQUEST["lastname"] : "";
 $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
@@ -24,7 +25,8 @@ $cellphone = array_key_exists("cellphone", $_REQUEST) ? $_REQUEST["cellphone"] :
 $employee = array_key_exists("employee", $_REQUEST) ? $_REQUEST["employee"] : "";
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "";
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? $_REQUEST["onlyemp"] : "";
-
+$queryMembership = array_key_exists("getmemb", $_REQUEST) ? $_REQUEST["getmemb"] :1;
+ 
 $db = new DB();
 
 switch ($action) {
@@ -51,7 +53,7 @@ switch ($action) {
 		$accPers->setPhone($phone);
 		$accPers->setEmail($email);
 		$accPers->setCellphone($cellphone);
-		echo json_encode($accPers->search());
+		echo json_encode($accPers->search($queryMembership));
 		break;
 	case "save" :
 		$accPers = new AccountPerson($db);

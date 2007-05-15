@@ -18,7 +18,6 @@ if(array_key_exists("year", $_GET)) {
 } else {
 	$year = 0;
 }
-
 $db = new DB();
 
 if (!$month || !$year) {

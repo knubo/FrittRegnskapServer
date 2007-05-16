@@ -23,7 +23,7 @@ class Memberships {
 		return substr($string, 0, strlen($match)) == $match;
 	}
 
-	function find($perMemberid, $id) {
+	function find(&$perMemberid, $id) {
 		if (!array_key_exists($id, $perMemberid)) {
 			$perMemberid[$id] = new Memberships();
 			$perMemberid[$id]->Memberid = $id;

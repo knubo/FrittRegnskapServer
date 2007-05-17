@@ -15,14 +15,14 @@ class AccountyearMembership {
 	function addCreditPost($line, $amount) {
 
 		$postType = AppConfig :: YearMembershipCreditPost;
-		$post = new AccountPost($line, "-1", $postType, $amount);
-		$post->store();
+		$post = new AccountPost($this->db, $line, "-1", $postType, $amount);
+		return $post->store();
 
 	}
 
 	function addDebetPost($line, $postType, $amount) {
-		$post = new AccountPost($line, "1", $postType, $amount);
-		$post->store();
+		$post = new AccountPost($this->db, $line, "1", $postType, $amount);
+		return $post->store();
 	}
 
 	function getAllMemberNames($year) {

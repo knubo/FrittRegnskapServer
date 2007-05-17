@@ -25,14 +25,14 @@ class AccountSemesterMembership {
 				break;
 		}
 
-		$post = new AccountPost($line, "-1", $postType, $amount);
-		$post->store();
+		$post = new AccountPost($this->db, $line, "-1", $postType, $amount);
+		return $post->store();
 
 	}
 
 	function addDebetPost($line, $postType, $amount) {
-		$post = new AccountPost($line, "1", $postType, $amount);
-		$post->store();
+		$post = new AccountPost($this->db, $line, "1", $postType, $amount);
+		return $post->store();
 	}
 
 	function getAllMemberNames($semester) {
@@ -77,14 +77,22 @@ class AccountSemesterMembership {
 			return;
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . $this->Type . "_membership set semester = ?, memberid=?, regn_line=?");
+		$sql = "insert into " . AppConfig :: DB_PREFIX . $this->Type . "_membership set semester = ?, memberid=?, regn_line=?";
+		$prep = $this->db->prepare($sql);
 
 		$prep->bind_params("iii", $this->Semester, $this->User, $this->Regn_line);
 
 		$prep->execute();
-
+		
 		return $this->db->affected_rows();
 	}
 
+	function course() {
+		return "course";
+	}
+	
+	function train() {
+		return "train";
+	}
 }
 ?>

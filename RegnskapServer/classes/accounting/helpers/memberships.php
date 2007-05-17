@@ -14,7 +14,7 @@ class Memberships {
 	private $Day;
 	private $Memberid;
 	private $Post;
-
+	
 	function starts_with($string, $match) {
 		if (strlen($string) < strlen($match)) {
 			return false;
@@ -59,6 +59,63 @@ class Memberships {
 		return array_values($perMemberId);
 	}
 
+	function store($db, $objects) {
+		$standard = new AccountStandard($db);
+      	$active_month = $standard->getOneValue("STD_MONTH");
+      	$active_year = $standard->getOneValue("STD_YEAR");
+      	$active_semester = $standard->getOneValue("STD_SEMESTER");
+		$memberPrice = $standard->getOneValue("STD_MEMBERSHIP_PRICE");
+		$coursePrice = $standard->getOneValue("STD_COURSE_PRICE");
+		$trainPrice = $standard->getOneValue("STD_TRAIN_PRICE");
+		
+		foreach($objects as $one) {
+			
+			$line = 0;
+			if($one->day()) {
+				$user = new AccountPerson($db);
+				$user->load($one->memberid());
+				
+				if(!$user) {
+					throw new Exception("Failed to load user ".$one->memberid());
+				}
+				
+				$line = new AccountLine($db);
+				$line->setNewLatest("M: ".$user->name(), $one->day(), $active_year, $active_month);
+				$line->store();
+			}
+			
+			$lineId = $line ? $line->getId() : 0;
+      
+	     	/* Register the memberships... */
+	     	if($one->year()) {
+	 		  $yearM = new AccountYearMembership($db, $one->memberid(), $active_year, $lineId);
+			  $yearM->store();
+			  if($lineId) {
+			  	  $yearM->addCreditPost($lineId, $memberPrice);
+		  		  $yearM->addDebetPost($lineId, $one->post(), $memberPrice);
+			  }
+		  	}
+		  	
+		  	if($one->train()) {
+				$trainM = new AccountSemesterMembership($db, AccountSemesterMembership::train(), $one->memberid(), $active_semester, $lineId);
+				$trainM->store();
+				if($lineId) {
+			  		$trainM->addCreditPost($lineId, $trainPrice);
+		  			$trainM->addDebetPost($lineId, $one->post(), $trainPrice);
+				}
+	      	}
+			if($one->course()) {
+				$courseM = new AccountSemesterMembership($db, AccountSemesterMembership::course(), $one->memberid(), $active_semester, $lineId);
+				$courseM->store();
+				if($lineId) {
+			  		$courseM->addCreditPost($lineId, $coursePrice);
+		  			$courseM->addDebetPost($lineId, $one->post(), $coursePrice);
+				}
+			}
+		}
+		return 1;
+	}
+
 
 	function year() {
 		return $this->Year;
@@ -82,6 +139,6 @@ class Memberships {
 	function post() {
 		return $this->Post;
 	}
-
+	
 }
 ?>

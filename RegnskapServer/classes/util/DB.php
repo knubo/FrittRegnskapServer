@@ -13,6 +13,18 @@ class DB {
 		return $this->link;
 	}
 
+	function begin() {
+		$this->link->autocommit(FALSE);
+	}
+	
+	function rollbackc() {
+		$this->link->rollback();
+	}
+	
+	function commit() {
+		$this->link->commit();		
+	}
+	
 	function __construct() {
 		$this->link = mysqli_connect("127.0.0.1", "root", "", "knubo");
 		if (mysqli_connect_errno()) {

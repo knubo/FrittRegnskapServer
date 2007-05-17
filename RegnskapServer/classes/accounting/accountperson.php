@@ -73,6 +73,25 @@ class AccountPerson {
 		}
 		return 0;
 	}
+	
+	function load($id) {
+		$fields = $this->getOne($id);
+		
+		if(!$fields) {
+			return;
+		}
+		
+		$this->setIsEmployee($fields["employee"]);
+		$this->setFirstname($fields["firstname"]);
+		$this->setLastname($fields["lastname"]);
+		$this->setEmail($fields["email"]);
+		$this->setPostnmb($fields["postnmb"]);
+		$this->setCity($fields["city"]);
+		$this->setCountry($fields["country"]);
+		$this->setPhone($fields["phone"]);
+		$this->setCellphone($fields["cellphone"]);
+	}	
+
 
 	function getAll($isEmpoyee = 0) {
 		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";

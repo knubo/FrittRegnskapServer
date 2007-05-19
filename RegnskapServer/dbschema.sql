@@ -3,6 +3,15 @@ username varchar(25),
 sessionval varchar(255)
 );
 
+create table if not exists regn_happening(
+  id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  description varchar(40),
+  linedesc varchar(80),
+  debetpost INT(5) UNSIGNED,
+  kredpost INT(5) UNSIGNED,
+  count_req tinyint
+);
+
 create table if not exists regn_user(
   username varchar(25),
   pass varchar(15)
@@ -31,13 +40,6 @@ CREATE TABLE IF NOT EXISTS regn_grouping (
 CREATE TABLE IF NOT EXISTS regn_fordring (
   regn_line INT(8) UNSIGNED,
   debet ENUM('-1', '1')
-);
-
-
-CREATE TABLE IF NOT EXISTS regn_happening (
-   name VARCHAR(50) PRIMARY KEY,
-   creditPost INTEGER(8),
-   debetPost INTEGER(8)
 );
 
 

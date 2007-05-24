@@ -5,6 +5,11 @@
  */
 include_once ("../../conf/AppConfig.php");
 
-echo json_encode(AppConfig::CountValues());
+$ret = array();
+
+$ret["values"] = AppConfig::CountValues();
+$ret["columns"] = AppConfig::CountColumns();
+
+echo json_encode($ret);
 
 ?>

@@ -491,8 +491,17 @@ class AccountLine {
   function getAttachment() {
     return $this->Attachment;
   }
+  
+  function setAttachment($a) {
+  	 $this->Attachment = $a;
+  }
+  
   function getPostnmb() {
     return $this->Postnmb;
+  }
+  
+  function setPostnmb($p) {
+  	$this->Postnmb = $p;
   }
   
   function getDay() {

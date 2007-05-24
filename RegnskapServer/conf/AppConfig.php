@@ -13,15 +13,6 @@ function CountColumns() {
   return array('a1000','a500','a200','a100','a50','a20','a10','a5','a1','a_5'); 
 }
 	
-#Posts possible to register a count.
-function CountPosts() {
-	return array(9010,9020);	
-}
-
-#Posts possible to move between in move/count sheme.
-function MovePosts() {
-	return array(1904,1905);
-}
 #Fordring posts
 function FordringPosts() {
 	return array(1370,1380,1390,1500,1570);

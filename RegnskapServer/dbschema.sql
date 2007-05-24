@@ -3,7 +3,7 @@ username varchar(25),
 sessionval varchar(255)
 );
 
-create table if not exists regn_happening(
+create table if not exists regn_happeningv2(
   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   description varchar(40),
   linedesc varchar(80),

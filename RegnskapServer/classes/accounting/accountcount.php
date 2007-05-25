@@ -17,7 +17,7 @@ class AccountCount {
 	# Postcols must be column->value
 	function save($lineId, $postCols) {
 		$values = array();
-		$sql = "insert into regn_count set regn_line=?";
+		$sql = "insert into " . AppConfig :: DB_PREFIX . "telling set regn_line=?";
 		$params = "i";
 		$values[] = $lineId;
 
@@ -33,9 +33,13 @@ class AccountCount {
 	}
 
 	function load($lineid) {
-		$prep = $db->prepare("select * from regn_count where regn_line=?");
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "telling where regn_line=?");
 		$prep->bind_params("i", $lineid);
-		return $prep->execute();
+		$data = $prep->execute();
+		
+		foreach($data as $one) {
+			return $one;
+		}
 	}
 
 	function getId() {

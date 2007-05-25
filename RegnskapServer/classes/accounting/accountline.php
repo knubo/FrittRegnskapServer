@@ -343,7 +343,7 @@ class AccountLine {
       foreach($allPosts as $onePost) {
 	     $type = $onePost->getPost_type();
 	     $collectionPost = $accAccountPostType->getAccountPostType($type);
-	     if(array_key_exists($onePost->getLine(), $sortedById)) {
+	     if($collectionPost && array_key_exists($onePost->getLine(), $sortedById)) {
 	        $sortedById[$onePost->getLine()]->addCachedPost($collectionPost->getCollectionPost(), $onePost);
 	     }
       }

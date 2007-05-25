@@ -21,9 +21,13 @@ class AccountHappening {
 
 	function load($id) {
 		$prep = $this->db->prepare("select debetpost,kredpost from " . AppConfig :: DB_PREFIX . "happeningv2 where id = ?");
-		$prep->bind_params("i", $this->Id);
-		return $prep->execute();
+		$prep->bind_params("i", $id);
+		$res =  $prep->execute();
 		
+		foreach($res as $one) {
+			$this->debetpost = $one["debetpost"];
+			$this->kredpost = $one["kredpost"];
+		}
 	}
 
 	function getAll() {
@@ -49,7 +53,7 @@ class AccountHappening {
 	function getDebetpost() {
 		return $this->debetpost;
 	}
-	function getKredpost() {
+	function getKreditpost() {
 		return $this->kredpost;
 	}	
 	function setCount_req($kontreq) {

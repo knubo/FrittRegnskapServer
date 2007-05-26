@@ -127,7 +127,10 @@ class AccountPostType {
 
 	/*! Call this only after you have fethced all posttypes */
 	function getAccountPostType($id) {
-		return $this->AllEntries[$id];
+		if(array_key_exists($id, $this->AllEntries)) {		
+			return $this->AllEntries[$id];
+		}
+		return 0;
 	}
 
 	function getYearEndTransferPost() {

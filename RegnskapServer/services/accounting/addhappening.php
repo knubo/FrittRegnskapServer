@@ -5,6 +5,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/accounting/accountcount.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accounthappening.php");
@@ -22,7 +23,7 @@ include_once ("../../classes/accounting/accountstandard.php");
  $postcols = array();
  
  foreach(AppConfig::CountColumns() as $one) {
- 	if(array_key_exists($one, $postcols)) {
+ 	if(array_key_exists($one, $_REQUEST)) {
  		$postcols[$one] = $_REQUEST[$one];
  	}
  }

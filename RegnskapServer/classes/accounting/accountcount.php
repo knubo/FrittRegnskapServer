@@ -26,10 +26,10 @@ class AccountCount {
 			$values[] = $postCols[$one];
 			$params.="i";
 		}
-		$prep = $db->prepare($sql);
+		$prep = $this->db->prepare($sql);
 		$prep->bind_array_params($params, $values);
 		$prep->execute();
-		$this->Id = $db->insert_id();	
+		$this->Id = $this->db->insert_id();	
 	}
 
 	function load($lineid) {

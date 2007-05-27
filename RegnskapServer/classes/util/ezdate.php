@@ -547,7 +547,7 @@ class eZDate
         if($m < 10) {
 	      $m = "0$m";
         }
-        return "$d.$m ".$this->Year;
+        return "$d.$m.".$this->Year;
     }
     
     function display() {

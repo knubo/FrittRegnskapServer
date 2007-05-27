@@ -421,6 +421,10 @@ class AccountLine {
   	
   	$sum = 0;
   	foreach($this->postArray as $post) {
+		if(!is_object($post)) {
+			echo "Strange: $post";
+			continue;
+		}  		
   		if($post->getDebet() == 1) {
   			$sum+= $post->getAmount();
   		} else {
@@ -446,8 +450,8 @@ class AccountLine {
   /*! Returns all posts for a given account line. If first cached by
     getMonth, then the items are indexed by their collection post type. */
   function getAllPosts($onlycache = 0) {
-    if($this->Posts) {
-      return $this->Posts;
+    if($this->PostsArray) {
+      return $this->PostsArray;
     }
 
     if($onlycache) {

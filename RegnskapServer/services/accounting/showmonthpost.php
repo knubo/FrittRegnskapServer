@@ -1,4 +1,5 @@
 <?php
+
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
@@ -13,7 +14,7 @@ $year = array_key_exists("year", $_REQUEST) ? $_GET["year"] : 0;
 
 $db = new DB();
 
-if (!$month || !$year) {
+if (!$month || !$year) { 
 	$standard = new AccountStandard($db);
 	$year = $standard->getOneValue("STD_YEAR");
 	$month = $standard->getOneValue("STD_MONTH");
@@ -23,13 +24,10 @@ $accLines = new AccountLine($db);
 
 $monthsLine = $accLines->getMonth($year, $month, 0, 0, 1);
 
-$result = array (
-	"year" => $year,
-	"month" => $month,
-	"lines" => $monthsLine,
-	
-);
+foreach($monthsLine as $one) {
+	$one->fetchAllPosts();
+}
 
-echo json_encode($result);
+echo json_encode($monthsLine);
+
 ?>
-

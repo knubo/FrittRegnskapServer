@@ -10,6 +10,14 @@ class AccountProject {
 		$this->Description = $description;
 	}
 
+	function setProject($p) {
+		$this->Project = $p;
+	}
+	
+	function setDescription($d) {
+		$this->Description = $d;
+	}
+	
 	function description() {
 		return $this->Description;
 	}
@@ -31,10 +39,11 @@ class AccountProject {
 	}
 
 	function save() {
-		if ($this->project) {
-			$prep = $this->db->prepare("insert from " . AppConfig :: DB_PREFIX . "project (description) values (?)");
+		if (!$this->Project) {
+			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "project (description) values (?)");
 			$prep->bind_params("s", $this->Description);
 			$prep->execute();
+			$this->Project = $this->db->insert_id();
 		} else {
 			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "project set description = ? where project = ?");
 			$prep->bind_params("si", $this->Description, $this->Project);

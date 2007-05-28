@@ -8,7 +8,9 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountposttype.php");
- 
+
+
+
 $db = new DB(); 
 $acc = new AccountPostType($db);
 

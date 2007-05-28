@@ -554,9 +554,18 @@ class eZDate
 	   return $this->Day."/".$this->Month."-".$this->Year;
     }
 
+	function monthNameNor($month) {
+		$months = array("","januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember");
+		
+		return $months[$month];
+	}
+
     private $Year;
     private $Month;
     private $Day;
-    
+
+
 }
+
+
 ?>

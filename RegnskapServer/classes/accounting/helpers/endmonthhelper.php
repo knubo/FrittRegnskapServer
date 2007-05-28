@@ -7,6 +7,7 @@
 
 class EndMonthHelper {
 	private $db;
+    private $endPosts;
 
 	function EndMonthHelper($db) {
 		$this->db = $db;
@@ -45,8 +46,12 @@ class EndMonthHelper {
 		$acStandard = new AccountStandard($this->db);
 		$active_month = $acStandard->getOneValue("STD_MONTH");
 		$active_year = $acStandard->getOneValue("STD_YEAR");
-		$acAccountLine = new AccountLine($this->db);
 		$endTransferPost = AccountPostType :: getEndTransferPost();
+
+        $acPostType = new AccountPostType($this->db);
+        $endPostIds = AccountPostType :: getEndPosts();
+        $this->endPosts = $acPostType->getSomeIndexedById($endPostIds);
+
 
 		$lastDay = new eZDate();
 		$lastDay->setDay(1);
@@ -71,13 +76,14 @@ class EndMonthHelper {
 			$this->transferPost($active_month, ($active_month +1), $active_year, $post, $amount, 1, $endTransferPost, -1);
 		}
 
-		$ezStandard->setValue("STD_MONTH", ($active_month +1));
+		$acStandard->setValue("STD_MONTH", ($active_month +1));
 
 	}
 
 	function transferPost($transfer_month, $active_month, $active_year, $post, $amount, $dayInMonth, $endTransferPost, $revFactor) {
-		$acAccountLine->setNewLatest("Overf¿ring " . $endPosts[$post]->getDescription() . " " . eZDate :: monthNameNor($transfer_month), $dayInMonth, $active_year, $active_month);
-		$acAccountLine->store();
+	    $acAccountLine = new AccountLine($this->db);
+		$acAccountLine->setNewLatest("Overf&oslash;ring " . $this->endPosts[$post]->getDescription() . " " . eZDate :: monthNameNor($transfer_month), $dayInMonth, $active_year, $active_month);
+		$acAccountLine->store($active_month, $active_year);
 
 		if ($amount > 0) {
 			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (1 * $revFactor), $endTransferPost, $amount);

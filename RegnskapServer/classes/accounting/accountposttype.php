@@ -68,15 +68,15 @@ class AccountPostType {
 			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type WHERE post_type >= ? and post_type <= ? order by post_type");
 			$prep->bind_params("ii", $from, $to);
 		} else {
-			$params = implode(",", array_fill(0, sizeof($ids), "?"));
+			$params = implode(",", array_fill(0, count($ids), "?"));
 			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type where post_type IN ($params)");
 
-			$prep->bind_array_params($prep, str_repeat("i", sizeof($ids)), $ids);
+			$prep->bind_array_params(str_repeat("i", count($ids)), $ids);
 		}
 
 		$group_array = $prep->execute();
 
-		if (count($group_array) >= 0) {
+		if (count($group_array) > 0) {
 
 			for ($i = 0; $i < count($group_array); $i++) {
 

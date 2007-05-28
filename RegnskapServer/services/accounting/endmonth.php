@@ -21,6 +21,12 @@ $db = new DB();
 $endHelper = new EndMonthHelper($db);
 
 switch ($action) {
+	case "test":
+        $acPostType = new AccountPostType($db);
+        $endPostIds = AccountPostType :: getEndPosts();
+        $endPosts = $acPostType->getSomeIndexedById($endPostIds);
+        echo json_encode($endPosts);
+        break;
 	case "status" :
         $acStandard = new AccountStandard($db);
 

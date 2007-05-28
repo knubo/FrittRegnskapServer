@@ -140,11 +140,16 @@ class AccountLine {
 	$prep->execute();
   }
   
-  function store() {
+  function store($month = 0, $year = 0) {
 
     $standard = new AccountStandard($this->db);
-    $month = $standard->getOneValue("STD_MONTH");
-    $year = $standard->getOneValue("STD_YEAR");
+    
+    if(!$month) {
+       $month = $standard->getOneValue("STD_MONTH");
+    }
+    if(!$year) {
+       $year = $standard->getOneValue("STD_YEAR");
+    }
     
     $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?");
     $prep->bind_params("iisiis", $this->Attachment, $this->Postnmb, $this->Description, $month, $year, $this->Occured->mySQLDate());

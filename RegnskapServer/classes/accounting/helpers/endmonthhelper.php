@@ -24,8 +24,18 @@ class EndMonthHelper {
 		$sumPosts = array ();
 
 		foreach ($endPostIds as $id) {
-			$sumPosts[$id] += $acAccountLine->sumPosts($id, $active_year, $active_month, '1');
-			$sumPosts[$id] -= $acAccountLine->sumPosts($id, $active_year, $active_month, '-1');
+            if(array_key_exists($id, $sumPosts)) {			
+			   $sumPosts[$id] += $acAccountLine->sumPosts($id, $active_year, $active_month, '1');
+            } else {
+            	$sumPosts[$id] = $acAccountLine->sumPosts($id, $active_year, $active_month, '1');
+            }
+            
+            if(array_key_exists($id, $sumPosts)) {
+    			$sumPosts[$id] -= $acAccountLine->sumPosts($id, $active_year, $active_month, '-1');            	
+            } else {
+    			$sumPosts[$id] = $acAccountLine->sumPosts($id, $active_year, $active_month, '-1');            	            	
+            }
+            
 		}
 
 		return $sumPosts;

@@ -22,7 +22,13 @@ $endHelper = new EndMonthHelper($db);
 
 switch ($action) {
 	case "status" :
-		echo json_encode($endHelper->status());
+        $acStandard = new AccountStandard($db);
+
+        $res = array();
+        $res["posts"] = $endHelper->status();
+        $res["year"] = $acStandard->getOneValue("STD_YEAR");;
+        $res["month"] = $acStandard->getOneValue("STD_MONTH");
+		echo json_encode($res);
 		break;
 	case "end" :
 		$db->begin();

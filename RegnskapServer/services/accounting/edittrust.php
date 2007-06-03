@@ -19,13 +19,18 @@ switch ($action) {
         $data["types"] = $accTrust->getFondtypes();
         
         $fondData = array();
-        
+        $sumfondData = array();
+        $sumclubData = array();
         foreach($data["types"] as $fondinfo) {
             $fond = $fondinfo["fond"];     	
            	$fondData[$fond] = $accTrust->getFondInfo($fond);
+            $sumfondData[$fond] = $accTrust->getFondSum($fond);
+            $sumclubData[$fond] = $accTrust->getFondSum($fond, 1);
         }
         
         $data["data"] = $fondData;
+        $data["sumfond"] = $sumfondData;
+        $data["sumclub"] = $sumclubData;
 		echo json_encode($data);
 		break;
 }

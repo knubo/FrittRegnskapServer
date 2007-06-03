@@ -54,12 +54,12 @@ class AccountTrust {
 		return $result;
 	}
 
-	function getFondSum($fond, $club) {
+	function getFondSum($fond, $club = 0) {
 
 		$field = $club ? "club_account" : "fond_account";
 
 		$prep = $this->db->prepare("select sum($field) as s from regn_fond where fond = ?");
-		$prep->bind_params("s", $field);
+		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 
 		foreach ($arr as $one) {

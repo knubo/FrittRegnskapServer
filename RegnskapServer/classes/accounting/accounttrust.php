@@ -31,7 +31,7 @@ class AccountTrust {
 
 		$date = $this->Occured->mySQLDate();
 
-		$prep = $this->db->prepare("insert into regn_fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?");
 		$prep->bind_params("sssii", $date, $this->Fond, $this->Description, $this->Fond_account, $this->Club_account);
 		$prep->execute();
 		return $this->db->insert_id();
@@ -39,7 +39,7 @@ class AccountTrust {
 
 	function getFondtypes() {
 
-		$prep = $this->db->prepare("select * from regn_fond_type");
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "fond_type");
 		$arr = $prep->execute();
 
 		$result = array ();
@@ -58,7 +58,7 @@ class AccountTrust {
 
 		$field = $club ? "club_account" : "fond_account";
 
-		$prep = $this->db->prepare("select sum($field) as s from regn_fond where fond = ?");
+		$prep = $this->db->prepare("select sum($field) as s from " . AppConfig :: DB_PREFIX . "fond where fond = ?");
 		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 
@@ -68,7 +68,7 @@ class AccountTrust {
 	}
 
 	function getFondInfo($fond) {
-		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account from regn_fond where fond=? order by occured,id");
+		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account from " . AppConfig :: DB_PREFIX . "fond where fond=? order by occured,id");
 		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 

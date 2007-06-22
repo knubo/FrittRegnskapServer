@@ -169,3 +169,14 @@ CREATE TABLE IF NOT EXISTS regn_budsjett (
    amount NUMERIC(8,2) UNSIGNED,
    predict NUMERIC(8,2) UNSIGNED
 );
+
+CREATE TABLE IF NOT EXISTS regn_fond_action (
+   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   description varchar(40),
+   fond varchar(3),
+   defaultdesc varchar(50),
+   actionclub INTEGER(1), -- +/- 1
+   actionfond INTEGER(1), -- +/- 1
+   debetpost INTEGER(5),
+   creditpost INTEGER(5)
+);

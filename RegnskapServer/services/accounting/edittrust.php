@@ -31,6 +31,7 @@ switch ($action) {
         $data["data"] = $fondData;
         $data["sumfond"] = $sumfondData;
         $data["sumclub"] = $sumclubData;
+        $data["currentYear"] = 0;
 		echo json_encode($data);
 		break;
 }

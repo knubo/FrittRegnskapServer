@@ -16,6 +16,5 @@ class AccountTrustAction {
         
         return $prep->execute();
 	}
-
 }
 ?>

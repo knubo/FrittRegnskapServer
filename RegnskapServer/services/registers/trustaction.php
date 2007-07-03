@@ -23,7 +23,7 @@ switch ($action) {
          
 		echo json_encode($res);
 		break;
-	default :
+	default :  
 		die("Unknown action" + $action);
 		break;
 }

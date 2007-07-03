@@ -10,8 +10,13 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounttrust.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "status";
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "status";
-
+$day = array_key_exists("day", $_REQUEST) ? $_REQUEST["day"] : 0;
+$month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 0;
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
+$desc = array_key_exists("desc", $_REQUEST) ? $_REQUEST["desc"] : 0;
+$attachment = array_key_exists("attachment", $_REQUEST) ? $_REQUEST["attachment"] : 0;
+$postnmb = array_key_exists("postnmb", $_REQUEST) ? $_REQUEST["postnmb"] : 0;
+$amount = array_key_exists("amount", $_REQUEST) ? $_REQUEST["amount"] : 0;
 
 $db = new DB();
 $accTrust = new AccountTrust($db);

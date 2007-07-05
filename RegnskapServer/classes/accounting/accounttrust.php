@@ -7,8 +7,9 @@ class AccountTrust {
 	public $Occured;
 	public $Fond_account;
 	public $Club_account;
+	public $AccountLine;
 
-	function AccountTrust($db, $fond = 0, $description = 0, $fond_account = 0, $club_account = 0, $occured = 0, $id = 0) {
+	function AccountTrust($db, $fond = 0, $description = 0, $fond_account = 0, $club_account = 0, $occured = 0, $id = 0, $accountLine = 0) {
 		$this->db = $db;
 
 		$this->Id = $id;
@@ -17,6 +18,7 @@ class AccountTrust {
 		$this->Occured = $occured;
 		$this->Fond_account = $fond_account;
 		$this->Club_account = $club_account;
+		$this->AccountLine = $accountLine;
 	}
 
 	function setDate($day, $month, $year) {
@@ -31,9 +33,9 @@ class AccountTrust {
 
 		$date = $this->Occured->mySQLDate();
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?");
-		$prep->bind_params("sssii", $date, $this->Fond, $this->Description, $this->Fond_account, $this->Club_account);
-		$prep->execute();
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?,accountline=?");
+		$prep->bind_params("sssiii", $this->Fond, $this->Description, $date,$this->Fond_account, $this->Club_account, $this->AccountLine);
+    	$prep->execute();
 		return $this->db->insert_id();
 	}
 
@@ -68,14 +70,14 @@ class AccountTrust {
 	}
 
 	function getFondInfo($fond) {
-		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account from " . AppConfig :: DB_PREFIX . "fond where fond=? order by occured,id");
+		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account, accountline from " . AppConfig :: DB_PREFIX . "fond where fond=? order by occured,id");
 		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 
 		$result = array ();
 
 		foreach ($arr as $one) {
-			$result[] = new AccountTrust($this->db, $fond, $one["description"], $one["fond_account"], $one["club_account"], $one["occured"], $one["id"]);
+			$result[] = new AccountTrust($this->db, $fond, $one["description"], $one["fond_account"], $one["club_account"], $one["occured"], $one["id"], $one["accountline"]);
 		}
 
 		return $result;

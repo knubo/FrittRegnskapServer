@@ -160,7 +160,8 @@ CREATE TABLE IF NOT EXISTS regn_fond (
    description VARCHAR(50),
    occured DATE,
    fond_account NUMERIC(8,2),
-   club_account NUMERIC(8,2)
+   club_account NUMERIC(8,2),
+   accountline INTEGER(8) UNSIGNED
 );
 
 CREATE TABLE IF NOT EXISTS regn_budsjett (

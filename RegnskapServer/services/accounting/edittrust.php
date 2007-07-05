@@ -7,9 +7,15 @@
  */
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accounttrust.php");
+include_once ("../../classes/accounting/accounttrustaction.php");
+include_once ("../../classes/accounting/accountline.php");
+include_once ("../../classes/accounting/accountpost.php");
+include_once ("../../classes/accounting/accountstandard.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "status";
+$actionid = array_key_exists("actionid", $_REQUEST) ? $_REQUEST["actionid"] : 0;
 $day = array_key_exists("day", $_REQUEST) ? $_REQUEST["day"] : 0;
 $month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 0;
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
@@ -43,7 +49,11 @@ switch ($action) {
 		echo json_encode($data);
 		break;
 	case "add" :
-        
-		break;
+		$accTrustAction = new AccountTrustAction($db);
+		$accTrustAction->load($actionid);
+        $result = array();
+        $result["result"] = $accTrustAction->addAccountTrust($day, $month, $year, $desc, $attachment, $postnmb, $amount);
+		echo json_encode($result);
+        break;
 }
 ?>

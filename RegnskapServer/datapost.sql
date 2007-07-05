@@ -1,3 +1,4 @@
+alter table regn_fond add accountline INTEGER(8) UNSIGNED;
 
 insert into regn_happening set description='Dansekveld', linedesc='Dansekveld',debetpost=1904 ,kredpost=3980, count_req=0;
 
@@ -8,3 +9,4 @@ insert into regn_fond_action (description, fond, defaultdesc, actionclub, action
 
 insert into regn_fond_action (description, fond, defaultdesc, actionclub, actionfond, debetpost, creditpost) 
   values ('Justering fond negativt','BSC','Justering fond negativt',0,-1, null, null);
+

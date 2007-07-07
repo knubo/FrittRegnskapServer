@@ -77,7 +77,7 @@ class AccountyearMembership {
 	}
 
 	function getReportUsers($year) {
-		$prep = $this->db->prepare("select id as id, firstname as firstname, lastname as lastname, birthdate as birthdate from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=?");
+		$prep = $this->db->prepare("select distinct id as id, firstname as firstname, lastname as lastname, birthdate as birthdate from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by birthdate desc,lastname,firstname");
 		$prep->bind_params("i", $year);
 		$res = $prep->execute();
 

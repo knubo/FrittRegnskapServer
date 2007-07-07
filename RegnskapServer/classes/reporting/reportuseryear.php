@@ -9,6 +9,7 @@ class ReportUserYear {
     public $birthdate;
     public $lastname;
     public $id;
+    public $age;
     
     function ReportUserYear($id, $firstname, $lastname, $birthdate) {
         $this->id = $id;
@@ -19,6 +20,10 @@ class ReportUserYear {
     
     function getBirthdate() {
     	return $this->birthdate;
+    }
+    
+    function setAge($age) {
+    	$this->age = $age;
     }
 }
 

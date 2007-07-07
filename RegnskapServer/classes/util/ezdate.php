@@ -142,6 +142,7 @@ class eZDate
     */
     function setMySQLDate( $value )
     {
+        $orgval = $value;
         if ( ereg( "([0-9]{4})-([0-9]{2})-([0-9]{2})", $value, $valueArray ) )
         {
             $this->setYear( $valueArray[1] );
@@ -150,7 +151,7 @@ class eZDate
         }
         else
         {
-            print( "<b>Error:</b> eZDate::setMySQLDate() received wrong MySQL date format." );
+            print( "<b>Error:</b> eZDate::setMySQLDate() received wrong MySQL date format. Got:>".$orgval."<.<br>" );
         }
     }
     

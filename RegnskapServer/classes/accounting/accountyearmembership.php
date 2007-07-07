@@ -26,7 +26,7 @@ class AccountyearMembership {
 	}
 
 	function getAllMemberNames($year) {
-		/* Using group by here due to previous bug which added duplicate entries. */	
+		/* Using group by here due to previous bug which added duplicate entries. */
 		$prep = $this->db->prepare("select firstname, lastname,id from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
 		$prep->bind_params("i", $year);
 		$query_array = $prep->execute();
@@ -62,11 +62,11 @@ class AccountyearMembership {
 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_membership where year = ? and memberid=?");
 		$prep->bind_params("ii", $this->Year, $this->User);
 		$res = $prep->execute();
-	
-		if(sizeof($res)) {
+
+		if (sizeof($res)) {
 			return;
 		}
-	
+
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_membership set year = ?, memberid=?, regn_line=?");
 
 		$prep->bind_params("iii", $this->Year, $this->User, $this->Regn_line);
@@ -74,6 +74,27 @@ class AccountyearMembership {
 		$prep->execute();
 
 		return $this->db->affected_rows();
+	}
+
+	function getReportUsers($year) {
+		$prep = $this->db->prepare("select id as id, firstname as firstname, lastname as lastname, birthdate as birthdate from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=?");
+		$prep->bind_params("i", $year);
+		$res = $prep->execute();
+
+		$arr = array ();
+		foreach ($res as $one) {
+            
+            $d = "";
+            if(array_key_exists("birthdate", $one) && $one["birthdate"]) {
+    			$tmpdate = new eZDate();
+	       		$tmpdate->setMySQLDate($one["birthdate"]);
+            	$d = $tmpdate->displayAccount();
+            }
+            
+			$arr[] = new ReportUserYear($one["id"], $one["firstname"], $one["lastname"], $d);
+		}
+
+		return $arr;
 	}
 }
 ?>

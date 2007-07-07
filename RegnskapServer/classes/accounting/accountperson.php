@@ -3,13 +3,15 @@ class AccountPerson {
 	public $Id;
 	public $FirstName;
 	public $LastName;
-	public $IsEmpoyee;
+	public $IsEmployee;
 	public $Address;
 	public $PostNmb;
 	public $City;
 	public $Phone;
 	public $Cellphone;
 	public $Email;
+    /* Here kept as dd.mm.yyyy */
+    public $Birthdate;
 	private $db;
 
 	function AccountPerson($db) {
@@ -24,8 +26,8 @@ class AccountPerson {
 	function setLastname($lastname) {
 		$this->LastName = $lastname;
 	}
-	function setIsEmployee($isEmpoyee) {
-		$this->IsEmpoyee = $isEmpoyee;
+	function setIsEmployee($isEmployee) {
+		$this->IsEmployee = $isEmployee;
 	}
 
 	function setAddress($address) {
@@ -54,6 +56,10 @@ class AccountPerson {
 		$this->Email = $email;
 	}
 
+    function setBirthdate($birthdate) {
+       $this->Birthdate = $birthdate;
+    }
+
 	function name() {
 		return $this->FirstName . " " . $this->LastName;
 	}
@@ -68,10 +74,7 @@ class AccountPerson {
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
 
-		foreach ($res as $one) {
-			return $one;
-		}
-		return 0;
+        return array_pop($res);
 	}
 	
 	function load($id) {
@@ -80,7 +83,7 @@ class AccountPerson {
 		if(!$fields) {
 			return;
 		}
-		
+        $this->Id = $id;
 		$this->setIsEmployee($fields["employee"]);
 		$this->setFirstname($fields["firstname"]);
 		$this->setLastname($fields["lastname"]);
@@ -90,6 +93,11 @@ class AccountPerson {
 		$this->setCountry($fields["country"]);
 		$this->setPhone($fields["phone"]);
 		$this->setCellphone($fields["cellphone"]);
+        $this->setAddress($fields["address"]);
+        
+        $tmpdate = new eZDate();
+        $tmpdate->setMySQLDate($fields["birthdate"]);
+        $this->setBirthdate($tmpdate->displayAccount());
 	}	
 
 
@@ -102,16 +110,21 @@ class AccountPerson {
 	}
 
 	function save() {
+        
+        $bdSave = new eZDate();
+        $bdSave->setDate($this->Birthdate);
+        
+        $mysqlDate = $bdSave->mySQLDate();
 
 		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? where id = ?");
-			$prep->bind_params("ssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee, $this->Id);
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=? where id = ?");
+			$prep->bind_params("sssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Id);
 			$prep->execute();
 			return $this->db->affected_rows();
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=? ");
-		$prep->bind_params("ssssssssss", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmpoyee);
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=? ");
+		$prep->bind_params("sssssssssss", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate);
 		$prep->execute();
 
 		$this->id = $this->db->insert_id();

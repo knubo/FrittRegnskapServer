@@ -7,13 +7,15 @@
  * To change the template for this generated file go to
  * Window - Preferences - PHPeclipse - PHP - Code Templates
  */
-include_once ("../../conf/AppConfig.php");
+include_once ("../../conf/AppConfig.php"); 
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountsemester.php");
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "search";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $firstname = array_key_exists("firstname", $_REQUEST) ? $_REQUEST["firstname"] : "";
+$birthdate = array_key_exists("birthdate", $_REQUEST) ? $_REQUEST["birthdate"] : "";
 $lastname = array_key_exists("lastname", $_REQUEST) ? $_REQUEST["lastname"] : "";
 $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
 $address = array_key_exists("address", $_REQUEST) ? $_REQUEST["address"] : "";
@@ -35,10 +37,10 @@ switch ($action) {
 		$columnList = $accPers->getAll($onlyEmp);
 		echo json_encode($columnList);
 		break;
-	case "get" :
+	case "get" : 
 		$accPers = new AccountPerson($db);
-		$columnList = $accPers->getOne($id);
-		echo json_encode($columnList);
+		$accPers->load($id);
+		echo json_encode($accPers) ;
 		break;
 	case "search" :
 		$accPers = new AccountPerson($db);
@@ -68,6 +70,7 @@ switch ($action) {
 		$accPers->setPhone($phone);
 		$accPers->setEmail($email);
 		$accPers->setCellphone($cellphone);
+        $accPers->setBirthdate($birthdate);
 		echo $accPers->save();
 		break;
 }

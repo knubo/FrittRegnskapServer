@@ -124,6 +124,18 @@ class eZDate
         setType( $this->Day, "integer" );
     }
 
+    function setDate($value) {
+        if ( ereg( "([0-9]{2}).([0-9]{2}).([0-9]{4})", $value, $valueArray ) )
+        {
+            $this->setDay( $valueArray[1] );
+            $this->setMonth( $valueArray[2] );
+            $this->setYear( $valueArray[3] );
+        } else {
+        	print("Expected dd.mm.yyyy got $value.");
+        }
+    	
+    }
+
     /*!
       Sets the date according to the MySQL date given as parameter.      
       If the parameter is invalid nothing is set and an error is printed.

@@ -3,7 +3,7 @@
  * Created on Jul 7, 2007
  */
 
-class ReportUserYear {
+class ReportUserBirthdate {
     
     public $firstname;
     public $birthdate;
@@ -11,7 +11,7 @@ class ReportUserYear {
     public $id;
     public $age;
     
-    function ReportUserYear($id, $firstname, $lastname, $birthdate) {
+    function ReportUserBirthdate($id, $firstname, $lastname, $birthdate) {
         $this->id = $id;
     	$this->firstname = $firstname;
         $this->lastname = $lastname;

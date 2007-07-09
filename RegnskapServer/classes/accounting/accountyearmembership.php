@@ -44,19 +44,19 @@ class AccountyearMembership {
 
 	}
 
-	function getUserMemberships($user) {
-
-		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
-
-		$query_array = $prep->execute();
-
-		$result = array ();
-
-		foreach ($query_array as $one) {
-			$result[] = & new eZAccountMembership($user, $this->Type, $one["year"], $one["regn_line"]);
-		}
-		return $result;
-	}
+//	function getUserMemberships($user) {
+//
+//		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
+//
+//		$query_array = $prep->execute();
+//
+//		$result = array ();
+//
+//		foreach ($query_array as $one) {
+//			$result[] = & new eZAccountMembership($user, $this->Type, $one["year"], $one["regn_line"]);
+//		}
+//		return $result;
+//	}
 
 	function store() {
 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_membership where year = ? and memberid=?");
@@ -76,7 +76,7 @@ class AccountyearMembership {
 		return $this->db->affected_rows();
 	}
 
-	function getReportUsers($year) {
+	function getReportUsersBirthdate($year) {
 		$prep = $this->db->prepare("select distinct id as id, firstname as firstname, lastname as lastname, birthdate as birthdate from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by birthdate desc,lastname,firstname");
 		$prep->bind_params("i", $year);
 		$res = $prep->execute();
@@ -91,7 +91,7 @@ class AccountyearMembership {
             	$d = $tmpdate->displayAccount();
             }
             
-			$arr[] = new ReportUserYear($one["id"], $one["firstname"], $one["lastname"], $d);
+			$arr[] = new ReportUserBirthdate($one["id"], $one["firstname"], $one["lastname"], $d);
 		}
 
 		return $arr;

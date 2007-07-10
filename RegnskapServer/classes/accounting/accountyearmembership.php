@@ -96,5 +96,13 @@ class AccountyearMembership {
 
 		return $arr;
 	}
+    
+    function getReportUsersFull($year) {
+        $prep = $this->db->prepare("select distinct * from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by lastname,firstname");
+        $prep->bind_params("i", $year);
+        $res = $prep->execute();
+
+        return $res;
+    }
 }
 ?>

@@ -273,8 +273,9 @@ class AccountLine {
 		}
 		
         $searchWrap = $this->db->search($stat, "order by occured, postnmb");
-        $searchWrap->addAndSQL("i", 1, "RL.id = RP.line and 1 = ?");
-
+        if ($account || $person || $project) {
+            $searchWrap->addAndSQL("i", 1, "RL.id = RP.line and 1 = ?");
+        }
 		if ($fromdate) {
 			$searchD = new eZDate();
 			$searchD->setDate($fromdate);

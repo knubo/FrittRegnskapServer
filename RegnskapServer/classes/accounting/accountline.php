@@ -264,35 +264,39 @@ class AccountLine {
   	  }
   }
 
-  function getByKonto($year, $konto, $project, $person) {
+  function getByKonto($fromdate, $todate, $account, $project, $person) {
 
-	$params = array($year);
-	$fields = "i";
-	    
-    $spec = "";
+    $stat = 0;
 
-    if($konto) {
-      $spec = "RP.post_type = ? AND ";
-   	  $fields.="i";
-   	  $params[] = $konto;
+    if($account || $person || $project) {
+    	$stat = "select distinct RL.id, RL.attachnmb, RL.occured, RL.postnmb, RL.description from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP where";
+    } else {
+    	$stat = "select distinct attachnmb, RL.occured, RL.postnmb, RL.description from " . AppConfig :: DB_PREFIX . "line where";
+    }
+
+    $searchWrap = $this->db->search($stat);
+
+    if($fromdate) {
+        $searchWrap->addAndSQL("s", $fromdate, "RL.occured >= ?");    	
+    }
+
+    if($todate) {
+        $searchWrap->addAndSQL("s", $todate, "RL.occured <= ?");      
+    }
+    
+    if($person) {
+    	$searchWrap->addAndSQL("i", $person, "RP.person = ?");
     }
 
     if($project) {
-      $spec .= "RP.project = ? AND ";
-   	  $fields.="i";
-   	  $params[] = $project;
+        $searchWrap->addAndSQL("i", $project, "RP.project = ?");
     }
-
-    if($person) {
-      $spec .= "RP.person = ? AND ";
-   	  $fields.="i";
-   	  $params[] = $person;
+    
+    if($account) {
+    	$searchWrap->addAndSQL("i", $account, "RP.post_type = ?");
     }
-
-    $prep = $this->db->prepare("select distinct(RL.id), RL.attachnmb, RL.occured, RL.postnmb, RL.description from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP where RL.year=? AND $spec RP.line = RL.id order by RL.occured, RL.postnmb");
-	$prep->bind_array_params($fields, $params);
 	
-    return $this->getLines($prep->execute());
+    return $this->getLines($searchWrap->execute());
   }
 
   /*! Expects a query done on " . AppConfig :: DB_PREFIX . "line*/

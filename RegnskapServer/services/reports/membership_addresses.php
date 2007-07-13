@@ -5,8 +5,8 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 
-$year = array_key_exists("year", $_REQUEST) ? $_GET["year"] : 2007;
-$action = array_key_exists("action", $_REQUEST) ? $_GET["action"] : "json";
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "json";
 $db = new DB();
 
 if (!$year) {

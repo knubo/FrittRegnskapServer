@@ -261,6 +261,7 @@ class SearchWrapper {
 		}		
 		
 		$sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
+//        echo "SQL:$sql\n";
 		$prep = $this->Db->prepare($sql);
 		$prep->bind_array_params($this->Type, $this->Params);
 		return $prep->execute();

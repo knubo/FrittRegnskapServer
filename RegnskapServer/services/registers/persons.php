@@ -13,6 +13,8 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountsemester.php");
+include_once ("../../classes/auth/RegnSession.php");
+
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $firstname = array_key_exists("firstname", $_REQUEST) ? $_REQUEST["firstname"] : "";
 $birthdate = array_key_exists("birthdate", $_REQUEST) ? $_REQUEST["birthdate"] : "";
@@ -30,6 +32,9 @@ $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? $_REQUEST["onlyemp"] : "";
 $queryMembership = array_key_exists("getmemb", $_REQUEST) ? $_REQUEST["getmemb"] :1;
  
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 
 switch ($action) {
 	case "all" :

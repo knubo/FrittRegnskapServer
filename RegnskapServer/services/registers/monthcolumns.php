@@ -8,8 +8,12 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountcolumn.php");
+include_once ("../../classes/auth/RegnSession.php");
  
 $db = new DB(); 
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $acCols = new AccountColumn($db);
 
 $columnList = $acCols->getAllColumns();

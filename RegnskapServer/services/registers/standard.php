@@ -8,6 +8,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
@@ -18,6 +19,9 @@ $cost_practice = array_key_exists("cost_practice", $_REQUEST) ? $_REQUEST["cost_
 $cost_membership = array_key_exists("cost_membership", $_REQUEST) ? $_REQUEST["cost_membership"] : "0";
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $accStd = new AccountStandard($db);
 
 switch ($action) {

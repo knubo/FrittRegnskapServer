@@ -10,8 +10,13 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountcount.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
+
 $accCount = new AccountCount($db);
 
 if(!$line) {

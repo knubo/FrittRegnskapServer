@@ -20,8 +20,12 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountproject.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $accProj = new AccountProject($db);
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";

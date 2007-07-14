@@ -8,6 +8,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounthappening.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $description = array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : "";
@@ -18,6 +19,9 @@ $count_req = array_key_exists("count_req", $_REQUEST) ? $_REQUEST["count_req"] :
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : 0;
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 
 switch ($action) {
 	case "all" :

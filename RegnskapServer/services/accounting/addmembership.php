@@ -12,8 +12,13 @@ include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/helpers/memberships.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
+
 $actions = Memberships::parseParams($_REQUEST);
 try {
 	$db->begin();	

@@ -11,12 +11,15 @@ include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "year";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
 $semester = array_key_exists("semester", $_REQUEST) ? $_REQUEST["semester"] : "0";
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
 
 $standard = new AccountStandard($db);
 $semesterAcc = new AccountSemester($db);

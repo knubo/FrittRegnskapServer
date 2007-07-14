@@ -13,6 +13,7 @@ include_once ("../../classes/accounting/accounttrustaction.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "status";
 $actionid = array_key_exists("actionid", $_REQUEST) ? $_REQUEST["actionid"] : 0;
@@ -25,6 +26,9 @@ $postnmb = array_key_exists("postnmb", $_REQUEST) ? $_REQUEST["postnmb"] : 0;
 $amount = array_key_exists("amount", $_REQUEST) ? $_REQUEST["amount"] : 0;
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $accTrust = new AccountTrust($db);
 
 switch ($action) {

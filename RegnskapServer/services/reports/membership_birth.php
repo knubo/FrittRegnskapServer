@@ -5,9 +5,12 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php"); 
 include_once ("../../classes/reporting/reportuserbirthdate.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
 $db = new DB();
+ $regnSession = new RegnSession($db);
+$regnSession->auth();
  
 if (!$year) {
     $standard = new AccountStandard($db);

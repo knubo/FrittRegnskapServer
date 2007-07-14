@@ -8,10 +8,14 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounttrustaction.php");
 include_once ("../../classes/accounting/accounttrust.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $accountAction = new AccountTrustAction($db);
 $accTrust = new AccountTrust($db);
 

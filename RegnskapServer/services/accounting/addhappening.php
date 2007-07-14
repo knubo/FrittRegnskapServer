@@ -10,6 +10,7 @@ include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accounthappening.php");
 include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/auth/RegnSession.php");
  
  
  $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "";
@@ -33,6 +34,10 @@ include_once ("../../classes/accounting/accountstandard.php");
  }
  
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
+
 $db->begin();
 
 $happening = new AccountHappening($db);

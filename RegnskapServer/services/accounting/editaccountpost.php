@@ -10,6 +10,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountpost.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "query";
 $line = array_key_exists("line", $_REQUEST) ? $_REQUEST["line"] : 1;
@@ -21,6 +22,10 @@ $project = array_key_exists("project", $_REQUEST) ? $_REQUEST["project"] : 0;
 $person = array_key_exists("person", $_REQUEST) ? $_REQUEST["person"] : 0;
 
 $db = new DB();
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
+
 $accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $project, $person);
 
 switch ($action) {

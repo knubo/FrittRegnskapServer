@@ -12,6 +12,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "query";
 $line = array_key_exists("line", $_REQUEST) ? $_REQUEST["line"] : 1;
@@ -23,6 +24,10 @@ $attachment = array_key_exists("attachment", $_REQUEST) ? $_REQUEST["attachment"
 $postnmb = array_key_exists("postnmb", $_REQUEST) ? $_REQUEST["postnmb"] : 0;
 
 $db = new DB();
+
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 $accLine = new AccountLine($db);
 
 if ($day && $month && $year) {

@@ -7,11 +7,16 @@ include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/accounting/accountcolumn.php");
+include_once ("../../classes/auth/RegnSession.php");
 
 $month = array_key_exists("month", $_REQUEST) ? $_GET["month"] : 0;
 $year = array_key_exists("year", $_REQUEST) ? $_GET["year"] : 0;
 
 $db = new DB();
+
+$regnSession = new RegnSession($db);
+$regnSession->auth();
+
 
 if (!$month || !$year) {
 	$standard = new AccountStandard($db);

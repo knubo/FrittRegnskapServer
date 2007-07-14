@@ -6,6 +6,21 @@
 class RegnSession {
 	private $db;
 
+    function auth() {
+        
+        if(!AppConfig::USE_AUTHENTICATION) {
+        	return;
+        }
+
+        session_start();
+
+        if(!$_SESSION["username"]) {
+            header("HTTP/1.0 510 Not Authenticated");
+            die("Not authenticated");           
+        }
+    }
+
+
 	function __construct($db) {
 		$this->db = $db;
  

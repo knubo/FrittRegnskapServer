@@ -1,8 +1,3 @@
-CREATE TABLE IF NOT EXISTS regn_session(
-username varchar(25), 
-sessionval varchar(255)
-);
-
 create table if not exists regn_happeningv2(
   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   description varchar(40),
@@ -13,8 +8,9 @@ create table if not exists regn_happeningv2(
 );
 
 create table if not exists regn_user(
-  username varchar(25),
-  pass varchar(15)
+  username varchar(25) PRIMARY KEY,
+  pass varchar(15),
+  person INT(11) unsigned 
 );
 
 CREATE TABLE IF NOT EXISTS regn_grouping_head (

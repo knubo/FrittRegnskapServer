@@ -36,11 +36,20 @@ class User {
 	}
     
     function getAll() {
-    	$bind = $this->db->prepare("select username, person from ". AppConfig :: DB_PREFIX ."user");
+    	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name from ". AppConfig :: DB_PREFIX ."user, ".AppConfig :: DB_PREFIX."person where id=person");
         return $bind->execute();
     }
     
     function save($user, $password, $person) {
+        
+        if(!$password) {
+            $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=? where username=?");
+            $bind->bind_params("is", $person, $user);
+            $bind->execute();
+        
+            return $this->db->affected_rows();
+        }
+        
     	$bind = $this->db->prepare("insert into ". AppConfig :: DB_PREFIX ."user set pass=?, person=?, username=? ON DUPLICATE KEY UPDATE pass=?,person=?");
         $pass = crypt($password);
         

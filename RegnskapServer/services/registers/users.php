@@ -10,7 +10,7 @@ include_once ("../../classes/auth/User.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
-$user = array_key_exists("user", $_REQUEST) ? $_REQUEST["user"] : "";
+$user = array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : "";
 $password = array_key_exists("password", $_REQUEST) ? $_REQUEST["password"] : "";
 $person = array_key_exists("person", $_REQUEST) ? $_REQUEST["person"] : "";
 

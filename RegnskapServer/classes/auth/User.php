@@ -41,7 +41,6 @@ class User {
     }
     
     function save($user, $password, $person) {
-        
         if(!$password) {
             $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=? where username=?");
             $bind->bind_params("is", $person, $user);

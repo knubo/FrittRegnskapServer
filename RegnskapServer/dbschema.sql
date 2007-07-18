@@ -10,7 +10,9 @@ create table if not exists regn_happeningv2(
 create table if not exists regn_user(
   username varchar(25) PRIMARY KEY,
   pass varchar(15),
-  person INT(11) unsigned 
+  person INT(11) unsigned,
+  readonly tinyint,
+
 );
 
 CREATE TABLE IF NOT EXISTS regn_grouping_head (

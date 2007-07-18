@@ -36,23 +36,23 @@ class User {
 	}
     
     function getAll() {
-    	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name from ". AppConfig :: DB_PREFIX ."user, ".AppConfig :: DB_PREFIX."person where id=person");
+    	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly from ". AppConfig :: DB_PREFIX ."user, ".AppConfig :: DB_PREFIX."person where id=person");
         return $bind->execute();
     }
     
-    function save($user, $password, $person) {
+    function save($user, $password, $person, $readonly) {
         if(!$password) {
-            $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=? where username=?");
-            $bind->bind_params("is", $person, $user);
+            $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=?,readonly=? where username=?");
+            $bind->bind_params("iis", $person, $readonly, $user);
             $bind->execute();
         
             return $this->db->affected_rows();
         }
         
-    	$bind = $this->db->prepare("insert into ". AppConfig :: DB_PREFIX ."user set pass=?, person=?, username=? ON DUPLICATE KEY UPDATE pass=?,person=?");
+    	$bind = $this->db->prepare("insert into ". AppConfig :: DB_PREFIX ."user set pass=?, person=?, username=?,readonly=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?");
         $pass = crypt($password);
         
-        $bind->bind_params("sissi", $pass, $person, $user,$pass, $person);
+        $bind->bind_params("sisisii", $pass, $person, $user, $readonly, $pass, $person, $readonly);
         $bind->execute();
         
         return $this->db->affected_rows();

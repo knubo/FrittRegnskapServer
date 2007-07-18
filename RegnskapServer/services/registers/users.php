@@ -13,6 +13,7 @@ $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $user = array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : "";
 $password = array_key_exists("password", $_REQUEST) ? $_REQUEST["password"] : "";
 $person = array_key_exists("person", $_REQUEST) ? $_REQUEST["person"] : "";
+$readonly = array_key_exists("readonly", $_REQUEST) ? $_REQUEST["readonly"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -26,7 +27,7 @@ switch ($action) {
 		break;
 	case "save" :
 		$accUsers = new User($db);
-		$rowsAffected = $accUsers->save($user, $password, $person);
+		$rowsAffected = $accUsers->save($user, $password, $person,$readonly);
 		$res = array ();
 		$res["result"] = $rowsAffected;
 		echo json_encode($res);

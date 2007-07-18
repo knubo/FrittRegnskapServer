@@ -30,6 +30,8 @@ $accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $projec
 
 switch ($action) {
 	case "delete" :
+        $regnSession->checkWriteAccess();
+    
 		$res = $accPost->delete($line, $id);
 		
 	 	if($res) {
@@ -39,6 +41,7 @@ switch ($action) {
 	 	}
 		break;
 	case "insert" :
+        $regnSession->checkWriteAccess();
 		$accPost->store();
 		if($accPost->getId()) {
 		   echo $accPost->getId().":".$accPost->sumForLine($line);

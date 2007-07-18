@@ -53,6 +53,8 @@ switch ($action) {
 		echo json_encode($data);
 		break;
 	case "add" :
+        $regnSession->checkWriteAccess();
+    
 		$accTrustAction = new AccountTrustAction($db);
 		$accTrustAction->load($actionid);
         $result = array();

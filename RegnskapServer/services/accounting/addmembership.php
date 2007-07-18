@@ -17,6 +17,7 @@ include_once ("../../classes/auth/RegnSession.php");
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
+$regnSession->checkWriteAccess();
 
 
 $actions = Memberships::parseParams($_REQUEST);

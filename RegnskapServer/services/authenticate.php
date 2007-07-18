@@ -28,6 +28,7 @@ switch ($action) {
 		if ($auth->authenticate($user, $password) == User :: AUTH_OK) {
 			session_start();
 			$_SESSION["username"] = $user;
+            $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
 			$arr = array (
 				'url' => '/RegnskapClient/www/no.knubo.accounting.AccountingGWT/AccountingGWT.html'
 			);

@@ -40,6 +40,8 @@ switch ($action) {
 		echo json_encode($accLine);
 		break;
 	case "insert" :
+        $regnSession->checkWriteAccess();
+    
 		if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
 			die("Missing params for insert of accountline.");
 		}
@@ -49,6 +51,7 @@ switch ($action) {
 		break;
 
 	case "update" :
+        $regnSession->checkWriteAccess();
 		if (!$postnmb || !$day ||  !$desc || !$line || !$occured || !$attachment) {
 			die("Missing params for update of accountline.");
 		}

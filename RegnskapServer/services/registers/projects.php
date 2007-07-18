@@ -38,6 +38,8 @@ switch ($action) {
 		echo json_encode($all);
 		break;
 	case "save" :
+        $regnSession->checkWriteAccess();
+    
 		$accProj->setProject($project);
 		$accProj->setDescription($description);
 		$accProj->save();

@@ -30,6 +30,8 @@ switch ($action) {
 		echo json_encode($columnList);
 		break;
 	case "save" :
+        $regnSession->checkWriteAccess();
+
 		$accHapp = new AccountHappening($db);
 		$accHapp->setId($id);
 		$accHapp->setDescription($description);

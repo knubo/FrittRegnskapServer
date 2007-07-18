@@ -36,6 +36,8 @@ switch ($action) {
 		echo json_encode($res);
 		break;
 	case "save" :
+        $regnSession->checkWriteAccess();
+    
 		$res = 0;
 		$res = $res || $accStd->setValue("STD_YEAR", $year);
 		$res = $res || $accStd->setValue("STD_MONTH", $month);

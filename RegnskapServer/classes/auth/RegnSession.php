@@ -19,6 +19,20 @@ class RegnSession {
             die("Not authenticated");           
         }
     }
+    
+    function checkWriteAccess() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return;
+        }
+
+        $this->auth();
+        
+        if($_SESSION["readonly"]) {
+            header("HTTP/1.0 511 No access");
+            die("No access for operation");           
+        }
+    	
+    }
 
 
 	function __construct($db) {

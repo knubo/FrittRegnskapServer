@@ -41,6 +41,7 @@ switch ($action) {
 		echo json_encode($res);
 		break;
 	case "end" :
+        $regnSession->checkWriteAccess();
 		$db->begin();
 		$res = $endHelper->endMonth();
 		$db->commit();

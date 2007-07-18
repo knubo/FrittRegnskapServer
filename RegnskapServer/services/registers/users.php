@@ -26,6 +26,7 @@ switch ($action) {
 		echo json_encode($columnList);
 		break;
 	case "save" :
+        $regnSession->checkWriteAccess();
 		$accUsers = new User($db);
 		$rowsAffected = $accUsers->save($user, $password, $person,$readonly);
 		$res = array ();
@@ -33,6 +34,7 @@ switch ($action) {
 		echo json_encode($res);
         break;  
 	case "delete" :
+        $regnSession->checkWriteAccess();
         $accUsers = new User($db);
         $rowsAffected = $accUsers->delete($user);
         $res = array ();

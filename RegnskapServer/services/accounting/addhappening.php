@@ -21,6 +21,8 @@ include_once ("../../classes/auth/RegnSession.php");
  $amount = array_key_exists("amount", $_REQUEST) ? $_REQUEST["amount"] : 0;
  $post = array_key_exists("post", $_REQUEST) ? $_REQUEST["post"] : 0;
  
+ 
+ 
  $postcols = array();
  
  foreach(AppConfig::CountColumns() as $one) {
@@ -36,6 +38,7 @@ include_once ("../../classes/auth/RegnSession.php");
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
+$regnSession->checkWriteAccess();
 
 
 $db->begin();

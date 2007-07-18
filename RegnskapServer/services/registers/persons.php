@@ -59,6 +59,8 @@ switch ($action) {
 		echo json_encode($accPers->search($queryMembership));
 		break;
 	case "save" :
+        $regnSession->checkWriteAccess();
+    
 		$accPers = new AccountPerson($db);
 		$accPers->setId($id);
 		$accPers->setFirstname($firstname);

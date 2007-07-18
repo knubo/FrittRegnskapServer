@@ -10,6 +10,7 @@ class User {
 	const AUTH_FAILED = 0;
 
 	private $db;
+    private $read_only;
 
 	function __construct($dbi) {
 		$this->db = $dbi;
@@ -17,7 +18,7 @@ class User {
 
 	function authenticate($username, $password) {
 
-		$toBind = $this->db->prepare("select pass from ". AppConfig :: DB_PREFIX ."user where username = ?");
+		$toBind = $this->db->prepare("select pass,readonly from ". AppConfig :: DB_PREFIX ."user where username = ?");
 		
 		$toBind->bind_params("s", $username);
 		
@@ -29,11 +30,17 @@ class User {
 		
 		$crypted = $result[0]["pass"];
 		
+        $this->read_only = $result[0]["readonly"];
+        
 		if (crypt($password, $crypted) == $crypted) {
 			return User::AUTH_OK;
 		}
 		return User::AUTH_FAILED;
 	}
+    
+    function hasOnlyReadAccess() {
+    	return $this->read_only;
+    }
     
     function getAll() {
     	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly from ". AppConfig :: DB_PREFIX ."user, ".AppConfig :: DB_PREFIX."person where id=person");

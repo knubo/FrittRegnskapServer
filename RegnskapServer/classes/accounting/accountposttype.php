@@ -136,23 +136,13 @@ class AccountPostType {
 	function getYearEndTransferPost() {
 		return AppConfig :: EndPostYearTransferPost;
 	}
-
-	function aktiver($posts) {
-
-		$params = implode(",", array_fill(0, sizeof($posts), "?"));
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = 1 where post_type IN($params)");
-		$prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
-		$prep->execute();
-
-	}
-
-	function slett($posts) {
-		$params = implode(",", array_fill(0, sizeof($posts), "?"));
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = 0 where post_type IN($params)");
-		$prep->bind_array_params($prep, str_repeat("i", sizeof($posts)), $posts);
-		$prep->execute();
-
-	}
+    
+    function updateInUse($posttype, $inuse) {
+		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = ? where post_type = ?");
+		$prep->bind_params("ii", $inuse, $posttype);
+        $prep->execute();
+        return $this->db->affected_rows();    	
+    }
 
 	function getEndTransferPost() {
 		return AppConfig :: EndPostTransferPost;

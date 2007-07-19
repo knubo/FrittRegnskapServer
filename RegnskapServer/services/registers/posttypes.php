@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Created on Apr 11, 2007
  *
@@ -10,13 +11,19 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$db = new DB(); 
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
+$disableFilter = array_key_exists("disableFilter", $_REQUEST) ? $_REQUEST["disableFilter"] : 0;
+
+$db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
-$acc = new AccountPostType($db);
+switch ($action) {
+	case "all" :
+		$acc = new AccountPostType($db);
 
-$columnList = $acc->getAll();
-echo json_encode($columnList);
- 
+		$columnList = $acc->getAll($disableFilter);
+		echo json_encode($columnList);
+        break;
+}
 ?>

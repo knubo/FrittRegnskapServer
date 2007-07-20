@@ -132,6 +132,8 @@ class AccountPostType {
 		}
 		return 0;
 	}
+    
+    
 
 	function getYearEndTransferPost() {
 		return AppConfig :: EndPostYearTransferPost;

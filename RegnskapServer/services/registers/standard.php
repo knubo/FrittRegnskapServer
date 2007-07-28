@@ -37,7 +37,6 @@ switch ($action) {
 		break;
 	case "save" :
         $regnSession->checkWriteAccess();
-    
 		$res = 0;
 		$res = $res || $accStd->setValue("STD_YEAR", $year);
 		$res = $res || $accStd->setValue("STD_MONTH", $month);
@@ -46,7 +45,10 @@ switch ($action) {
 		$res = $res || $accStd->setValue("STD_TRAIN_PRICE", $cost_practice);
 		$res = $res || $accStd->setValue("STD_MEMBERSHIP_PRICE", $cost_membership);
 
-		echo $res;
+        $report = array();
+        $report["result"] = $res ? 1 : 0;
+
+        echo json_encode($report);
 		break;
 }
 ?>

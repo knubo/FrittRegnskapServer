@@ -17,19 +17,21 @@ class DB {
 		$this->link->autocommit(FALSE);
 	}
 	
-	function rollbackc() {
+	function rollback() {
 		$this->link->rollback();
 	}
 	
 	function commit() {
-		$this->link->commit();		
+		if(!$this->link->commit()) {
+			$this->report_error();
+		}		
 	}
 	
 	function __construct() {
 		$this->link = mysqli_connect("127.0.0.1", "root", "", "knubo");
 		if (mysqli_connect_errno()) {
-			printf("Connect failed: %s\n", mysqli_connect_error());
-			exit;
+            header("HTTP/1.0 512 DB error");
+			die("Connect failed: ".mysqli_connect_error());
 		}
 	}
 
@@ -40,21 +42,32 @@ class DB {
 	function table_exists($table) {
 		$result = $this->link->query("show tables like '" . $table . "'");
 
+        if(!$result) {
+        	$this->report_error();
+        }
+
 		$match = $result->num_rows;
 
 		$result->close();
 
 		return $match > 0;
 	}
+    
+    function report_error() {
+        $error = $this->link->error; 
+        header("HTTP/1.0 512 DB error");
+        $this->rollback();
+        die("DB:".$error);           
+    }
 
 	function prepare($query) {
 		$mysqli = mysqli_prepare($this->link, $query);
-
+        
 		if (!$mysqli) {
-			die('Invalid query: ' . $this->link->error);
+            $this->report_error();
 		}
 
-		return new PrepWrapper($mysqli);
+		return new PrepWrapper($mysqli, $this);
 	}
 
 	function search($prequery, $orderby = "") {
@@ -62,7 +75,10 @@ class DB {
 	}
 
 	function action($query) {
-		mysqli_query($this->link, $query);
+		if(!mysqli_query($this->link, $query)) {
+			$this->report_error();
+		}
+        
 	}
 
 	function backtrace() {
@@ -119,15 +135,16 @@ class DB {
 class PrepWrapper {
 	private $Mysqli;
 
-	function __construct($mysqli) {
+	function __construct($mysqli, $db) {
 		$this->Mysqli = $mysqli;
+        $this->db = $db;
 	}
 
 	function execute() {
 		$handle = $this->Mysqli;
 
 		if (!$handle->execute()) {
-			die("Klarte ikke kj¿re query.");
+			$this->db->report_error();
 		}
 
 		$metadata = $handle->result_metadata();
@@ -164,7 +181,9 @@ class PrepWrapper {
 			$arg[$i +1] = & $result[$i];
 		}
 
-		call_user_func_array('mysqli_stmt_bind_result', $arg);
+		if(!call_user_func_array('mysqli_stmt_bind_result', $arg)) {
+        	$this->db->report_error();
+		}
 
 		$myall = array ();
 
@@ -189,14 +208,18 @@ class PrepWrapper {
 			$types
 		), $args);
 
-		call_user_func_array('mysqli_stmt_bind_param', $allArgs);
+		if(!call_user_func_array('mysqli_stmt_bind_param', $allArgs)) {
+			$this->db->report_error();
+		}
 	}
 
 	function bind_params() {
 		$args = func_get_args();
 
-		call_user_func_array('mysqli_stmt_bind_param', 
-		   array_merge(array ($this->Mysqli), $args));
+		if(!call_user_func_array('mysqli_stmt_bind_param', 
+		   array_merge(array ($this->Mysqli), $args))) {
+		  $this->db->report_error();
+	    }
 	}
 }
 

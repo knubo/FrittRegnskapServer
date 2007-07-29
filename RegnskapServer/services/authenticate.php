@@ -35,7 +35,7 @@ switch ($action) {
 
 		} else {
 			$arr = array (
-				'error' => 'Ulovlig brukernavn eller passord.'
+				'error' => 'Ugyldig brukernavn eller passord.'
 			);
 		}
 		echo json_encode($arr);

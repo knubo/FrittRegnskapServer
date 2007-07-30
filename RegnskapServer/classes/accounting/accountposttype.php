@@ -51,10 +51,11 @@ class AccountPostType {
 	}
 
 	function save($posttype, $desc, $collpost, $detailpost) {
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1) on deplicate key update coll_post=?, detail_post=?, description=?");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1) on duplicate key update coll_post=?, detail_post=?, description=?");
 
 		$prep->bind_params("iisiiis", $posttype, $collpost, $desc, $detailpost, $collpost, $detailpost, $desc);
 		$prep->execute();
+        return $this->db->affected_rows() > 0 ? 1 : 0;
 	}
 
 	function getSome($ids, $from = 0, $to = 0) {

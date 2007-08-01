@@ -28,7 +28,9 @@ class DB {
 	}
 	
 	function __construct() {
-		$this->link = mysqli_connect("127.0.0.1", "root", "", "knubo");
+         $this->link = mysqli_connect("localhost",
+            "root", "", "knubo");
+         mysqli_query($this->link, "SET NAMES 'utf8'");
 		if (mysqli_connect_errno()) {
             header("HTTP/1.0 512 DB error");
 			die("Connect failed: ".mysqli_connect_error());

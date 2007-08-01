@@ -15,9 +15,9 @@ switch ($action) {
 		$db = new DB();
 		$sess = new RegnSession($db);
 
-		$user = $_GET["user"];
+		$user = $_REQUEST["user"];
 
-		$password = $_GET["password"];
+		$password = $_REQUEST["password"];
 
 		if (!$user || !$password) {
 			die("Must supply user and password.");
@@ -30,7 +30,7 @@ switch ($action) {
 			$_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
 			$arr = array (
-				'url' => '/RegnskapClient/www/no.knubo.accounting.AccountingGWT/AccountingGWT.html'
+				'result' => 'ok'
 			);
 
 		} else {

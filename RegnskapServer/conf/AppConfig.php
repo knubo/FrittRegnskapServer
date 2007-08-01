@@ -4,7 +4,7 @@
 class AppConfig {
 
 #Set to 1 if you want authentication.
-const USE_AUTHENTICATION=0;
+const USE_AUTHENTICATION=1;
 
 #Common db prefix for all database.
 const DB_PREFIX = "regn_";

@@ -2,6 +2,11 @@
 
 
 class AppConfig {
+    
+const DB_HOST_NAME="";
+const DB_USER="";
+const DB_PASSWORD="";
+const DB_NAME="";
 
 #Set to 1 if you want authentication.
 const USE_AUTHENTICATION=1;

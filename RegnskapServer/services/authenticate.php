@@ -44,6 +44,7 @@ switch ($action) {
 		$db = new DB();
 		$sess = new RegnSession($db);
 
+        $sessionName = session_name();
 		$CookieInfo = session_get_cookie_params();
 		if ((empty ($CookieInfo['domain'])) && (empty ($CookieInfo['secure']))) {
 			setcookie(session_name(), '', time() - 3600, $CookieInfo['path']);
@@ -53,8 +54,8 @@ switch ($action) {
 		} else {
 			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
 		}
-		unset ($_COOKIE[session_name()]);
 		session_destroy();
+		unset ($_COOKIE[$sessionName]);
 		echo "1";
 		break;
 }

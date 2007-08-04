@@ -27,10 +27,13 @@ class DB {
 		}		
 	}
 	
-	function __construct() {
+	function __construct($keeplatin1 = 0) {
          $this->link = mysqli_connect(AppConfig::DB_HOST_NAME,
             AppConfig::DB_USER, AppConfig::DB_PASSWORD, AppConfig::DB_NAME);
-         mysqli_query($this->link, "SET NAMES 'utf8'");
+        
+        if(!$keeplatin1) {
+            mysqli_query($this->link, "SET NAMES 'utf8'");
+        } 
 		if (mysqli_connect_errno()) {
             header("HTTP/1.0 512 DB error");
 			die("Connect failed: ".mysqli_connect_error());

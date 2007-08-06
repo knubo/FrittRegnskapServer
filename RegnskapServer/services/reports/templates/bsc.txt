@@ -1,0 +1,124 @@
+document=paper:A4,layout:portrait
+encoding=latin-1
+margins=50, 50, 50, 50
+startdocument
+font=normal,../../pdf/fonts/Times-Roman.afm
+font=bold,../../pdf/fonts/Times-Bold.afm
+
+fontsize=30
+fontselect=bold
+text=790,30,BÅRDAR SWING CLUB
+
+fontsize=12
+wrapopts=right:200,left:20
+ezSetY=770
+wraptext=Årsmedlemsskap: 300kr
+
+fontselect=normal
+wraptext=Gjelder fra betalingsdato til 31.12. Medlemskortet er gyldig med kvittering fra bank (girobetaling) eller med signatur fra et styremedlem (kontant betaling). Medlemskap gir rabatt på dansekvelder og helgekurs arrangert av klubben. 50% rabatt for ungdom under 18 år.
+
+fontselect=bold
+wraptext=Kursavgift: 700 kr per semester (kommer i tillegg til meldmeskap)
+
+fontselect=normal
+wraptext=Med betalt kursavgift kan du delta på alle ukentlige kurs klubben arrangerer og benytte deg av treningstidene. 50% rabatt for ungdom under 18 pr. Betalt kursavgift gir også 20% rabatt på Bårdar Danseinsitutts kurs.
+
+fontselect=bold
+wraptext=Treningsavgift: 400 kr per semester (kommer i tillegg til medlmeskap)
+
+fontselect=normal
+wraptext=Med betalt treningsavgift kan du benytte deg av klubbens treningstider. 50% rabatt for ungdom under 18 år.
+
+ezSetDy=-10;
+wrapopts=
+wraptext=Se for øvring hjemmesiden vår, http://swing.oslo.no, eller kontakt oss på post@swing.oslo.no.
+
+setColor=255,0,0
+ezSetDy=-10
+fontsize=16
+wraptext=Endringer eller mangler av reg. informasjon sendes styret@swing.oslo.no
+
+setColor=0, 0, 0;
+ezSetDy=-10
+fontsize=12
+wraptext=DIN REGISTRERT INFORMASJON ER:
+
+ezSetY=370
+wrapopts=right:250,left:0
+wraptext=Gjennpart for kontant betaling (fylles ut av klubbens representant)
+
+#Ramme for gjennpart for kontant betaling.
+setLineStyle=2
+relrectangle=25,-112,300,138
+setLineStyle=1
+
+relrectangle=32,-15,5,5
+fontsize=11
+reltext=42,-15,Kontant
+
+relrectangle= 32, -30, 5, 5
+reltext=42, -30,Giro
+
+relrectangle= 90, -15, 5, 5
+reltext=100, -15,Medlem, kr 300,-
+
+relrectangle= 90, -30, 5, 5
+reltext=100, -30,Kursavgift, kr 700,-
+
+relrectangle= 197, -15, 5, 5
+reltext=207, -15,Treningsavgift, kr 400,-
+
+fontsize=12
+reltext=32, -50,Periode: 
+relrectangle= 80 -50, 8, 8
+
+reltext=90, -50,Vår
+relrectangle= 112, -50, 8, 8
+
+reltext=122, -50,Høst
+reltext=152, -50, 20____
+
+reltext=32, -65,Ungdomsrabatt:
+
+relrectangle= 115, -65, 8, 8
+reltext=125, -65, Ja
+
+relrectangle= 140, -65, 8, 8
+reltext=150, -65, Nei
+
+reltext=32, -85,Bet. mottatt dato: ____________
+reltext=32, -100,Bet. mottatt av:
+
+
+ezSetY=120
+wrapopts=right:20,left:300
+wraptext=Bårdar Swing Club
+wraptext=Kristian Augusts gt. 15
+wraptext=0164 Oslo
+
+
+ezSetY=70
+wrapopts=right:20,left:350
+wraptext=6030 05 67048
+
+#This one works for wraptext in user loop.
+wrapopts=right:200,left:20
+
+query=memberships
+#here mass letter function start.
+
+ezSetY=450
+starttable=fontSize:12,showHeadings:0,showLines:1,xPos:left,xOrientation:right
+row=Navn: |#firstname #lastname
+row=Adresse: |#address
+row=E-post: |#email
+row=Fødselsdato: |#birthdate
+endtable
+
+ezSetY=120
+wraptext=#firstname #lastname
+wraptext=#address
+wraptext=#zip #city
+
+#and as it ends here, it will loop for each user.
+

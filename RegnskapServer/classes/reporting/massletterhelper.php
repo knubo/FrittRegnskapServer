@@ -29,10 +29,17 @@ class MassLetterHelper {
     
     
 	function listTemplates() {
-		$arr = array ();
-		$arr[] = "templates/bsc.txt";
+        $filenames = array();
+        $d = dir("templates/");
+        
+        while (false !== ($entry = $d->read())) {
+            if(substr_compare($entry,".",0,1) != 0 && $entry != "images") {
+                $filenames[] = $entry;              
+            }
+        }
+        $d->close();
 
-		return $arr;
+		return $filenames;
 	}
 
     function getParams($args) {
@@ -221,14 +228,17 @@ class MassLetterHelper {
         $this->pdf->addObject($this->all, 'all');
     }
 
-	function useTemplate($number) {
+	function useTemplate($template) {
 		$arr = $this->listtemplates();
+
+        if(!in_array($template, $arr)) {
+        	die("Unknown template $template - valid templates are:".implode(',', $arr).".");
+        }
 
 		$this->fonts = array ();
 		$this->wrapopts = array ();
-		$template = array_shift(array_slice($arr,$number));
 
-		$lines = file($template);
+		$lines = file("templates/$template");
 
         if(!$lines) {
         	die("Failed to open $template");

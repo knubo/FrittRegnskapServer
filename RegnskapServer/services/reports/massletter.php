@@ -34,16 +34,10 @@ switch ($action) {
 		$massLetterHelper->useTemplate($template);
 		break;
 	case "list" :
-        $filenames = array();
-        $d = dir("templates/");
-        
-        while (false !== ($entry = $d->read())) {
-            if(substr_compare($entry,".",0,1) != 0 && $entry != "images") {
-                $filenames[] = $entry;            	
-            }
-        }
-        $d->close();
-        echo json_encode($filenames);
+        $massLetterHelper = new MassLetterHelper($db, $year);
+        echo json_encode($massLetterHelper->listTemplates());
         break;
+    default:
+        die("Unknown action $action");
 }
 ?>

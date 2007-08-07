@@ -43,6 +43,9 @@ ezSetDy=-10
 fontsize=12
 wraptext=DIN REGISTRERT INFORMASJON ER:
 
+ezSetY=800
+image=file:templates/images/logo_black.jpg,padding:55,width:200,just:right
+
 ezSetY=370
 wrapopts=right:250,left:0
 wraptext=Gjennpart for kontant betaling (fylles ut av klubbens representant)

@@ -195,6 +195,17 @@ class MassLetterHelper {
     	$pdf->addText($p1, ($pdf->y)+$p2, $this->fontSize, $t);
     }
     
+    function image($args) {
+        $opts = $this->getParams($args);
+        
+        $width = $opts["width"];
+        $resize = '';
+        $just= $opts["just"];
+        $img = $opts["file"];
+        $pad = $opts["padding"];
+    	$this->pdf->ezImage($img, $pad, $width, $resize, $just,0);
+    }
+    
     function query($args) {
         if($args == "memberships") {
         	$accYearMem = new AccountYearMembership($this->db);
@@ -327,6 +338,9 @@ class MassLetterHelper {
                 break;
             case "startdocument":
                 $this->startDocument();
+                break;
+            case "image":
+                $this->image($args);
                 break;
             default:
                 die("Unknown action: '$action'");

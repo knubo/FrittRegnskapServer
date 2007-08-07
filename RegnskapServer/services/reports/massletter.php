@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Created on Aug 4, 2007
  */
@@ -14,7 +13,7 @@ include_once ("../../classes/reporting/massletterhelper.php");
 include_once ("../../pdf/class.ezpdf.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "pdf";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $template = array_key_exists("template", $_REQUEST) ? $_REQUEST["template"] : 0;
 
 $db = new DB(1);
@@ -27,12 +26,24 @@ if (!$year) {
 }
 
 error_reporting(E_ALL);
-set_time_limit(1800); 
- 
-switch($action) {
-	case "pdf":
-        $massLetterHelper = new MassLetterHelper($db,$year);
-        $massLetterHelper->useTemplate($template);
+set_time_limit(1800);
+
+switch ($action) {
+	case "pdf" :
+		$massLetterHelper = new MassLetterHelper($db, $year);
+		$massLetterHelper->useTemplate($template);
+		break;
+	case "list" :
+        $filenames = array();
+        $d = dir("templates/");
+        
+        while (false !== ($entry = $d->read())) {
+            if(substr_compare($entry,".",0,1) != 0 && $entry != "images") {
+                $filenames[] = $entry;            	
+            }
+        }
+        $d->close();
+        echo json_encode($filenames);
         break;
 }
 ?>

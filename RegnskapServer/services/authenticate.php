@@ -54,7 +54,6 @@ switch ($action) {
 		} else {
 			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
 		}
-		session_destroy();
 		unset ($_COOKIE[$sessionName]);
 		echo "1";
 		break;

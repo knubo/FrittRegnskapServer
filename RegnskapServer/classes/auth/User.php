@@ -16,6 +16,24 @@ class User {
 		$this->db = $dbi;
 	}
 
+    function makesalt($type=CRYPT_SALT_LENGTH) {
+        switch($type) {
+        case 8:
+            $saltlen=9; 
+            $saltprefix='$1$'; 
+            $saltsuffix='$'; 
+            break;
+        case 2:
+        default: // by default, fall back on Standard DES (should work everywhere)
+            $saltlen=2; 
+            $saltprefix=''; 
+            $saltsuffix=''; break;
+        }
+         $salt='';
+        while(strlen($salt)<$saltlen) $salt.=chr(rand(64,126));
+        return $saltprefix.$salt.$saltsuffix;
+}
+ 
 	function authenticate($username, $password) {
 
 		$toBind = $this->db->prepare("select pass,readonly from ". AppConfig :: DB_PREFIX ."user where username = ?");
@@ -57,7 +75,7 @@ class User {
         }
         
     	$bind = $this->db->prepare("insert into ". AppConfig :: DB_PREFIX ."user set pass=?, person=?, username=?,readonly=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?");
-        $pass = crypt($password);
+        $pass = crypt($password, $this->makesalt());
         
         $bind->bind_params("sisisii", $pass, $person, $user, $readonly, $pass, $person, $readonly);
         $bind->execute();

@@ -7,7 +7,7 @@ class AppConfig {
 	const DB_NAME = "";
 
 	#Set to 1 if you want authentication.
-	const USE_AUTHENTICATION = 0;
+	const USE_AUTHENTICATION = 1;
 
 	#Common db prefix for all database.
 	const DB_PREFIX = "regn_";
@@ -41,17 +41,6 @@ class AppConfig {
 			'a5',
 			'a1',
 			'a_5'
-		);
-	}
-
-	#Fordring posts
-	function FordringPosts() {
-		return array (
-			1370,
-			1380,
-			1390,
-			1500,
-			1570
 		);
 	}
 	#Posts that are to be transfered to next month.
@@ -95,27 +84,5 @@ class AppConfig {
 	const YearMembershipCreditPost = 3920;
 	const CourseMembershipCreditPost = 3925;
 	const TrainMembershipCreditPost = 3926;
-	#Membership group
-	const MembershipGroup = 4;
-	#Fond - club account post
-	const ClubAccountPost = 1920;
-	#
-	const BBC_FondDebetPost = 7795;
-	#
-	const BBC_FondKreditPost = 3995;
-	#
-	const TSO_FondKreditPost = 3397;
-	#
-	function DivPosts() {
-		return array (
-			3999,
-			7990,
-			8400,
-			8500,
-			1370,
-			1380,
-			1390
-		);
-	}
 }
 ?>

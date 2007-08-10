@@ -3,17 +3,17 @@
 
 class AppConfig {
     
-const DB_HOST_NAME="";
-const DB_USER="";
-const DB_PASSWORD="";
-const DB_NAME="";
+const DB_HOST_NAME="bardarswingc.mysql.domeneshop.no";
+const DB_USER="bardarswingc";
+const DB_PASSWORD="khDzxPA";
+const DB_NAME="bardarswingc";
 
 #Set to 1 if you want authentication.
-const USE_AUTHENTICATION=1;
+const USE_AUTHENTICATION=0;
 
 #Common db prefix for all database.
 const DB_PREFIX = "regn_";
-	
+
 #Values for count. Must match CountCoulumns.
 function CountValues() {
 	return array(1000,500,200,100,50,20,10,5,1,0.5); 

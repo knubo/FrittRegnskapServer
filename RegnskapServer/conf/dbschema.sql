@@ -107,7 +107,8 @@ create table if not exists regn_person (
    phone varchar(13),
    cellphone varchar(13),
    employee tinyint,
-   birthdate DATE
+   birthdate DATE,
+   newsletter tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_post_type (

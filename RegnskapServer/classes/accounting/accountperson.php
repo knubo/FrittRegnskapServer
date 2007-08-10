@@ -7,11 +7,14 @@ class AccountPerson {
 	public $Address;
 	public $PostNmb;
 	public $City;
+	public $Country;
 	public $Phone;
 	public $Cellphone;
 	public $Email;
     /* Here kept as dd.mm.yyyy */
     public $Birthdate;
+    public $Newsletter;
+    
 	private $db;
 
 	function AccountPerson($db) {
@@ -60,6 +63,10 @@ class AccountPerson {
        $this->Birthdate = $birthdate;
     }
 
+    function setNewsletter($newsletter) {
+    	$this->Newsletter = $newsletter;
+    }
+
 	function name() {
 		return $this->FirstName . " " . $this->LastName;
 	}
@@ -94,7 +101,7 @@ class AccountPerson {
 		$this->setPhone($fields["phone"]);
 		$this->setCellphone($fields["cellphone"]);
         $this->setAddress($fields["address"]);
-        
+        $this->setNewsletter($fields["newsletter"]);
         $tmpdate = new eZDate();
         $tmpdate->setMySQLDate($fields["birthdate"]);
         $this->setBirthdate($tmpdate->displayAccount());
@@ -117,14 +124,14 @@ class AccountPerson {
         $mysqlDate = $bdSave->mySQLDate();
 
 		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=? where id = ?");
-			$prep->bind_params("sssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Id);
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=? where id = ?");
+			$prep->bind_params("sssssssssssii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Id);
 			$prep->execute();
 			return $this->db->affected_rows();
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=? ");
-		$prep->bind_params("sssssssssss", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate);
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=? ");
+		$prep->bind_params("sssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter);
 		$prep->execute();
 
 		$this->id = $this->db->insert_id();
@@ -147,7 +154,7 @@ class AccountPerson {
 
 		$searchWrap->addAndParam("s", "firstname", $this->FirstName);
 		$searchWrap->addAndParam("s", "lastname", $this->LastName);
-		$searchWrap->addAndParam("i", "employee", $this->IsEmpoyee);
+		$searchWrap->addAndParam("i", "employee", $this->IsEmployee);
 		$searchWrap->addAndParam("s", "address", $this->Address);
 		$searchWrap->addAndParam("s", "postnmb", $this->PostNmb);
 		$searchWrap->addAndParam("s", "city", $this->City);
@@ -155,6 +162,7 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "phone", $this->Phone);
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
+		$searchWrap->addAndParam("i", "newsletter", $this->Newsletter);
 
 		return $searchWrap->execute();
 	}

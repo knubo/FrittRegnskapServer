@@ -9,10 +9,15 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
+include_once ("../../classes/accounting/accountperson.php");
+include_once ("../../classes/reporting/emailer.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "";
 $query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "members";
+$subject = array_key_exists("subject", $_REQUEST) ? $_REQUEST["subject"] : "";
+$email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
+$body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -23,16 +28,19 @@ $year = $standard->getOneValue("STD_YEAR");
 
 switch ($action) {
 	case "list" :
+        $ret = array ();
 		switch ($query) {
 			case "members" :
 				$accYearMem = new AccountYearMembership($db);
 				$users = $accYearMem->getReportUsersFull($year);
 				break;
 			case "newsletter" :
+                $accPerson = new AccountPerson($db);
+                $accPerson->setNewsletter(1);
+                $users = $accPerson->search(false);
 				break;
 		}
 
-		$ret = array ();
 		foreach ($users as $one) {
 			if (!array_key_exists("email", $one) || !$one["email"]) {
 				continue;
@@ -46,9 +54,10 @@ switch ($action) {
 		echo json_encode($ret);
 		break;
 	case "email" :
+        $emailer = new Emailer($db);
 		$res = array ();
-		$res["status"] = "1";
-		sleep(1);
+        $status = $emailer->sendEmail($subject, $email, $body, $standard->getOneValue("STD_EMAIL_SENDER"));
+		$res["status"] = $status ? 1 : 0;
 		echo json_encode($res);
 		break;
 	default :

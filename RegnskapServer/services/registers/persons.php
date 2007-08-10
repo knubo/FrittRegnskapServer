@@ -26,7 +26,7 @@ $employee = array_key_exists("employee", $_REQUEST) ? $_REQUEST["employee"] : ""
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "";
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? $_REQUEST["onlyemp"] : "";
 $queryMembership = array_key_exists("getmemb", $_REQUEST) ? $_REQUEST["getmemb"] :1;
- 
+$newsletter = array_key_exists("newsletter", $_REQUEST) ? $_REQUEST["newsletter"] : 0;
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
@@ -74,6 +74,7 @@ switch ($action) {
 		$accPers->setEmail($email);
 		$accPers->setCellphone($cellphone);
         $accPers->setBirthdate($birthdate);
+        $accPers->setNewsletter($newsletter);
 		echo $accPers->save();
 		break;
 }

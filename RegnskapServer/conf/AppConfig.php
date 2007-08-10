@@ -3,10 +3,10 @@
 
 class AppConfig {
     
-const DB_HOST_NAME="bardarswingc.mysql.domeneshop.no";
-const DB_USER="bardarswingc";
-const DB_PASSWORD="khDzxPA";
-const DB_NAME="bardarswingc";
+const DB_HOST_NAME="";
+const DB_USER="";
+const DB_PASSWORD="";
+const DB_NAME="";
 
 #Set to 1 if you want authentication.
 const USE_AUTHENTICATION=0;

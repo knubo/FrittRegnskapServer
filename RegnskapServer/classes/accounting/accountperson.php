@@ -15,6 +15,8 @@ class AccountPerson {
     public $Birthdate;
     public $Newsletter;
     
+    /* Only for querying - not in result set */
+    private $User;    
 	private $db;
 
 	function AccountPerson($db) {
@@ -23,6 +25,11 @@ class AccountPerson {
 	function setId($id) {
 		$this->Id = $id;
 	}
+    
+    function setUser($user) {
+    	$this->User = $user;
+    }
+    
 	function setFirstname($firstname) {
 		$this->FirstName = $firstname;
 	}
@@ -143,8 +150,8 @@ class AccountPerson {
 		if ($incMemberInfo) {
 			$accStandard = new AccountStandard($this->db);
 			$accSemester = new AccountSemester($this->db);
-			$active_semester = $accStandard->getOneValue("STD_SEMESTER");
-			$active_year = $accStandard->getOneValue("STD_YEAR");
+			$active_semester = addslashes($accStandard->getOneValue("STD_SEMESTER"));
+			$active_year = addslashes($accStandard->getOneValue("STD_YEAR"));
 			$cols = "*, (select distinct 1 from regn_train_membership where memberid=id and semester=$active_semester) as train".
 			", (select distinct 1 from regn_course_membership where memberid=id and semester=$active_semester) as course".
 			", (select distinct 1 from regn_year_membership where memberid=id and year=$active_year) as year";
@@ -163,8 +170,9 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
 		$searchWrap->addAndParam("i", "newsletter", $this->Newsletter);
-
-		return $searchWrap->execute();
+        $searchWrap->addAndQuery("s", $this->User, "exists (select null from regn_user where person=id and username=?)");
+        
+	   	return $searchWrap->execute();
 	}
 
 }

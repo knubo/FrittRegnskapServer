@@ -18,6 +18,7 @@ class RegnSession {
             header("HTTP/1.0 510 Not Authenticated");
             die("Not authenticated");           
         }
+        return $_SESSION["username"];
     }
     
     function checkWriteAccess() {

@@ -280,6 +280,21 @@ class SearchWrapper {
 			$this->Query .="$name = ?";			
 		}
 	}
+    
+    function addAndQuery($type, $param, $exists) {
+        if($param == "") {
+            return;
+        }
+        $this->Type .=$type;
+        
+        if(sizeof($this->Params) > 0) {
+            $this->Query .=" and ";
+        }
+        $this->Params[] = $param;
+        
+        $this->Query .= $exists;
+    	
+    }
 	
 	function execute() {
 		if(sizeof($this->Params) == 0) {
@@ -289,7 +304,6 @@ class SearchWrapper {
 		}		
 		
 		$sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
-//        echo "SQL:$sql\n";
 		$prep = $this->Db->prepare($sql);
 		$prep->bind_array_params($this->Type, $this->Params);
 		return $prep->execute();

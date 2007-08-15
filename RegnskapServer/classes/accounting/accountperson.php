@@ -11,12 +11,12 @@ class AccountPerson {
 	public $Phone;
 	public $Cellphone;
 	public $Email;
-    /* Here kept as dd.mm.yyyy */
-    public $Birthdate;
-    public $Newsletter;
-    
-    /* Only for querying - not in result set */
-    private $User;    
+	/* Here kept as dd.mm.yyyy */
+	public $Birthdate;
+	public $Newsletter;
+
+	/* Only for querying - not in result set */
+	private $User;
 	private $db;
 
 	function AccountPerson($db) {
@@ -25,11 +25,11 @@ class AccountPerson {
 	function setId($id) {
 		$this->Id = $id;
 	}
-    
-    function setUser($user) {
-    	$this->User = $user;
-    }
-    
+
+	function setUser($user) {
+		$this->User = $user;
+	}
+
 	function setFirstname($firstname) {
 		$this->FirstName = $firstname;
 	}
@@ -66,13 +66,13 @@ class AccountPerson {
 		$this->Email = $email;
 	}
 
-    function setBirthdate($birthdate) {
-       $this->Birthdate = $birthdate;
-    }
+	function setBirthdate($birthdate) {
+		$this->Birthdate = $birthdate;
+	}
 
-    function setNewsletter($newsletter) {
-    	$this->Newsletter = $newsletter;
-    }
+	function setNewsletter($newsletter) {
+		$this->Newsletter = $newsletter;
+	}
 
 	function name() {
 		return $this->FirstName . " " . $this->LastName;
@@ -88,16 +88,16 @@ class AccountPerson {
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
 
-        return array_pop($res);
+		return array_pop($res);
 	}
-	
+
 	function load($id) {
 		$fields = $this->getOne($id);
-		
-		if(!$fields) {
+
+		if (!$fields) {
 			return;
 		}
-        $this->Id = $id;
+		$this->Id = $id;
 		$this->setIsEmployee($fields["employee"]);
 		$this->setFirstname($fields["firstname"]);
 		$this->setLastname($fields["lastname"]);
@@ -107,13 +107,12 @@ class AccountPerson {
 		$this->setCountry($fields["country"]);
 		$this->setPhone($fields["phone"]);
 		$this->setCellphone($fields["cellphone"]);
-        $this->setAddress($fields["address"]);
-        $this->setNewsletter($fields["newsletter"]);
-        $tmpdate = new eZDate();
-        $tmpdate->setMySQLDate($fields["birthdate"]);
-        $this->setBirthdate($tmpdate->displayAccount());
-	}	
-
+		$this->setAddress($fields["address"]);
+		$this->setNewsletter($fields["newsletter"]);
+		$tmpdate = new eZDate();
+		$tmpdate->setMySQLDate($fields["birthdate"]);
+		$this->setBirthdate($tmpdate->displayAccount());
+	}
 
 	function getAll($isEmpoyee = 0) {
 		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
@@ -124,11 +123,11 @@ class AccountPerson {
 	}
 
 	function save() {
-        
-        $bdSave = new eZDate();
-        $bdSave->setDate($this->Birthdate);
-        
-        $mysqlDate = $bdSave->mySQLDate();
+
+		$bdSave = new eZDate();
+		$bdSave->setDate($this->Birthdate);
+
+		$mysqlDate = $bdSave->mySQLDate();
 
 		if ($this->Id) {
 			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=? where id = ?");
@@ -152,9 +151,9 @@ class AccountPerson {
 			$accSemester = new AccountSemester($this->db);
 			$active_semester = addslashes($accStandard->getOneValue("STD_SEMESTER"));
 			$active_year = addslashes($accStandard->getOneValue("STD_YEAR"));
-			$cols = "*, (select distinct 1 from regn_train_membership where memberid=id and semester=$active_semester) as train".
-			", (select distinct 1 from regn_course_membership where memberid=id and semester=$active_semester) as course".
-			", (select distinct 1 from regn_year_membership where memberid=id and year=$active_year) as year";
+			$cols = "*, (select distinct 1 from " . AppConfig :: DB_PREFIX . "train_membership where memberid=id and semester=$active_semester) as train" .
+			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "course_membership where memberid=id and semester=$active_semester) as course" .
+			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "year_membership where memberid=id and year=$active_year) as year";
 		}
 
 		$searchWrap = $this->db->search("select $cols from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
@@ -170,9 +169,14 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
 		$searchWrap->addAndParam("i", "newsletter", $this->Newsletter);
-        $searchWrap->addAndQuery("s", $this->User, "exists (select null from regn_user where person=id and username=?)");
-        
-	   	return $searchWrap->execute();
+		$searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig :: DB_PREFIX . "user where person=id and username=?)");
+
+		return $searchWrap->execute();
+	}
+
+	function allWithEmail() {
+		$searchWrap = $this->db->search("select firstname, lastname, email,newsletter from " . AppConfig :: DB_PREFIX . "person where email is not null order by newsletter desc, lastname, firstname, email");
+		return $searchWrap->execute();
 	}
 
 }

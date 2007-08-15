@@ -14,7 +14,7 @@ include_once ("../../classes/reporting/emailer.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
-$query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "test";
+$query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "all";
 $subject = array_key_exists("subject", $_REQUEST) ? $_REQUEST["subject"] : "";
 $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
 $body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
@@ -39,7 +39,13 @@ switch ($action) {
 				$accPerson->setNewsletter(1);
 				$users = $accPerson->search(false);
 				break;
-			case "test" :
+            case "all" :
+                $accPerson = new AccountPerson($db);
+                $users = $accPerson->allWithEmail();
+                echo json_encode($users);
+                die("");
+                break;
+			case "test" : 
                 if(!$currentUser) {
                 	die("Need current user");
                 }

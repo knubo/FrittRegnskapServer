@@ -9,6 +9,8 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountsemester.php");
+include_once ("../../classes/validators/emailvalidator.php");
+include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
@@ -61,6 +63,11 @@ switch ($action) {
 	case "save" :
         $regnSession->checkWriteAccess();
     
+        $validator = new ValidatorStatus();
+        if($email && !EmailValidator::check_email_address($email)) {
+        	$validator->addInvalidField("email");
+        }
+        $validator->dieIfNotValidated();
 		$accPers = new AccountPerson($db);
 		$accPers->setId($id);
 		$accPers->setFirstname($firstname);

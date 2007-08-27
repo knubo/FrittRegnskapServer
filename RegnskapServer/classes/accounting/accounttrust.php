@@ -38,6 +38,14 @@ class AccountTrust {
     	$prep->execute();
 		return $this->db->insert_id();
 	}
+    
+    function saveFondType($fond, $description) {
+        $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond_type set fond=?, description=? on duplicate key update description=?");    	
+        $prep->bind_params("sss",$fond,$description,$description);
+        $prep->execute();
+        
+        return $this->db->affected_rows();
+    }
 
 	function getFondtypes() {
 

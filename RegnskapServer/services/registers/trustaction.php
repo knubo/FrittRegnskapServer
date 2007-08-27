@@ -38,6 +38,7 @@ switch ($action) {
 		echo json_encode($res);
 		break;
 	case "save" :
+       $regnSession->checkWriteAccess();
        $accountAction = new AccountTrustAction($db, $trust,$description, $defaultdesc, $clubaction, $trustaction, $debetpost, $creditpost, $id);
        $res = $accountAction->save();
        

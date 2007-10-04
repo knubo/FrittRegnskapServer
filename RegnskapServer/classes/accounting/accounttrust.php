@@ -34,7 +34,7 @@ class AccountTrust {
 		$date = $this->Occured->mySQLDate();
 
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?,accountline=?");
-		$prep->bind_params("sssiii", $this->Fond, $this->Description, $date,$this->Fond_account, $this->Club_account, $this->AccountLine);
+		$prep->bind_params("sssddi", $this->Fond, $this->Description, $date,$this->Fond_account, $this->Club_account, $this->AccountLine);
     	$prep->execute();
 		return $this->db->insert_id();
 	}

@@ -14,6 +14,7 @@ class AccountPerson {
 	/* Here kept as dd.mm.yyyy */
 	public $Birthdate;
 	public $Newsletter;
+    public $Hidden;
 
 	/* Only for querying - not in result set */
 	private $User;
@@ -74,6 +75,10 @@ class AccountPerson {
 		$this->Newsletter = $newsletter;
 	}
 
+    function setHidden($hidden) {
+    	$this->Hidden = $hidden;
+    }
+
 	function name() {
 		return $this->FirstName . " " . $this->LastName;
 	}
@@ -109,9 +114,12 @@ class AccountPerson {
 		$this->setCellphone($fields["cellphone"]);
 		$this->setAddress($fields["address"]);
 		$this->setNewsletter($fields["newsletter"]);
-		$tmpdate = new eZDate();
-		$tmpdate->setMySQLDate($fields["birthdate"]);
-		$this->setBirthdate($tmpdate->displayAccount());
+        if($fields["birthdate"]) {
+           $tmpdate = new eZDate();
+           $tmpdate->setMySQLDate($fields["birthdate"]);
+           $this->setBirthdate($tmpdate->displayAccount());
+        }
+        $this->setHidden($fields["hidden"]);
 	}
 
 	function getAll($isEmpoyee = 0) {
@@ -130,14 +138,14 @@ class AccountPerson {
 		$mysqlDate = $bdSave->mySQLDate();
 
 		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=? where id = ?");
-			$prep->bind_params("sssssssssssii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Id);
+			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=? where id = ?");
+			$prep->bind_params("sssssssssssiii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Id);
 			$prep->execute();
 			return $this->db->affected_rows();
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=? ");
-		$prep->bind_params("sssssssssssi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter);
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=? ");
+		$prep->bind_params("sssssssssssii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden);
 		$prep->execute();
 
 		$this->id = $this->db->insert_id();
@@ -169,6 +177,10 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
 		$searchWrap->addAndParam("i", "newsletter", $this->Newsletter);
+        
+        if($this->Hidden) {
+        	$searchWrap->addOnlySql("(hidden is null or hidden <> 1)");
+        }
 		$searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig :: DB_PREFIX . "user where person=id and username=?)");
 
 		return $searchWrap->execute();

@@ -261,6 +261,13 @@ class SearchWrapper {
 		$this->Params[] = $bind;
 		$this->Query .= $sql;
 	}
+    
+    function addOnlySql($sql) {
+        if(sizeof($this->Params) > 0) {
+            $this->Query .=" and ";
+        }
+    	$this->Query .= $sql;
+    }
 	
 	function addAndParam($type, $name, $param, $allowNull = 0) {
 		if($param == "" && !$allowNull) {

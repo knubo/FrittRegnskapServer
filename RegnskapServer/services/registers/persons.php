@@ -29,6 +29,8 @@ $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "";
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? $_REQUEST["onlyemp"] : "";
 $queryMembership = array_key_exists("getmemb", $_REQUEST) ? $_REQUEST["getmemb"] :1;
 $newsletter = array_key_exists("newsletter", $_REQUEST) ? $_REQUEST["newsletter"] : 0;
+$hidden = array_key_exists("hidden", $_REQUEST) ? $_REQUEST["hidden"] : 0;
+
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
@@ -58,6 +60,7 @@ switch ($action) {
 		$accPers->setPhone($phone);
 		$accPers->setEmail($email);
 		$accPers->setCellphone($cellphone);
+        $accPers->setHidden($hidden);
 		echo json_encode($accPers->search($queryMembership));
 		break;
 	case "save" :
@@ -82,6 +85,7 @@ switch ($action) {
 		$accPers->setCellphone($cellphone);
         $accPers->setBirthdate($birthdate);
         $accPers->setNewsletter($newsletter);
+        $accPers->setHidden($hidden);
 		echo $accPers->save();
 		break;
 }

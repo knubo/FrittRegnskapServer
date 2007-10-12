@@ -3,15 +3,17 @@ class AccountSemesterMembership {
 	public $Semester;
 	public $User;
 	public $Regn_line;
+    public $Text;
 	private $db;
 	private $Type;
 
-	function AccountSemesterMembership($db, $type = 0, $user = 0, $semester = 0, $regn_line = 0) {
+	function AccountSemesterMembership($db, $type = 0, $user = 0, $semester = 0, $regn_line = 0, $desc = 0) {
 		$this->db = $db;
 		$this->Type = $type;
 		$this->Semester = $semester;
 		$this->User = $user;
 		$this->Regn_line = $regn_line;
+        $this->Text = $desc;
 	}
 
 	function addCreditPost($line, $amount) {
@@ -56,14 +58,14 @@ class AccountSemesterMembership {
 
 	function getUserMemberships($user, $type) {
 
-		$prep = $this->db->prepare("select memberid, semester, regn_line from " . AppConfig :: DB_PREFIX . $type."_membership where memberid = ? group by memberid, semester, regn_line order by semester");
+		$prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig :: DB_PREFIX . $type."_membership M, " . AppConfig :: DB_PREFIX ."semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");
         $prep->bind_params("i", $user);
 		$query_array = $prep->execute();
 
 		$result = array ();
 
 		foreach ($query_array as $one) {
-			$result[] = & new AccountSemesterMembership(null, $type, $user, $one["semester"], $one["regn_line"]);
+			$result[] = & new AccountSemesterMembership(null, $type, $user, $one["semester"], $one["regn_line"], $one["description"]);
 		}
 		return $result;
 	}

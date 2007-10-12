@@ -44,19 +44,19 @@ class AccountyearMembership {
 
 	}
 
-//	function getUserMemberships($user) {
-//
-//		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
-//
-//		$query_array = $prep->execute();
-//
-//		$result = array ();
-//
-//		foreach ($query_array as $one) {
-//			$result[] = & new eZAccountMembership($user, $this->Type, $one["year"], $one["regn_line"]);
-//		}
-//		return $result;
-//	}
+	function getUserMemberships($user) {
+
+		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
+        $prep->bind_params("i", $user);
+		$query_array = $prep->execute();
+
+		$result = array ();
+
+		foreach ($query_array as $one) {
+			$result[] = & new AccountyearMembership(null, $user, $one["year"], $one["regn_line"]);
+		}
+		return $result;
+	}
 
 	function store() {
 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_membership where year = ? and memberid=?");

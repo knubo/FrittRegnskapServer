@@ -9,11 +9,13 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountsemester.php");
+include_once ("../../classes/accounting/accountsemestermembership.php");
+include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/validators/emailvalidator.php");
 include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $firstname = array_key_exists("firstname", $_REQUEST) ? $_REQUEST["firstname"] : "";
 $birthdate = array_key_exists("birthdate", $_REQUEST) ? $_REQUEST["birthdate"] : "";
 $lastname = array_key_exists("lastname", $_REQUEST) ? $_REQUEST["lastname"] : "";
@@ -25,7 +27,7 @@ $country = array_key_exists("country", $_REQUEST) ? $_REQUEST["country"] : "";
 $phone = array_key_exists("phone", $_REQUEST) ? $_REQUEST["phone"] : "";
 $cellphone = array_key_exists("cellphone", $_REQUEST) ? $_REQUEST["cellphone"] : "";
 $employee = array_key_exists("employee", $_REQUEST) ? $_REQUEST["employee"] : "";
-$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "";
+$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "3";
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? $_REQUEST["onlyemp"] : "";
 $queryMembership = array_key_exists("getmemb", $_REQUEST) ? $_REQUEST["getmemb"] :1;
 $newsletter = array_key_exists("newsletter", $_REQUEST) ? $_REQUEST["newsletter"] : 0;
@@ -45,7 +47,14 @@ switch ($action) {
 	case "get" : 
 		$accPers = new AccountPerson($db);
 		$accPers->load($id);
-		echo json_encode($accPers) ;
+        $accSemesterMembership = new AccountSemesterMembership($db);
+        $accYearMembership = new AccountyearMembership($db);
+        $memberships = array();
+        $memberships["course"] = $accSemesterMembership->getUserMemberships($id, "course");
+        $memberships["train"] = $accSemesterMembership->getUserMemberships($id, "train");
+        $memberships["year"] = $accYearMembership->getUserMemberships($id, "train");
+        $accPers->Memberships = $memberships;
+		echo json_encode($accPers); 
 		break;
 	case "search" :
 		$accPers = new AccountPerson($db);

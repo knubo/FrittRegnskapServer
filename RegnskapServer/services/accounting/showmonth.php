@@ -31,7 +31,7 @@ $monthsLine = $accLines->getMonth($year, $month, 0, 0, 1);
 $result = array (
 	"year" => $year,
 	"month" => $month,
-	"lines" => $monthsLine,
+	"monthinfo" => $monthsLine,
 	
 );
 

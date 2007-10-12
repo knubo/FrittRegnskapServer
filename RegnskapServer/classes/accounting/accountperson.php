@@ -15,6 +15,8 @@ class AccountPerson {
 	public $Birthdate;
 	public $Newsletter;
     public $Hidden;
+    /* Populated from outside */
+    public $Memberships;
 
 	/* Only for querying - not in result set */
 	private $User;

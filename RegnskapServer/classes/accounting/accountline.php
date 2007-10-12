@@ -219,7 +219,9 @@ class AccountLine {
 		$lines = $this->getLines($prep->execute());
 
 		if ($fillGrouped) {
-			$this->fill_grouped($lines);
+			$groupArray = $this->fill_grouped($lines);
+            
+            return array("lines"=>$lines, "debetsums"=>$groupArray["debetsums"], "creditsums"=>$groupArray["creditsums"]);
 		}
 
 		return $lines;
@@ -229,6 +231,8 @@ class AccountLine {
 	 * Sums up the collection post data making it ready for wire.
 	 */
 	function fill_grouped($lines) {
+        $groupDebet = array();
+        $groupCredit = array();
 		foreach ($lines as $one) {
 
 			$one->groupDebetMonth = array ();
@@ -248,17 +252,29 @@ class AccountLine {
 						} else {
 							$one->groupDebetMonth[$groupid] = $post->getAmount();
 						}
+                        if (array_key_exists($groupid, $groupDebet)) {
+                            $groupDebet[$groupid]+= $post->getAmount();
+                        } else {
+                            $groupDebet[$groupid] = $post->getAmount();
+                        }
+                        
 					} else {
 						if (array_key_exists($groupid, $one->groupKredMonth)) {
 							$one->groupKredMonth[$groupid] += $post->getAmount();
 						} else {
 							$one->groupKredMonth[$groupid] = $post->getAmount();
 						}
+                         if (array_key_exists($groupid, $groupCredit)) {
+                            $groupCredit[$groupid]+= $post->getAmount();
+                        } else {
+                            $groupCredit[$groupid] = $post->getAmount();
+                        }
 					}
 				}
 			}
 			$one->PostsArray = null;
 		}
+        return array("creditsums" => $groupCredit, "debetsums" => $groupDebet);
 	}
 
 	function searchLines($fromdate, $todate, $account, $project, $person) {

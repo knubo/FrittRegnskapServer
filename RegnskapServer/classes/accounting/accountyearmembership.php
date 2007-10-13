@@ -43,6 +43,13 @@ class AccountyearMembership {
 		return $result;
 
 	}
+    
+    function delete($year, $person) {
+    	$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? and year=?");
+        $prep->bind_params("ii", $person, $year);
+        $prep->execute();
+        return $this->db->affected_rows();
+    }
 
 	function getUserMemberships($user) {
 

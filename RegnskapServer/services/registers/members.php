@@ -16,6 +16,7 @@ include_once ("../../classes/auth/RegnSession.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "year";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
 $semester = array_key_exists("semester", $_REQUEST) ? $_REQUEST["semester"] : "0";
+$personId = array_key_exists("personId", $_REQUEST) ? $_REQUEST["personId"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -35,6 +36,27 @@ if (!$semester) {
 $result = array ();
 
 switch ($action) {
+	case "deleteyear" :
+		$regnSession->checkWriteAccess();
+		$acc = new AccountYearMembership($db);
+        $res = $acc->delete($year, $personId);
+
+        $result = array("result" => $res);
+		break;
+	case "deletetrain" :
+		$regnSession->checkWriteAccess();
+		$acc = new AccountSemesterMembership($db, "train");
+        $res = $acc->delete($semester, $personId);
+
+        $result = array("result" => $res);
+		break;
+	case "deletecourse" :
+		$regnSession->checkWriteAccess();
+		$acc = new AccountSemesterMembership($db, "course");
+        $res = $acc->delete($semester, $personId);
+
+        $result = array("result" => $res);
+		break;
 	case "year" :
 		$acc = new AccountYearMembership($db);
 		$result["members"] = $acc->getAllMemberNames($year);

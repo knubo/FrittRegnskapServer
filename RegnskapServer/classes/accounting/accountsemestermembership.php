@@ -56,6 +56,14 @@ class AccountSemesterMembership {
 
 	}
 
+   
+    function delete($semester, $person) {
+        $prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . $this->Type."_membership where memberid = ? and semester=?");
+        $prep->bind_params("ii", $person, $semester);
+        $prep->execute();
+        return $this->db->affected_rows();
+    }
+
 	function getUserMemberships($user, $type) {
 
 		$prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig :: DB_PREFIX . $type."_membership M, " . AppConfig :: DB_PREFIX ."semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");

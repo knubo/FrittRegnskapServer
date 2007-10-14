@@ -18,9 +18,10 @@ $todate = array_key_exists("todate", $_REQUEST) ? $_REQUEST["todate"] : 0;
 $account = array_key_exists("account", $_REQUEST) ? $_REQUEST["account"] : 0;
 $project = array_key_exists("project", $_REQUEST) ? $_REQUEST["project"] : 0;
 $person = array_key_exists("employee", $_REQUEST) ? $_REQUEST["employee"] : 0;
+$description =  array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : 0;
 
-if (!$fromdate && !$todate && !$account && !$project && !$person) {
-	die("Did not get arguments");
+if (!$fromdate && !$todate && !$account && !$project && !$person && !$description) {
+	die("Did not get arguments.");
 }
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -28,7 +29,7 @@ $regnSession->auth();
 
 $accLine = new AccountLine($db);
 
-$data = $accLine->searchLines($fromdate, $todate, $account, $project, $person);
+$data = $accLine->searchLines($fromdate, $todate, $account, $project, $person, $description);
 
 foreach($data as $one) {
     $one->fetchAllPosts();

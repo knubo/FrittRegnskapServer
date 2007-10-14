@@ -303,7 +303,7 @@ class AccountLine {
         return array("creditsums" => $groupCredit, "debetsums" => $groupDebet);
 	}
 
-	function searchLines($fromdate, $todate, $account, $project, $person) {
+	function searchLines($fromdate, $todate, $account, $project, $person, $description) {
 
 		$stat = 0;
 
@@ -341,6 +341,10 @@ class AccountLine {
 		if ($account) {
 			$searchWrap->addAndSQL("i", $account, "RP.post_type = ?");
 		}
+        
+        if($description) {
+        	$searchWrap->addAndSQL(s, $description, "RL.description like ?");
+        }
 
 		$res = $this->getLines($searchWrap->execute());
 

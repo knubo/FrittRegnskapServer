@@ -49,6 +49,32 @@ class AccountLine {
 		return $prep->execute($prep);
 	}
 
+    function findLine($action, $line) {
+        switch($action) {
+        	case "next":
+               $prep = $this->db->prepare("select min(id) as navid from " . AppConfig :: DB_PREFIX . "line where id > ?");
+               $prep->bind_params("i", $line);
+               break;
+            case "previous":
+               $prep = $this->db->prepare("select max(id) as navid from " . AppConfig :: DB_PREFIX . "line where id < ?");
+               $prep->bind_params("i", $line);
+               break;
+            default:
+            die("Unknown action for navigation '$action'");
+        }
+        $res = $prep->execute();
+        
+        if(!count($res)) {
+        	return $line;
+        }
+        $navline = $res[0]["navid"];
+        
+        if(!$navline) {
+        	return $line;
+        }
+        return $navline;
+    }
+
 	function read($id) {
 		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig :: DB_PREFIX . "line where id = ?");
 		$prep->bind_params("i", $id);

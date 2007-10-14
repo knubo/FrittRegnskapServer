@@ -22,6 +22,7 @@ $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 0;
 $attachment = array_key_exists("attachment", $_REQUEST) ? $_REQUEST["attachment"] : 0;
 $postnmb = array_key_exists("postnmb", $_REQUEST) ? $_REQUEST["postnmb"] : 0;
+$navigate = array_key_exists("navigate", $_REQUEST) ? $_REQUEST["navigate"] : 0;
 
 $db = new DB();
 
@@ -35,6 +36,9 @@ if ($day && $month && $year) {
 }
 switch ($action) {
 	case "query" :
+        if($navigate) {
+        	$line = $accLine->findLine($navigate, $line);
+        }
 		$accLine->read($line);
 		$accLine->fetchAllPosts();
 		echo json_encode($accLine);

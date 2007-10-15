@@ -343,7 +343,7 @@ class AccountLine {
 		}
         
         if($description) {
-        	$searchWrap->addAndSQL(s, $description, "RL.description like ?");
+        	$searchWrap->addAndSQL("s", $description, "RL.description like ?");
         }
 
 		$res = $this->getLines($searchWrap->execute());

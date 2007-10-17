@@ -1,3 +1,7 @@
+create table if not exists regn_accounttrack(
+   post INTEGER(8) PRIMARY KEY
+)
+
 create table if not exists regn_happeningv2(
   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   description varchar(40),

@@ -84,6 +84,17 @@ class AccountPost {
 		$prep->execute();
     	return $this->db->affected_rows();
 	}
+    
+    function sumForPostType($postType) {
+        $prep = $this->db->prepare("select (select sum(amount) from " . AppConfig :: DB_PREFIX . "post where post_type=? and debet='1') - ".
+                                           "(select sum(amount) from " . AppConfig :: DB_PREFIX . "post where post_type=? and debet='-1') as D");
+    	$prep->bind_params("ii", $postType, $postType);
+        $res = $prep->execute();
+        
+        foreach($res as $one) {
+        	return $one["D"];
+        }
+    }
 	
 	function sumForLine($lineId) {
 		$prep = $this->db->prepare("select sum(amount) as D from " . AppConfig :: DB_PREFIX . "post where line=? and debet='1'");

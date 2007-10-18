@@ -14,5 +14,31 @@
         
         return $prep->execute();
  	}
+    
+    function addPosts($posts) {
+    	$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "accounttrack set post=?");
+        
+        foreach($posts as $one) {
+            $prep->bind_params("i", $one);
+            $prep->execute();
+            if($this->db->affected_rows() == 0) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    
+    function removePosts($posts) {
+        $prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "accounttrack where post=?");
+        
+        foreach($posts as $one) {
+            $prep->bind_params("i", $one);
+            $prep->execute();
+            if($this->db->affected_rows() == 0) {
+                return 0;
+            }
+        }
+        return 1;
+    }
  }
 ?>

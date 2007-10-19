@@ -29,6 +29,7 @@ switch ($action) {
 			session_start();
 			$_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
+            $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
 			$arr = array (
 				'result' => 'ok'
 			);

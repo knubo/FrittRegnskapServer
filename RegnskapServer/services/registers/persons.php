@@ -73,7 +73,7 @@ switch ($action) {
 		echo json_encode($accPers->search($queryMembership));
 		break;
 	case "save" :
-        $regnSession->checkWriteAccess();
+        $regnSession->checkReducedWriteAccess();
     
         $validator = new ValidatorStatus();
         if($email && !EmailValidator::check_email_address($email)) {

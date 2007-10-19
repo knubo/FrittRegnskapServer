@@ -22,6 +22,7 @@ $accPlan = new AccountTrackAccount($db);
 
 switch ($action) {
 	case "add" :
+        $regnSession->checkWriteAccess();
 		$db->begin();
 		$data = json_decode($values);
 		if (!$accPlan->addPosts($data)) {
@@ -38,6 +39,7 @@ switch ($action) {
 
 		break;
 	case "remove" :
+        $regnSession->checkWriteAccess();
         $db->begin();
 		$data = json_decode($values);
 		if (!$accPlan->removePosts($data)) {

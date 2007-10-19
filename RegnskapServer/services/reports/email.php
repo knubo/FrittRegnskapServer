@@ -67,6 +67,7 @@ switch ($action) {
 		echo json_encode($ret);
 		break;
 	case "email" :
+        $regnSession->checkReducedWriteAccess();
 		$emailer = new Emailer($db);
 		$res = array ();
 		$status = $emailer->sendEmail($subject, $email, $body, $standard->getOneValue("STD_EMAIL_SENDER"));

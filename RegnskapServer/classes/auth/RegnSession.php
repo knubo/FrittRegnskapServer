@@ -21,13 +21,28 @@ class RegnSession {
         return $_SESSION["username"];
     }
     
-    function checkWriteAccess() {
-        if(!AppConfig::USE_AUTHENTICATION) {
+    function checkReducedWriteAccess() {
+    	if(!AppConfig::USE_AUTHENTICATION) {
             return;
         }
 
         $this->auth();
         
+        if($_SESSION["reducedwrite"]) {
+            return;
+        }
+         
+        if($_SESSION["readonly"]) {
+            header("HTTP/1.0 511 No access");
+            die("No access for operation");           
+        }
+    }
+    
+    function checkWriteAccess() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return;
+        }
+
         if($_SESSION["readonly"]) {
             header("HTTP/1.0 511 No access");
             die("No access for operation");           

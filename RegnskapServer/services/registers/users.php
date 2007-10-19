@@ -14,6 +14,7 @@ $user = array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : "";
 $password = array_key_exists("password", $_REQUEST) ? $_REQUEST["password"] : "";
 $person = array_key_exists("person", $_REQUEST) ? $_REQUEST["person"] : "";
 $readonly = array_key_exists("readonly", $_REQUEST) ? $_REQUEST["readonly"] : "";
+$reducedwrite = array_key_exists("reducedwrite", $_REQUEST) ? $_REQUEST["reducedwrite"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -28,7 +29,7 @@ switch ($action) {
 	case "save" :
         $regnSession->checkWriteAccess();
 		$accUsers = new User($db);
-		$rowsAffected = $accUsers->save($user, $password, $person,$readonly);
+		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite);
 		$res = array ();
 		$res["result"] = $rowsAffected;
 		echo json_encode($res);

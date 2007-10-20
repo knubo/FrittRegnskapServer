@@ -14,6 +14,9 @@ include_once ("../../classes/auth/RegnSession.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $values = array_key_exists("values", $_REQUEST) ? $_REQUEST["values"] : 0;
 
+/* Some servers add \ when receiving these data.. */
+$values = str_replace("\\","", $values);
+
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();

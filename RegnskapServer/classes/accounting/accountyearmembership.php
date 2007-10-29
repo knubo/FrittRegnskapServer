@@ -111,5 +111,10 @@ class AccountyearMembership {
 
         return $res;
     }
+    
+    function getOverview() {
+        $prep = $this->db->prepare("select count(*) as C, year from " . AppConfig :: DB_PREFIX . "year_membership group by year;");
+    	return $prep->execute();
+    }
 }
 ?>

@@ -67,7 +67,9 @@ CREATE TABLE IF NOT EXISTS regn_train_membership (
 
 CREATE TABLE IF NOT EXISTS regn_semester (
    semester INTEGER(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-   description VARCHAR(20)
+   description VARCHAR(20),
+   year int,
+   fall tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_standard (

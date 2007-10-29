@@ -96,6 +96,12 @@ class AccountSemesterMembership {
 		
 		return $this->db->affected_rows();
 	}
+    
+    function getOverview() {
+        $prep = $this->db->prepare("select count(*) as C, semester from " . AppConfig :: DB_PREFIX . $this->Type . "_membership group by semester;");
+        return $prep->execute();
+    }
+
 
 	function course() {
 		return "course";

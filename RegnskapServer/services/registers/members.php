@@ -13,7 +13,7 @@ include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "year";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "overview";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
 $semester = array_key_exists("semester", $_REQUEST) ? $_REQUEST["semester"] : "0";
 $personId = array_key_exists("personId", $_REQUEST) ? $_REQUEST["personId"] : "0";
@@ -75,6 +75,16 @@ switch ($action) {
 		$result["semester"] = $semester;
 		$result["text"] = $semesterAcc->getSemesterName($semester);
 		break;
+     case "overview":
+        $accYear = new AccountYearMembership($db);
+        $accCourse = new AccountSemesterMembership($db, "course");
+        $accTrain = new AccountSemesterMembership($db, "train");
+        
+        $result["year"] = $accYear->getOverview();   
+        $result["train"] = $accTrain->getOverview();   
+        $result["course"] = $accCourse->getOverview();   
+        
+        break;
 	default :
 		die("Unknown action $action");
 }

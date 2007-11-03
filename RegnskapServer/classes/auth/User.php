@@ -71,6 +71,16 @@ class User {
         return $bind->execute();
     }
     
+    function updatePassword($user, $password) {
+        $pass = crypt($password, $this->makesalt());
+
+        $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set pass=? where username=?");
+        $bind->bind_params("ss", $pass, $user);
+        $bind->execute();
+        
+        return $this->db->affected_rows();    	
+    }
+    
     function save($user, $password, $person, $readonly, $reducedwrite) {
         if(!$password) {
             $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=?,readonly=?,reducedwrite=? where username=?");

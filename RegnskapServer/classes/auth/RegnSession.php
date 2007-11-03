@@ -21,13 +21,19 @@ class RegnSession {
         return $_SESSION["username"];
     }
     
+    function hasReducedWriteAccess() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return 0;
+        }
+
+    	return $_SESSION["reducedwrite"];
+    }
+    
     function checkReducedWriteAccess() {
     	if(!AppConfig::USE_AUTHENTICATION) {
             return;
         }
 
-        $this->auth();
-        
         if($_SESSION["reducedwrite"]) {
             return;
         }

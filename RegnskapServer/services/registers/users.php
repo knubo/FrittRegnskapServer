@@ -18,7 +18,7 @@ $reducedwrite = array_key_exists("reducedwrite", $_REQUEST) ? $_REQUEST["reduced
 
 $db = new DB();
 $regnSession = new RegnSession($db);
-$regnSession->auth();
+$loggedInUser = $regnSession->auth();
  
 switch ($action) {
 	case "all" :
@@ -27,11 +27,19 @@ switch ($action) {
 		echo json_encode($columnList);
 		break;
 	case "save" :
-        $regnSession->checkWriteAccess();
-		$accUsers = new User($db);
-		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite);
 		$res = array ();
-		$res["result"] = $rowsAffected;
+
+        if($loggedInUser == $user && $regnSession->hasReducedWriteAccess()) {
+            $accUsers = new User($db);
+            $rowsAffected = $accUsers->updatePassword($user, $password);
+            $res["result"] = $rowsAffected;
+        } else {
+            $regnSession->checkWriteAccess();
+    		$accUsers = new User($db);
+    		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite);        	
+    		$res["result"] = $rowsAffected;
+        }
+    
 		echo json_encode($res);
         break;  
 	case "delete" :

@@ -7,14 +7,14 @@
  */
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
-include_once ("../../classes/accounting/helpers/membersbudget.php");
+include_once ("../../classes/accounting/helpers/membersformatter.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "overview";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
 $semester = array_key_exists("semester", $_REQUEST) ? $_REQUEST["semester"] : "0";
 $personId = array_key_exists("personId", $_REQUEST) ? $_REQUEST["personId"] : "0";
@@ -81,8 +81,20 @@ switch ($action) {
         $accCourse = new AccountSemesterMembership($db, "course");
         $accTrain = new AccountSemesterMembership($db, "train");
 
-        $result = MembersBudget::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview());
+        $result = MembersFormatter::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview());
         break;
+      case "all":
+        $accTrain = new AccountSemesterMembership($db, "train");
+        $accCourse = new AccountSemesterMembership($db, "course");
+        $accYear = new AccountYearMembership($db);
+        $result["year"] = $year;
+        $result["semester"] = $semester;
+        $result["text"] = $semesterAcc->getSemesterName($semester);
+
+        $result["members"] = MembersFormatter::allInOne($accYear->getAllMemberNames($year), $accCourse->getAllMemberNames($semester),$accTrain->getAllMemberNames($semester));
+
+        break;
+
 	default :
 		die("Unknown action $action");
 }

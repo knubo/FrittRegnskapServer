@@ -7,6 +7,7 @@
  */
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/accounting/helpers/membersbudget.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountsemester.php");
@@ -79,11 +80,8 @@ switch ($action) {
         $accYear = new AccountYearMembership($db);
         $accCourse = new AccountSemesterMembership($db, "course");
         $accTrain = new AccountSemesterMembership($db, "train");
-        
-        $result["year"] = $accYear->getOverview();   
-        $result["train"] = $accTrain->getOverview();   
-        $result["course"] = $accCourse->getOverview();   
-        
+
+        $result = MembersBudget::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview());
         break;
 	default :
 		die("Unknown action $action");

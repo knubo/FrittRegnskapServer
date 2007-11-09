@@ -56,7 +56,7 @@ class AccountSemesterMembership {
 
 	}
 
-   
+
     function delete($semester, $person) {
         $prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . $this->Type."_membership where memberid = ? and semester=?");
         $prep->bind_params("ii", $person, $semester);
@@ -93,12 +93,12 @@ class AccountSemesterMembership {
 		$prep->bind_params("iii", $this->Semester, $this->User, $this->Regn_line);
 
 		$prep->execute();
-		
+
 		return $this->db->affected_rows();
 	}
-    
+
     function getOverview() {
-        $prep = $this->db->prepare("select count(*) as C, semester from " . AppConfig :: DB_PREFIX . $this->Type . "_membership group by semester;");
+        $prep = $this->db->prepare("select count(*) as C, M.semester,fall,year from " . AppConfig :: DB_PREFIX . $this->Type . "_membership M," . AppConfig :: DB_PREFIX ."semester S where S.semester=M.semester group by semester;");
         return $prep->execute();
     }
 
@@ -106,7 +106,7 @@ class AccountSemesterMembership {
 	function course() {
 		return "course";
 	}
-	
+
 	function train() {
 		return "train";
 	}

@@ -20,21 +20,26 @@ $db = new DB(1);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
+$standard = new AccountStandard($db);
+
 if (!$year) {
-	$standard = new AccountStandard($db);
 	$year = $standard->getOneValue("STD_YEAR");
 }
+
+$yearprice = $standard->getOneValue("STD_MEMBERSHIP_PRICE");
+$courseprice = $standard->getOneValue("STD_COURSE_PRICE");
+$trainprice = $standard->getOneValue("STD_TRAIN_PRICE");
 
 error_reporting(E_ALL);
 set_time_limit(1800);
 
 switch ($action) {
 	case "pdf" :
-		$massLetterHelper = new MassLetterHelper($db, $year);
+		$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice);
 		$massLetterHelper->useTemplate($template);
 		break;
 	case "list" :
-        $massLetterHelper = new MassLetterHelper($db, $year);
+        $massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice);
         echo json_encode($massLetterHelper->listTemplates());
         break;
     default:

@@ -13,13 +13,13 @@ class AccountSemester {
 			if (!($p % 2)) {
 				$i++;
 			}
-			$prep = $this->db->prepare("insert into regn_semester values ($p, '$s $i');");
+			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "semester values ($p, '$s $i');");
 			$prep->execute();
 		}
 	}
 
 	function getSemesterName($id) {
-		$prep = $this->db->prepare("select semester, description from regn_semester where semester = ?");
+		$prep = $this->db->prepare("select semester, description from " . AppConfig :: DB_PREFIX . "semester where semester = ?");
 
 		$prep->bind_params("i", $id);
 
@@ -31,5 +31,10 @@ class AccountSemester {
 
 		return "";
 	}
+
+    function getAll() {
+    	$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester");
+        return $prep->execute();
+    }
 }
 ?>

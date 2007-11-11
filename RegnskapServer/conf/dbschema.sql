@@ -52,16 +52,32 @@ CREATE TABLE IF NOT EXISTS regn_year_membership (
    regn_line INT(8) UNSIGNED
 );
 
+CREATE TABLE IF NOT EXISTS regn_year_price(
+   year INTEGER(4) UNSIGNED PRIMARY KEY,
+   amount NUMERIC(8,2) UNSIGNED
+);
+
+
 CREATE TABLE IF NOT EXISTS regn_course_membership (
    memberid INT(6) UNSIGNED,
    semester INTEGER(4) UNSIGNED,
    regn_line INT(8) UNSIGNED
 );
 
+CREATE TABLE IF NOT EXISTS regn_course_price(
+   semester INTEGER(4) UNSIGNED PRIMARY KEY,
+   amount NUMERIC(8,2) UNSIGNED
+);
+
 CREATE TABLE IF NOT EXISTS regn_train_membership (
    memberid INT(6) UNSIGNED,
    semester INTEGER(4) UNSIGNED,
    regn_line INT(8) UNSIGNED
+);
+
+CREATE TABLE IF NOT EXISTS regn_train_price(
+   semester INTEGER(4) UNSIGNED PRIMARY KEY,
+   amount NUMERIC(8,2) UNSIGNED
 );
 
 

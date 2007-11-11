@@ -10,6 +10,12 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
+$yearPrice = array_key_exists("yearPrice", $_REQUEST) ? $_REQUEST["yearPrice"] : 0;
+$springCoursePrice = array_key_exists("springCoursePrice", $_REQUEST) ? $_REQUEST["springCoursePrice"] : 0;
+$springTrainPrice = array_key_exists("springTrainPrice", $_REQUEST) ? $_REQUEST["springTrainPrice"] : 0;
+$fallCoursePrice = array_key_exists("fallCoursePrice", $_REQUEST) ? $_REQUEST["fallCoursePrice"] : 0;
+$fallTrainPrice = array_key_exists("fallTrainPrice", $_REQUEST) ? $_REQUEST["fallTrainPrice"] : 0;
 
 $accPrice = new AccountMemberPrice($db);
 
@@ -25,12 +31,14 @@ switch ($action) {
         break;
     case "save" :
         $regnSession->checkWriteAccess();
+        $db->begin();
+        $ret = $accPrice->save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $fallCoursePrice, $fallTrainPrice);
 
-//        if (!$project) {
-//            echo json_encode($accProj);
-//        } else {
-//            echo $db->affected_rows();
-//        }
+       	$db->commit();
+
+        $result = array();
+        $result["status"] = $ret ? 1 : 0;
+        echo json_encode($result);
         break;
 }
 ?>

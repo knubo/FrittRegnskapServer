@@ -48,7 +48,7 @@ ezSetY=860
 image=file:templates/images/logo_farger_medium.png,padding:85,width:200,just:right
 
 #small image to the right to hit membership card
-ezSetY=480
+ezSetY=528
 image=file:templates/images/logo_farger_medium.png,padding:80,width:80,just:right
 
 
@@ -99,12 +99,13 @@ reltext=32, -85,Bet. mottatt dato: ____________
 reltext=32, -100,Bet. mottatt av: ____________
 
 
-ezSetY=190
-wrapopts=right:20,left:270
+ezSetY=185
+fontsize=11
+wrapopts=right:20,left:275
 wraptext=BŒrdar Swing Club
 wraptext=Kristian Augusts gt. 15
 wraptext=0164 Oslo
-
+fontsize=10
 
 ezSetY=70
 wrapopts=right:20,left:320
@@ -126,20 +127,23 @@ row=F¿dselsdato: |#birthdate
 endtable
 
 #This is the Betal av fields
-ezSetY=190
+fontsize=11
+ezSetY=185
 wraptext=#firstname #lastname
 wraptext=#address
 wraptext=#zip #city
 
 #Here we have the membership card info.
 
-ezSetY=430
+fontsize=10
+ezSetY=448s
 wrapopts=right:0,left:300
 wraptext=#firstname #lastname
 wraptext=Periode: #year
 
 fontsize=8
-wraptext=www.bardarswingclub.no / post@bardarswingclub.no
+wraptext=www.bardarswingclub.no
+wraptext=post@bardarswingclub.no
 fontsize=10
 
 

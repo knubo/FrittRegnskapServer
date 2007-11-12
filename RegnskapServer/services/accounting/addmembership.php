@@ -11,6 +11,7 @@ include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
+include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/accounting/helpers/memberships.php");
 include_once ("../../classes/auth/RegnSession.php");
 
@@ -22,7 +23,7 @@ $regnSession->checkWriteAccess();
 
 $actions = Memberships::parseParams($_REQUEST);
 try {
-	$db->begin();	
+	$db->begin();
 	Memberships::store($db, $actions);
 	$db->commit();
 	echo "1";

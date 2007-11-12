@@ -12,6 +12,20 @@ class AccountMemberPrice {
     	$this->db = $db;
     }
 
+    function getCurrentPrices() {
+    	$prep = $this->db->prepare("select C.amount as course, T.amount as train, Y.amount as year from " .
+                                    AppConfig :: DB_PREFIX . "course_price C,  " .
+                                    AppConfig :: DB_PREFIX . "train_price T, ".
+                                    AppConfig :: DB_PREFIX . "year_price Y, ".
+                                    AppConfig :: DB_PREFIX . "standard SY,".
+                                    AppConfig :: DB_PREFIX . "standard SS ".
+                                    "where SS.id = 'STD_SEMESTER' and SY.id = 'STD_YEAR' and ".
+                                    "C.semester = SS.value and T.semester = SS.value and SY.value = Y.year");
+        $res = $prep->execute();
+
+        return $res[0];
+    }
+
     function getAll() {
         $res = array();
         $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "course_price");

@@ -8,6 +8,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
+include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/reporting/massletterhelper.php");
 include_once ("../../pdf/class.ezpdf.php");
@@ -26,9 +27,12 @@ if (!$year) {
 	$year = $standard->getOneValue("STD_YEAR");
 }
 
-$yearprice = $standard->getOneValue("STD_MEMBERSHIP_PRICE");
-$courseprice = $standard->getOneValue("STD_COURSE_PRICE");
-$trainprice = $standard->getOneValue("STD_TRAIN_PRICE");
+$accPrices = new AccountMemberPrice($db);
+$prices = $accPrices->getCurrentPrices();
+
+$yearprice = round($prices["year"]);
+$courseprice = round($prices["course"]);
+$trainprice = round($prices["train"]);
 
 error_reporting(E_ALL);
 set_time_limit(1800);

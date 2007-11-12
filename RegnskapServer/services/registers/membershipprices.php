@@ -9,7 +9,7 @@ $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "current";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $yearPrice = array_key_exists("yearPrice", $_REQUEST) ? $_REQUEST["yearPrice"] : 0;
 $springCoursePrice = array_key_exists("springCoursePrice", $_REQUEST) ? $_REQUEST["springCoursePrice"] : 0;
@@ -20,6 +20,10 @@ $fallTrainPrice = array_key_exists("fallTrainPrice", $_REQUEST) ? $_REQUEST["fal
 $accPrice = new AccountMemberPrice($db);
 
 switch ($action) {
+    case "current":
+        $prices = $accPrice->getCurrentPrices();
+        echo json_encode($prices);
+        break;
     case "all" :
         $accSemester = new AccountSemester($db);
 

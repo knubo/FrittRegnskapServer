@@ -14,7 +14,7 @@ class Memberships {
 	private $Day;
 	private $Memberid;
 	private $Post;
-	
+
 	function starts_with($string, $match) {
 		if (strlen($string) < strlen($match)) {
 			return false;
@@ -64,28 +64,32 @@ class Memberships {
       	$active_month = $standard->getOneValue("STD_MONTH");
       	$active_year = $standard->getOneValue("STD_YEAR");
       	$active_semester = $standard->getOneValue("STD_SEMESTER");
-		$memberPrice = $standard->getOneValue("STD_MEMBERSHIP_PRICE");
-		$coursePrice = $standard->getOneValue("STD_COURSE_PRICE");
-		$trainPrice = $standard->getOneValue("STD_TRAIN_PRICE");
-		
+
+        $accPrices = new AccountMemberPrice($db);
+        $prices = $accPrices->getCurrentPrices();
+
+		$memberPrice = $prices["year"];
+		$coursePrice = $prices["course"];
+		$trainPrice = $prices["train"];
+
 		foreach($objects as $one) {
-			
+
 			$line = 0;
 			if($one->day()) {
 				$user = new AccountPerson($db);
 				$user->load($one->memberid());
-				
+
 				if(!$user) {
 					throw new Exception("Failed to load user ".$one->memberid());
 				}
-				
+
 				$line = new AccountLine($db);
 				$line->setNewLatest("M: ".$user->name(), $one->day(), $active_year, $active_month);
 				$line->store();
 			}
-			
+
 			$lineId = $line ? $line->getId() : 0;
-      
+
 	     	/* Register the memberships... */
 	     	if($one->year()) {
 	 		  $yearM = new AccountYearMembership($db, $one->memberid(), $active_year, $lineId);
@@ -95,7 +99,7 @@ class Memberships {
 		  		  $yearM->addDebetPost($lineId, $one->post(), $memberPrice);
 			  }
 		  	}
-		  	
+
 		  	if($one->train()) {
 				$trainM = new AccountSemesterMembership($db, AccountSemesterMembership::train(), $one->memberid(), $active_semester, $lineId);
 				$trainM->store();
@@ -139,6 +143,6 @@ class Memberships {
 	function post() {
 		return $this->Post;
 	}
-	
+
 }
 ?>

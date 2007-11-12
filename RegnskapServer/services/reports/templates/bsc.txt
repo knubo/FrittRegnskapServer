@@ -117,6 +117,7 @@ query=memberships
 #This is the registered data part
 
 ezSetY=565
+wrapopts=right:20,left:20
 starttable=fontSize:10,showHeadings:0,showLines:1,xPos:left,xOrientation:right
 row=Navn: |#firstname #lastname
 row=Adresse: |#address

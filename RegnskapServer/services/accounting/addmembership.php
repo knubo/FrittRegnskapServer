@@ -20,16 +20,15 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 $regnSession->checkWriteAccess();
 
-
 $actions = Memberships::parseParams($_REQUEST);
-try {
-	$db->begin();
-	Memberships::store($db, $actions);
-	$db->commit();
-	echo "1";
-} catch(Exception $e) {
-	$db->rollback();
-	echo "Error:".$e->getMessage();
-}
+
+$db->begin();
+Memberships::store($db, $actions);
+$db->commit();
+
+$arr = array();
+$arr["result"] = 1;
+
+echo json_encode($arr);
 
 ?>

@@ -56,7 +56,9 @@ switch ($action) {
 			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
 		}
 		unset ($_COOKIE[$sessionName]);
-		echo "1";
+
+        $arr = array('result' => 1);
+        echo json_encode($arr);
 		break;
 }
 ?>

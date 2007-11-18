@@ -3,7 +3,7 @@
  * Created on Apr 12, 2007
  *
  */
-include_once ("../../conf/AppConfig.php"); 
+include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/accounting/accountperson.php");
@@ -44,7 +44,7 @@ switch ($action) {
 		$columnList = $accPers->getAll($onlyEmp);
 		echo json_encode($columnList);
 		break;
-	case "get" : 
+	case "get" :
 		$accPers = new AccountPerson($db);
 		$accPers->load($id);
         $accSemesterMembership = new AccountSemesterMembership($db);
@@ -54,7 +54,7 @@ switch ($action) {
         $memberships["train"] = $accSemesterMembership->getUserMemberships($id, "train");
         $memberships["year"] = $accYearMembership->getUserMemberships($id, "train");
         $accPers->Memberships = $memberships;
-		echo json_encode($accPers); 
+		echo json_encode($accPers);
 		break;
 	case "search" :
 		$accPers = new AccountPerson($db);
@@ -74,7 +74,7 @@ switch ($action) {
 		break;
 	case "save" :
         $regnSession->checkReducedWriteAccess();
-    
+
         $validator = new ValidatorStatus();
         if($email && !EmailValidator::check_email_address($email)) {
         	$validator->addInvalidField("email");
@@ -95,7 +95,11 @@ switch ($action) {
         $accPers->setBirthdate($birthdate);
         $accPers->setNewsletter($newsletter);
         $accPers->setHidden($hidden);
-		echo $accPers->save();
+
+        $res = array();
+        $res["result"] = $accPers->save();
+
+        echo json_encode($res);
 		break;
 }
 ?>

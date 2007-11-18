@@ -2,7 +2,7 @@
 
 /*
  * Created on Apr 13, 2007
- * 
+ *
  * query/insert/update service for accountline.
  */
 
@@ -45,13 +45,16 @@ switch ($action) {
 		break;
 	case "insert" :
         $regnSession->checkWriteAccess();
-    
+
 		if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
 			die("Missing params for insert of accountline.");
 		}
 		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
 		$insertAC->store();
-		echo $insertAC->getId();
+
+        $res = array();
+		$res["result"] = $insertAC->getId();
+        echo json_encode($res);
 		break;
 
 	case "update" :
@@ -60,8 +63,10 @@ switch ($action) {
 			die("Missing params for update of accountline.");
 		}
 		$updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
-		
-		echo $updateAcc->update();
+
+        $res = array();
+        $res["result"] = $updateAcc->update();
+        echo json_encode($res);
 		break;
 	default:
 		die("Missing action");

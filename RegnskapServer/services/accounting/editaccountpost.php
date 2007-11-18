@@ -31,23 +31,28 @@ $accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $projec
 switch ($action) {
 	case "delete" :
         $regnSession->checkWriteAccess();
-    
+
 		$res = $accPost->delete($line, $id);
-		
+
+        $arr = array();
 	 	if($res) {
-	 		echo $res.":".$accPost->sumForLine($line);
+            $arr["result"] = $res.":".$accPost->sumForLine($line);
 	 	} else {
-	 		echo "0";
+	 		$arr["result"] = 0;
 	 	}
+        echo json_encode($arr);
 		break;
 	case "insert" :
         $regnSession->checkWriteAccess();
 		$accPost->store();
+
+        $arr = array();
 		if($accPost->getId()) {
-		   echo $accPost->getId().":".$accPost->sumForLine($line);
+		   $arr["result"] = $accPost->getId().":".$accPost->sumForLine($line);
 		} else {
-			echo "0";
+            $arr["result"] = 0;
 		}
+        echo json_encode($arr);
 		break;
 	default :
 		die("Missing action");

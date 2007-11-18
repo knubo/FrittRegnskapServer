@@ -18,6 +18,7 @@ class MembersFormatter {
                 $prev = array();
             }
             $prev[$type] = $one["C"];
+            $prev["semester"] = $one["semester"];
             $grouped["$year-$fall"] = $prev;
         }
     }

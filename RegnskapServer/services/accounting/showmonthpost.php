@@ -18,7 +18,7 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 
 
-if (!$month || !$year) { 
+if (!$month || !$year) {
 	$standard = new AccountStandard($db);
 	$year = $standard->getOneValue("STD_YEAR");
 	$month = $standard->getOneValue("STD_MONTH");
@@ -26,10 +26,15 @@ if (!$month || !$year) {
 
 $accLines = new AccountLine($db);
 
-$monthsLine = $accLines->getMonth($year, $month, 0, 0, 1);
+$data = $accLines->getMonth($year, $month, 0, 0, 1);
+
+$monthsLine = $data["lines"];
+
 
 foreach($monthsLine as $one) {
-	$one->fetchAllPosts();
+    if(is_object($one)) {
+    	$one->fetchAllPosts();
+    }
 }
 
 echo json_encode($monthsLine);

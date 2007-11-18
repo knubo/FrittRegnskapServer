@@ -41,12 +41,15 @@ switch ($action) {
        $regnSession->checkWriteAccess();
        $accountAction = new AccountTrustAction($db, $trust,$description, $defaultdesc, $clubaction, $trustaction, $debetpost, $creditpost, $id);
        $res = $accountAction->save();
-       
+
+       $result = array();
+
        if($res) {
-       	    echo json_encode($accountAction);
+       	    $result["result"] = json_encode($accountAction);
        } else {
-       	    echo "0";
+       	    $result["result"] = 0;
        }
+       echo json_encode($result);
        break;
 	default :
 		die("Unknown action" + $action);

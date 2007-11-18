@@ -39,15 +39,17 @@ switch ($action) {
 		break;
 	case "save" :
         $regnSession->checkWriteAccess();
-    
+
 		$accProj->setProject($project);
 		$accProj->setDescription($description);
 		$accProj->save();
-		
+
 		if (!$project) {
 			echo json_encode($accProj);
 		} else {
-			echo $db->affected_rows();
+            $result = array();
+            $result["result"] = $db->affected_rows();
+            echo json_encode($result);
 		}
 		break;
 }

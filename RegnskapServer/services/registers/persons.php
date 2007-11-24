@@ -1,8 +1,5 @@
 <?php
-/*
- * Created on Apr 12, 2007
- *
- */
+
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/ezdate.php");
@@ -27,7 +24,7 @@ $country = array_key_exists("country", $_REQUEST) ? trim($_REQUEST["country"]) :
 $phone = array_key_exists("phone", $_REQUEST) ? trim($_REQUEST["phone"]) : "";
 $cellphone = array_key_exists("cellphone", $_REQUEST) ? trim($_REQUEST["cellphone"]) : "";
 $employee = array_key_exists("employee", $_REQUEST) ? trim($_REQUEST["employee"]) : "";
-$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"]: 0;
+$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"]: 3;
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? trim($_REQUEST["onlyemp"]) : "";
 $queryMembership = array_key_exists("getmemb", $_REQUEST) ? trim($_REQUEST["getmemb"]) :1;
 $newsletter = array_key_exists("newsletter", $_REQUEST) ? trim($_REQUEST["newsletter"]) : 0;

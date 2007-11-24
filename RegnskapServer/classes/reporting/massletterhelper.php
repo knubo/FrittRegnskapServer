@@ -19,18 +19,20 @@ class MassLetterHelper {
     private $yearprice;
     private $courseprice;
     private $trainprice;
+    private $dueDate;
     private $currentUser;
     private $date;
     private $tableopts;
     private $tablerows;
 
-    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice) {
+    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate) {
     	$this->db = $db;
         $this->year = $year;
         $this->date = new eZDate();
         $this->yearprice = $yearprice;
         $this->courseprice = $courseprice;
         $this->trainprice = $trainprice;
+        $this->dueDate = $dueDate;
     }
 
 
@@ -132,13 +134,20 @@ class MassLetterHelper {
     	}
     }
 
+    function str($str) {
+    	if(!$str) {
+    		return " ";
+    	}
+        return $str;
+    }
+
     function personText($text) {
-        $text = str_replace("#firstname", $this->currentUser["firstname"], $text);
-        $text = str_replace("#lastname", $this->currentUser["lastname"], $text);
-        $text = str_replace("#address", $this->currentUser["address"], $text);
-        $text = str_replace("#zip", $this->currentUser["postnmb"], $text);
-        $text = str_replace("#city", $this->currentUser["city"], $text);
-        $text = str_replace("#year", $this->year, $text);
+        $text = str_replace("#firstname", $this->str($this->currentUser["firstname"]), $text);
+        $text = str_replace("#lastname", $this->str($this->currentUser["lastname"]), $text);
+        $text = str_replace("#address", $this->str($this->currentUser["address"]), $text);
+        $text = str_replace("#zip", $this->str($this->currentUser["postnmb"]), $text);
+        $text = str_replace("#city", $this->str($this->currentUser["city"]), $text);
+        $text = str_replace("#year", $this->str($this->year), $text);
 
         $rep = $this->currentUser["email"] ? $this->currentUser["email"] : "mangler";
         $text = str_replace("#email", $rep, $text);
@@ -157,6 +166,7 @@ class MassLetterHelper {
     	$text = str_replace("#courseprice", $this->courseprice, $text);
     	$text = str_replace("#yearprice", $this->yearprice, $text);
     	$text = str_replace("#trainprice", $this->trainprice, $text);
+        $text = str_replace("#duedate", $this->dueDate, $text);
 
         return $text;
     }
@@ -376,6 +386,5 @@ class MassLetterHelper {
         }
         return 0;
     }
-
 }
 ?>

@@ -31,11 +31,11 @@ wraptext=Med betalt treningsavgift kan du benytte deg av klubbens treningstider.
 
 ezSetDy=-10;
 wrapopts=right:0,left:-10
-wraptext=Se for øvring hjemmesiden vår, http://swing.oslo.no, eller kontakt oss på post@swing.oslo.no.
+wraptext=Se for øvring hjemmesiden vår, http://baardarswingclub.no, eller kontakt oss på post@baardarswingclub.no.
 
 setColor=255,0,0
 fontsize=14
-wraptext=Endringer eller mangler av reg. informasjon sendes styret@swing.oslo.no
+wraptext=Endringer eller mangler av reg. informasjon sendes styret@baardarswingclub.no
 
 setColor=0, 0, 0;
 ezSetDy=-10
@@ -111,6 +111,9 @@ ezSetY=70
 wrapopts=right:20,left:320
 wraptext=6030 05 67048
 
+ezSetY=280
+wrapopts=right:20,left:410
+wraptext=#duedate
 
 #here mass letter function start.
 query=memberships
@@ -119,7 +122,7 @@ query=memberships
 
 ezSetY=565
 wrapopts=right:20,left:20
-starttable=fontSize:10,showHeadings:0,showLines:1,xPos:left,xOrientation:right
+starttable=fontSize:10,showHeadings:0,showLines:2,xPos:left,xOrientation:right,shaded=0
 row=Navn: |#firstname #lastname
 row=Adresse: |#address
 row=E-post: |#email
@@ -136,14 +139,14 @@ wraptext=#zip #city
 #Here we have the membership card info.
 
 fontsize=10
-ezSetY=448s
+ezSetY=448
 wrapopts=right:0,left:300
 wraptext=#firstname #lastname
 wraptext=Periode: #year
 
 fontsize=8
-wraptext=www.bardarswingclub.no
-wraptext=post@bardarswingclub.no
+wraptext=www.baardarswingclub.no
+wraptext=post@baardarswingclub.no
 fontsize=10
 
 

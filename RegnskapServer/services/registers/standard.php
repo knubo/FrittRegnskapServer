@@ -16,6 +16,7 @@ $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
 $month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : "0";
 $semester = array_key_exists("semester", $_REQUEST) ? $_REQUEST["semester"] : "0";
 $email_sender = array_key_exists("email_sender", $_REQUEST) ? $_REQUEST["email_sender"] : "0";
+$massletter_due_date = array_key_exists("massletter_due_date", $_REQUEST) ? $_REQUEST["massletter_due_date"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -30,6 +31,7 @@ switch ($action) {
 		$res["month"] = $accStd->getOneValue("STD_MONTH");
 		$res["semester"] = $accStd->getOneValue("STD_SEMESTER");
 		$res["email_sender"] = $accStd->getOneValue("STD_EMAIL_SENDER");
+        $res["massletter_due_date"] = $accStd->getOneValue("MASSLETTER_DUE_DATE");
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();
@@ -42,11 +44,11 @@ switch ($action) {
 	case "save" :
         $regnSession->checkWriteAccess();
 		$res = 0;
-		$res = $res || $accStd->setValue("STD_YEAR", $year);
-		$res = $res || $accStd->setValue("STD_MONTH", $month);
-		$res = $res || $accStd->setValue("STD_SEMESTER", $semester);
-		$res = $res || $accStd->setValue("STD_EMAIL_SENDER", $email_sender);
-
+		$res = $res | $accStd->setValue("STD_YEAR", $year);
+		$res = $res | $accStd->setValue("STD_MONTH", $month);
+		$res = $res | $accStd->setValue("STD_SEMESTER", $semester);
+		$res = $res | $accStd->setValue("STD_EMAIL_SENDER", $email_sender);
+        $res = $res | $accStd->setValue("MASSLETTER_DUE_DATE", $massletter_due_date);
         $report = array();
         $report["result"] = $res ? 1 : 0;
 

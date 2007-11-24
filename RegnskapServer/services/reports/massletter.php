@@ -33,17 +33,18 @@ $prices = $accPrices->getCurrentPrices();
 $yearprice = round($prices["year"]);
 $courseprice = round($prices["course"]);
 $trainprice = round($prices["train"]);
+$dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 
 error_reporting(E_ALL);
 set_time_limit(1800);
 
 switch ($action) {
 	case "pdf" :
-		$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice);
+		$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice,$dueDate);
 		$massLetterHelper->useTemplate($template);
 		break;
 	case "list" :
-        $massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice);
+        $massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice,$dueDate);
         echo json_encode($massLetterHelper->listTemplates());
         break;
     default:

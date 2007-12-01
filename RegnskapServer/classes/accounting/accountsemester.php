@@ -32,9 +32,46 @@ class AccountSemester {
 		return "";
 	}
 
-    function getAll() {
-    	$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester");
-        return $prep->execute();
-    }
+	function getAll() {
+		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester");
+		return $prep->execute();
+	}
+
+	function hasEntry($year, $fall) {
+		$prep = $this->db->prepare("select description from " . AppConfig :: DB_PREFIX . "semester where year=? and fall=?");
+		$prep->bind_params("ii", $year, $fall);
+		$res = $prep->execute();
+
+		return count($res) == 0 ? false : true;
+	}
+
+	function save($year, $fall, $spring) {
+		$updatePrep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "semester set description = ? where year = ? and fall = ?");
+		$insertPrep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "semester set description = ?, year = ?, fall = ?");
+
+		$res = 0;
+
+		if ($this->saveEntry($updatePrep, $insertPrep, $year, $spring, 0)) {
+			$res = 1;
+		}
+		if ($this->saveEntry($updatePrep, $insertPrep, $year, $fall, 1)) {
+			$res = 1;
+		}
+
+		return $res;
+	}
+
+	function saveEntry($updatePrep, $insertPrep, $year, $spring, $fall) {
+		if ($this->hasEntry($year, $fall)) {
+			$updatePrep->bind_params("sii", $spring, $year, $fall);
+			$updatePrep->execute();
+
+			return $this->db->affected_rows() != 0;
+		} else {
+			$insertPrep->bind_params("sii", $spring, $year, $fall);
+			$insertPrep->execute();
+			return true;
+		}
+	}
 }
 ?>

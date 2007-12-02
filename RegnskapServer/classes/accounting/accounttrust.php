@@ -38,12 +38,12 @@ class AccountTrust {
     	$prep->execute();
 		return $this->db->insert_id();
 	}
-    
+
     function saveFondType($fond, $description) {
-        $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond_type set fond=?, description=? on duplicate key update description=?");    	
+        $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond_type set fond=?, description=? on duplicate key update description=?");
         $prep->bind_params("sss",$fond,$description,$description);
         $prep->execute();
-        
+
         return $this->db->affected_rows();
     }
 
@@ -73,7 +73,7 @@ class AccountTrust {
 		$arr = $prep->execute();
 
 		foreach ($arr as $one) {
-			return $one["s"];
+			return floatval($one["s"]);
 		}
 	}
 
@@ -85,7 +85,7 @@ class AccountTrust {
 		$result = array ();
 
 		foreach ($arr as $one) {
-			$result[] = new AccountTrust($this->db, $fond, $one["description"], $one["fond_account"], $one["club_account"], $one["occured"], $one["id"], $one["accountline"]);
+			$result[] = new AccountTrust($this->db, $fond, $one["description"], floatval($one["fond_account"]), floatval($one["club_account"]), $one["occured"], $one["id"], $one["accountline"]);
 		}
 
 		return $result;

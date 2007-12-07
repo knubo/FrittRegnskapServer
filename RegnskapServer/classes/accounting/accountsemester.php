@@ -37,6 +37,12 @@ class AccountSemester {
 		return $prep->execute();
 	}
 
+    function getForYear($year) {
+    	$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester where year=? order by fall");
+        $prep->bind_params("i", $year);
+        return $prep->execute();
+    }
+
 	function hasEntry($year, $fall) {
 		$prep = $this->db->prepare("select description from " . AppConfig :: DB_PREFIX . "semester where year=? and fall=?");
 		$prep->bind_params("ii", $year, $fall);

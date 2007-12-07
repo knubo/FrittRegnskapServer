@@ -23,12 +23,18 @@ class MembersFormatter {
         }
     }
 
-    function group($yearData, $courseData, $trainData) {
+    function group($yearData, $courseData, $trainData, $budgetData, $semesterInfo) {
         $grouped = array();
 
         MembersFormatter::loop(&$grouped, $yearData, "year");
         MembersFormatter::loop(&$grouped, $courseData, "course");
         MembersFormatter::loop(&$grouped, $trainData, "train");
+
+        $springSemester = array_shift($semesterInfo);
+        $fallSemester = array_shift($semesterInfo);
+
+        $grouped[$budgetData["year"]."-0"] = array("budget"=>1, "semester"=> $springSemester["semester"], "year"=>$budgetData["year_members"], "course"=>$budgetData["spring_course"],"train"=>$budgetData["spring_train"], "keyYear"=>$budgetData["year"], "keyFall" => 0);
+        $grouped[$budgetData["year"]."-1"] = array("budget"=>1, "semester"=> $fallSemester["semester"], "year"=>0, "course"=>$budgetData["fall_course"],"train"=>$budgetData["fall_train"], "keyYear"=>$budgetData["year"], "keyFall"=> 1);
 
         return $grouped;
     }

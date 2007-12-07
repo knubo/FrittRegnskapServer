@@ -187,6 +187,16 @@ CREATE TABLE IF NOT EXISTS regn_fond (
    accountline INTEGER(8) UNSIGNED
 );
 
+create table if not exists regn_budget_membership (
+  year int(4) unsigned not null primary key,
+  year_members int(5) unsigned,
+  spring_train int(5) unsigned,
+  spring_course int(5) unsigned,
+  fall_train int(5) unsigned,
+  fall_course int(5) unsigned
+);
+  
+
 CREATE TABLE IF NOT EXISTS regn_budsjett (
    year INT(4) UNSIGNED NOT NULL,
    post_type INTEGER(5) UNSIGNED NOT NULL,

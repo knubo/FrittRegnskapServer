@@ -3,11 +3,20 @@ class AccountBudget {
 
 	private $db;
 
-	function AccountBudget($db) {
+    public $PostType;
+    public $Amount;
+
+	function AccountBudget($db, $postType = 0, $amount = 0) {
 		$this->db = $db;
+        $this->PostType = $postType;
+        $this->Amount = $amount;
 	}
 
-	function get($year) {
+    function getBudgetlines($year) {
+
+    }
+
+	function getMemberships($year) {
 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "budget_membership where year = ?");
 		$prep->bind_params("i", $year);
 

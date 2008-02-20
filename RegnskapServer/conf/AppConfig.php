@@ -2,28 +2,28 @@
 
 
 class AppConfig {
-    
+
 const DB_HOST_NAME="localhost";
 const DB_USER="root";
 const DB_PASSWORD="";
 const DB_NAME="knubo";
 
 #Set to 1 if you want authentication.
-const USE_AUTHENTICATION=1;
+const USE_AUTHENTICATION=0;
 
 #Common db prefix for all database.
 const DB_PREFIX = "regn_";
 
 #Values for count. Must match CountCoulumns.
 function CountValues() {
-	return array(1000,500,200,100,50,20,10,5,1,0.5); 
+	return array(1000,500,200,100,50,20,10,5,1,0.5);
 }
-     
+
 #Columns in database for count
 function CountColumns() {
-  return array('a1000','a500','a200','a100','a50','a20','a10','a5','a1','a_5'); 
+  return array('a1000','a500','a200','a100','a50','a20','a10','a5','a1','a_5');
 }
-	
+
 #Fordring posts
 function FordringPosts() {
 	return array(1370,1380,1390,1500,1570);

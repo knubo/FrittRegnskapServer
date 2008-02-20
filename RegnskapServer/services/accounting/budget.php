@@ -44,7 +44,7 @@ switch ($action) {
 		$accBudget = new AccountBudget($db);
         $accSemester = new AccountSemester($db);
 
-		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accBudget->get($budgetyear), $accSemester->getForYear($budgetyear));
+		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
 		$result["price"] = $accPrice->getAll();
 
 		echo json_encode($result);

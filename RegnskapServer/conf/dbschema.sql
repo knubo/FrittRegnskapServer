@@ -200,8 +200,7 @@ create table if not exists regn_budget_membership (
 CREATE TABLE IF NOT EXISTS regn_budsjett (
    year INT(4) UNSIGNED NOT NULL,
    post_type INTEGER(5) UNSIGNED NOT NULL,
-   amount NUMERIC(8,2) UNSIGNED,
-   predict NUMERIC(8,2) UNSIGNED
+   amount NUMERIC(8,2) UNSIGNED
 );
 
 CREATE TABLE IF NOT EXISTS regn_fond_action (

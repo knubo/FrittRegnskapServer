@@ -35,15 +35,15 @@ class AccountyearMembership {
 
 		foreach ($query_array as $one) {
 			$result[] = array (
+                $one["firstname"],
 				$one["lastname"],
-				$one["firstname"],
 				$one["id"]
 			);
 		}
 		return $result;
 
 	}
-    
+
     function delete($year, $person) {
     	$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? and year=?");
         $prep->bind_params("ii", $person, $year);
@@ -90,20 +90,20 @@ class AccountyearMembership {
 
 		$arr = array ();
 		foreach ($res as $one) {
-            
+
             $d = "";
             if(array_key_exists("birthdate", $one) && $one["birthdate"]) {
     			$tmpdate = new eZDate();
 	       		$tmpdate->setMySQLDate($one["birthdate"]);
             	$d = $tmpdate->displayAccount();
             }
-            
+
 			$arr[] = new ReportUserBirthdate($one["id"], $one["firstname"], $one["lastname"], $d);
 		}
 
 		return $arr;
 	}
-    
+
     function getReportUsersFull($year) {
         $prep = $this->db->prepare("select distinct * from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by lastname,firstname");
         $prep->bind_params("i", $year);
@@ -111,7 +111,7 @@ class AccountyearMembership {
 
         return $res;
     }
-    
+
     function getOverview() {
         $prep = $this->db->prepare("select count(*) as C, year from " . AppConfig :: DB_PREFIX . "year_membership group by year;");
     	return $prep->execute();

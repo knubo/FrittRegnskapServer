@@ -3,20 +3,20 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
-include_once ("../../classes/accounting/accountyearmembership.php"); 
+include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/reporting/reportuserbirthdate.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $db = new DB();
  $regnSession = new RegnSession($db);
 $regnSession->auth();
- 
+
 if (!$year) {
     $standard = new AccountStandard($db);
     $year = $standard->getOneValue("STD_YEAR");
 }
- 
+
 $accYearMem = new AccountYearMembership($db);
 
 $users = $accYearMem->getReportUsersBirthdate($year);
@@ -36,13 +36,13 @@ foreach($users as $one) {
   $birth = $one->getBirthdate();
 
   $age = $thisYear - substr($birth, -4) - 1;
-  
+
   if($age < 150) {
-    $one->setAge($age);  	
+    $one->setAge($age);
   } else {
   	$one->setAge("");
   }
-  if(!$birth) { 
+  if(!$birth) {
     $year_unset[] = $one;
   } else if(strlen($birth) != 10 || $age > 150) {
     $year_wrong[] = $one;

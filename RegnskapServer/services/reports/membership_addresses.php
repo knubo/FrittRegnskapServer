@@ -6,7 +6,7 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/auth/RegnSession.php");
 
-$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "json";
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -30,11 +30,11 @@ switch ($action) {
         header('Content-type: octet-stream');
         header('Content-Disposition: attachment; filename="memberaddresses.csv"');
         foreach($users as $one) {
-            
+
         	if($one["address"]) {
-        		echo $one["firstname"].";".$one["lastname"].";".$one["address"].";".$one["postnmb"].";".$one["city"].";".$one["email"].";".$one["birthdate"].";".$one["cellphone"].";".$one["phone"].";\n"; 
+        		echo $one["firstname"].";".$one["lastname"].";".$one["address"].";".$one["postnmb"].";".$one["city"].";".$one["email"].";".$one["birthdate"].";".$one["cellphone"].";".$one["phone"].";\n";
         	}
-        } 
+        }
 		break;
 }
 ?>

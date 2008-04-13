@@ -38,7 +38,7 @@ const EndPostTransferPost=9000;
 const EndPostYearTransferPost=8800;
 #Posts available in select when registering a membership.
 function RegisterMembershipPosts() {
-	return array(1920,1904,1905,9201,9202,9203,9204,9205,9206,9207,9208,9209,9210,9211,9212,9213,9214,9215,9216,9217,9218);
+	return array(1920,1905, 2910, 2990);
 }
 const YearMembershipCreditPost=3920;
 const CourseMembershipCreditPost=3925;

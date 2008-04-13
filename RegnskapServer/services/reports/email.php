@@ -18,6 +18,7 @@ $query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "all";
 $subject = array_key_exists("subject", $_REQUEST) ? $_REQUEST["subject"] : "";
 $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
 $body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
+$attachments = array_key_exists("attachments", $_REQUEST) ? $_REQUEST["attachments"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -45,14 +46,14 @@ switch ($action) {
                 echo json_encode($users);
                 die("");
                 break;
-			case "test" : 
+			case "test" :
                 if(!$currentUser) {
                 	die("Need current user");
                 }
                 $accPerson = new AccountPerson($db);
-                $accPerson->setUser($currentUser);            
+                $accPerson->setUser($currentUser);
 				$users = $accPerson->search(false);
-				}
+		}
 
 		foreach ($users as $one) {
 			if (!array_key_exists("email", $one) || !$one["email"]) {
@@ -70,7 +71,13 @@ switch ($action) {
         $regnSession->checkReducedWriteAccess();
 		$emailer = new Emailer($db);
 		$res = array ();
-		$status = $emailer->sendEmail($subject, $email, $body, $standard->getOneValue("STD_EMAIL_SENDER"));
+
+        $subject = urldecode($subject);
+        $body = urldecode($body);
+        $attachments = urldecode($attachments);
+        $attObjs = $attachments ? json_decode($attachments) : null;
+
+		$status = $emailer->sendEmail($subject, $email, $body, $standard->getOneValue("STD_EMAIL_SENDER"), $attObjs);
 		$res["status"] = $status ? 1 : 0;
 		echo json_encode($res);
 		break;

@@ -28,20 +28,35 @@ class Emailer {
 
 	  $bndp = md5(time()).rand(1000,9999);
       $headers .= "Content-Type: multipart/mixed; $eol       boundary=\"".$bndp."\"".$eol.$eol;
-      $msg = "This is a multi-part message in MIME format.".$eol.$eol;
+      $msg = "This is a multi-part message in MIME format.".$eol;
+      $msg .= $eol;
+
       $msg.= "--".$bndp.$eol;
-      $bnd = md5(time()).rand(1000,9999);
-      $msg.= "Content-Type: multipart/alternative; $eol       boundary=\"".$bnd."\"".$eol.$eol;
-      $msg.= "--".$bnd.$eol;
       $msg.= "Content-Type: text/plain; charset=UTF-8".$eol;
-      $msg.= "Content-Transfer-Encoding: 8bit".$eol.$eol;
+      $msg.= "Content-Transfer-Encoding: 8bit".$eol;
+      $msg.= $eol;
       $msg.= $body.$eol;
-//      $msg.= "--".$bnd.$eol;
-//      $msg.= "Content-Type: text/html; charset=UTF-8".$eol;
-//      $msg.= "Content-Transfer-Encoding: 8-bit".$eol.$eol;
-//      $msg.= $body.$eol;
-      $msg .= "--".$bnd."--".$eol.$eol;
-      $msg .= "--".$bndp."--";
+
+     if($attachObj) {
+         foreach($attachObj as $one) {
+              $one = rtrim($one);
+              if($one[0] == '.') {
+                 die("Illegal file name");
+              }
+
+              $fileData = chunk_split(base64_encode(file_get_contents("../../storage/$one")), 68, $eol);
+              $fileName = $one;
+
+              $msg.= "--".$bndp.$eol;
+              $msg.= "Content-Type: application/octet-stream;name=\"$fileName\"".$eol;
+              $msg.= "Content-Transfer-Encoding: base64".$eol;
+              $msg.= $eol;
+              $msg.= $fileData.$eol;
+         }
+      }
+
+
+      $msg .= "--".$bndp."--$eol";
 
       # SEND THE EMAIL
       $sendmail_from = 0;

@@ -10,6 +10,7 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
+$file = array_key_exists("file", $_REQUEST) ? $_REQUEST["file"] : "";
 
 
 switch($action) {
@@ -26,6 +27,19 @@ switch($action) {
         echo json_encode($res);
 
         break;
+    case "delete":
+        $res = array();
+
+        if($file[0] == '.') {
+            $result["status"] = 0;
+        } else {
+            $res["result"] = unlink("../../storage/$file") ? 1 : 0;
+        }
+
+
+        echo json_encode($res);
+
+        break;
 	case "upload":
         $regnSession->checkWriteAccess();
 
@@ -38,9 +52,8 @@ switch($action) {
         if($fileName[0] == '.') {
             $result["status"] = 0;
         } else {
-            $result["status"] = copy($_FILES['uploadFormElement']['tmp_name'], "../../storage/$fileName");
+            $result["status"] = copy($_FILES['uploadFormElement']['tmp_name'], "../../storage/$fileName") ? 1 : 0;
         }
-
 
         echo json_encode($result);
         break;

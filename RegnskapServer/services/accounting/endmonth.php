@@ -45,7 +45,7 @@ switch ($action) {
 		$db->begin();
 		$res = $endHelper->endMonth();
 		$db->commit();
-		echo "1";
+		echo json_encode("1");
 		break;
 }
 ?>

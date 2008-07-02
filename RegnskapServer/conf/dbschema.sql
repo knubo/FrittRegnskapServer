@@ -132,7 +132,8 @@ create table if not exists regn_person (
    employee tinyint,
    birthdate DATE,
    newsletter tinyint,
-   hidden tinyint
+   hidden tinyint,
+   gender varchar(1)
 );
 
 CREATE TABLE IF NOT EXISTS regn_post_type (

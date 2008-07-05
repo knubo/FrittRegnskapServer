@@ -1,3 +1,13 @@
+create table if not exists regn_log(
+  id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  occured TIMESTAMP,
+  username varchar(25),
+  category varchar(10),
+  action varchar(10),
+  message TEXT
+);
+
+
 create table if not exists regn_accounttrack(
    post INTEGER(8) PRIMARY KEY
 )

@@ -32,6 +32,7 @@ switch ($action) {
 		$ret = array ();
 		switch ($query) {
 			case "members" :
+            case "simulate":
 				$accYearMem = new AccountYearMembership($db);
 				$users = $accYearMem->getReportUsersFull($year);
 				break;
@@ -68,6 +69,7 @@ switch ($action) {
 		echo json_encode($ret);
 		break;
 	case "email" :
+    case "simulatemail":
         $regnSession->checkReducedWriteAccess();
 		$emailer = new Emailer($db);
 		$res = array ();
@@ -76,8 +78,14 @@ switch ($action) {
         $body = urldecode($body);
         $attachments = urldecode($attachments);
         $attObjs = $attachments ? json_decode($attachments) : null;
+        $sender = $standard->getOneValue("STD_EMAIL_SENDER");
 
-		$status = $emailer->sendEmail($subject, $email, $body, $standard->getOneValue("STD_EMAIL_SENDER"), $attObjs);
+        if($action == "email") {
+		  $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs);
+        } else {
+        	$status = true;
+        }
+
 		$res["status"] = $status ? 1 : 0;
 		echo json_encode($res);
 		break;

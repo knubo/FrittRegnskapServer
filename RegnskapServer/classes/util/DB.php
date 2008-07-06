@@ -16,24 +16,24 @@ class DB {
 	function begin() {
 		$this->link->autocommit(FALSE);
 	}
-	
+
 	function rollback() {
 		$this->link->rollback();
 	}
-	
+
 	function commit() {
 		if(!$this->link->commit()) {
 			$this->report_error();
-		}		
+		}
 	}
-	
+
 	function __construct($keeplatin1 = 0) {
          $this->link = mysqli_connect(AppConfig::DB_HOST_NAME,
             AppConfig::DB_USER, AppConfig::DB_PASSWORD, AppConfig::DB_NAME);
-        
+
         if(!$keeplatin1) {
             mysqli_query($this->link, "SET NAMES 'utf8'");
-        } 
+        }
 		if (mysqli_connect_errno()) {
             header("HTTP/1.0 512 DB error");
 			die("Connect failed: ".mysqli_connect_error());
@@ -57,17 +57,17 @@ class DB {
 
 		return $match > 0;
 	}
-    
+
     function report_error() {
-        $error = $this->link->error; 
+        $error = $this->link->error;
         header("HTTP/1.0 512 DB error");
         $this->rollback();
-        die("DB:".$error);           
+        die("DB:".$error);
     }
 
 	function prepare($query) {
 		$mysqli = mysqli_prepare($this->link, $query);
-        
+
 		if (!$mysqli) {
             $this->report_error();
 		}
@@ -83,7 +83,7 @@ class DB {
 		if(!mysqli_query($this->link, $query)) {
 			$this->report_error();
 		}
-        
+
 	}
 
 	function backtrace() {
@@ -221,7 +221,7 @@ class PrepWrapper {
 	function bind_params() {
 		$args = func_get_args();
 
-		if(!call_user_func_array('mysqli_stmt_bind_param', 
+		if(!call_user_func_array('mysqli_stmt_bind_param',
 		   array_merge(array ($this->Mysqli), $args))) {
 		  $this->db->report_error();
 	    }
@@ -230,13 +230,13 @@ class PrepWrapper {
 
 class SearchWrapper {
 	private $Db;
-	private $Prequery;	
+	private $Prequery;
 	private $Type;
 	private $Params;
 	private $Query;
 	private $OuterJoin;
 	private $SqlWhere;
-	
+
 	function SearchWrapper($db, $prequery, $orderby) {
 		$this->Db = $db;
 		$this->Prequery = $prequery;
@@ -247,7 +247,11 @@ class SearchWrapper {
 		$this->Query = "";
 		$this->SqlWhere = "";
 	}
-	
+
+    function query() {
+    	return $this->Query;
+    }
+
 	function addOuterJoin($table, $condA, $condB) {
 		$this->OuterJoin .= " left join $table on $condA = $condB ";
 	}
@@ -261,55 +265,55 @@ class SearchWrapper {
 		$this->Params[] = $bind;
 		$this->Query .= $sql;
 	}
-    
+
     function addOnlySql($sql) {
         if(sizeof($this->Params) > 0) {
             $this->Query .=" and ";
         }
     	$this->Query .= $sql;
     }
-	
+
 	function addAndParam($type, $name, $param, $allowNull = 0) {
 		if($param == "" && !$allowNull) {
 			return;
 		}
-		
+
 		$this->Type .=$type;
-		
+
 		if(sizeof($this->Params) > 0) {
 			$this->Query .=" and ";
 		}
-		
+
 		$this->Params[] = $param;
 		if($type == "s") {
 			$this->Query .="$name like ?";
 		} else {
-			$this->Query .="$name = ?";			
+			$this->Query .="$name = ?";
 		}
 	}
-    
+
     function addAndQuery($type, $param, $exists) {
         if($param == "") {
             return;
         }
         $this->Type .=$type;
-        
+
         if(sizeof($this->Params) > 0) {
             $this->Query .=" and ";
         }
         $this->Params[] = $param;
-        
+
         $this->Query .= $exists;
-    	
+
     }
-	
+
 	function execute() {
 		if(sizeof($this->Params) == 0) {
 			$sql = $this->Prequery. " ".$this->OuterJoin." ".$this->SqlWhere." ".$this->OrderBy;
 			$prep = $this->Db->prepare($sql);
-			return $prep->execute();			
-		}		
-		
+			return $prep->execute();
+		}
+
 		$sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
 		$prep = $this->Db->prepare($sql);
 		$prep->bind_array_params($this->Type, $this->Params);

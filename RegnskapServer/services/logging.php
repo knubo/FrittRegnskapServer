@@ -9,6 +9,7 @@ $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $category = array_key_exists("category", $_REQUEST) ? $_REQUEST["category"] : "error";
 $logaction = array_key_exists("logaction", $_REQUEST) ? $_REQUEST["logaction"] : "";
 $message = array_key_exists("message", $_REQUEST) ? $_REQUEST["message"] : "";
+$pos = array_key_exists("pos", $_REQUEST) ? $_REQUEST["pos"] : null;
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -21,8 +22,7 @@ switch ($action) {
 		echo "Logged";
 		break;
 	case "list" :
-		echo "TODO";
-		//TODO
+        echo json_encode($logger->list_entries($pos));
 		break;
 	default :
 		echo "Unknown action $action";

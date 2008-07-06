@@ -187,7 +187,14 @@ class AccountPerson {
 		$searchWrap->addAndParam("s", "cellphone", $this->Cellphone);
 		$searchWrap->addAndParam("s", "email", $this->Email);
 		$searchWrap->addAndParam("i", "newsletter", $this->Newsletter);
-		$searchWrap->addAndParam("s", "gender", $this->Gender);
+
+        if($this->Gender == "U") {
+            /* Appears that addOnlySql bugs if no other params are set */
+        	$searchWrap->addAndParam("i", "1", 1);
+        	$searchWrap->addOnlySql("gender is null");
+        } else {
+            $searchWrap->addAndParam("s", "gender", $this->Gender);
+        }
 
         if($this->Hidden) {
         	$searchWrap->addOnlySql("(hidden is null or hidden <> 1)");

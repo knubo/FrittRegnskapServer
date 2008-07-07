@@ -55,6 +55,9 @@ switch ($action) {
         echo json_encode($res);
         break;
 	case "get" :
+        header('Content-type: octet-stream');
+        header('Content-Disposition: attachment; filename="backup.zip"');
+        readfile("../backup/backup.zip");
 		break;
 }
 ?>

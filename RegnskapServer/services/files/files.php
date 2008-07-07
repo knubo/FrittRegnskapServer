@@ -2,16 +2,17 @@
 
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
-include_once ("../../classes/accounting/accountplan.php");
+include_once ("../../classes/util/strings.php");
+include_once ("../../classes/util/logger.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $db = new DB();
+$logger = new Logger($db);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $file = array_key_exists("file", $_REQUEST) ? $_REQUEST["file"] : "";
-
 
 switch($action) {
     case "list":
@@ -47,6 +48,8 @@ switch($action) {
 
         $fileName = $_FILES['uploadFormElement']['name'];
 
+        $fileName = Strings::whitelist($fileName);
+
         $result = array();
 
         if($fileName[0] == '.') {
@@ -54,6 +57,8 @@ switch($action) {
         } else {
             $result["status"] = copy($_FILES['uploadFormElement']['tmp_name'], "../../storage/$fileName") ? 1 : 0;
         }
+
+        $logger->log("info","files", "Uploaded: $fileName");
 
         echo json_encode($result);
         break;

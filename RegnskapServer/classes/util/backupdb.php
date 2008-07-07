@@ -2,26 +2,50 @@
 class BackupDB {
 
 	private $db;
+    private $logger;
 
 	function BackupDB($db) {
 		$this->db = $db;
+        $this->logger = new Logger($db);
 	}
 
-    function info() {
+	function info() {
+	}
 
-    }
+	function init() {
 
-    function init() {
+	}
 
-    }
+	function tables() {
+		$prep = $this->db->prepare("show tables like '" . AppConfig :: DB_PREFIX . "%'");
+		$res = $prep->execute();
 
-    function tables() {
+		$tables = array ();
+		foreach ($res as $value) {
+			$tables = array_merge($tables, array_values($value));
+		}
 
-    }
+		return $tables;
+	}
 
-    function backup($table) {
+	function backup($table) {
+        $cmd = AppConfig::MYSQLDUMP." -cnt -u" . AppConfig :: DB_USER . " -h " . AppConfig :: DB_HOST_NAME;
 
-    }
+        if(AppConfig :: DB_PASSWORD && strlen(AppConfig::DB_PASSWORD) > 0) {
+        	$cmd.= " -p" . AppConfig :: DB_PASSWORD;
+        }
+
+        $cmd.= " " . AppConfig :: DB_NAME . " $table";
+        $data = array();
+		$res = exec($cmd, &$data);
+
+        if(count($data) == 0) {
+            $this->logger->log("error","exec", "Failed to run command $cmd");
+        	return false;
+        }
+
+        return file_put_contents("../backup/$table.sql", $data) > 0;
+	}
 }
 ?>
 

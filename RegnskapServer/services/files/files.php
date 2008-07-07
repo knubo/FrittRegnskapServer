@@ -35,8 +35,8 @@ switch($action) {
             $result["status"] = 0;
         } else {
             $res["result"] = unlink("../../storage/$file") ? 1 : 0;
+            $logger->log("info","files", "Deleted: $fileName");
         }
-
 
         echo json_encode($res);
 

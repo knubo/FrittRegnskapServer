@@ -145,6 +145,22 @@ class PrepWrapper {
         $this->db = $db;
 	}
 
+    function meta() {
+        $handle = $this->Mysqli;
+
+        $metadata = $handle->result_metadata();
+
+        # No rows, no result, no action.
+        if ($metadata == FALSE) {
+            return;
+        }
+
+        $nof = $metadata->field_count;
+
+        # The metadata of all fields
+        return $metadata->fetch_fields();
+    }
+
 	function execute() {
 		$handle = $this->Mysqli;
 

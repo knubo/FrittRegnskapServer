@@ -28,6 +28,19 @@ class BackupDB {
 		return $tables;
 	}
 
+    function zip() {
+        $cmd = "/usr/bin/zip ../backup/backup.zip ../backup/*.sql";
+
+        $data = array();
+        $res = exec($cmd, &$data);
+
+        if(count($data) == 0) {
+            $this->logger->log("error","command", "Failed to run command $cmd");
+            return false;
+        }
+        return true;
+    }
+
 	function backup($table) {
         $cmd = AppConfig::MYSQLDUMP." -cnt -u" . AppConfig :: DB_USER . " -h " . AppConfig :: DB_HOST_NAME;
 

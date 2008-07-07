@@ -22,7 +22,7 @@ switch ($action) {
 		break;
 
 	case "init" :
-		$acStandard->setValue("BACKUP_TIME", date("m.d.y H:i"));
+		$acStandard->setValue("BACKUP_TIME", date("m.d.Y H:i"));
 		/* Fallthrough */
 	case "delete" :
 		$path = "../backup/";
@@ -44,11 +44,16 @@ switch ($action) {
 	case "info" :
 		$res = array ();
 		$res["last_backup"] = $acStandard->getOneValue("BACKUP_TIME");
-
+        if(file_exists("../backup/backup.zip")) {
+            $res["backup_file"] = date("m.d.Y H:i", filemtime("../backup/backup.zip"));
+        }
 		echo json_encode($res);
 		break;
 	case "zip" :
-		break;
+        $res = array ();
+        $res["result"] = json_encode($backup->zip($table));
+        echo json_encode($res);
+        break;
 	case "get" :
 		break;
 }

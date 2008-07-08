@@ -57,8 +57,7 @@ class BackupDB {
         	return false;
         }
 
-        return file_put_contents("../backup/$table.sql", $data) > 0;
+        return file_put_contents("../backup/$table.sql", implode("\n",$data)) > 0;
 	}
 }
 ?>
-

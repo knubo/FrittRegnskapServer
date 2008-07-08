@@ -7,7 +7,7 @@ include_once ("../classes/util/backupdb.php");
 include_once ("../classes/util/logger.php");
 include_once ("../classes/auth/RegnSession.php");
 
-$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "info";
+$action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "tables";
 $table = array_key_exists("table", $_REQUEST) ? $_REQUEST["table"] : "";
 
 $db = new DB();
@@ -38,7 +38,7 @@ switch ($action) {
 		break;
 	case "backup" :
 		$res = array ();
-		$res["result"] = json_encode($backup->backup($table));
+		$res["result"] = json_encode($backup->backup($table)) ? 1 : 0;
 		echo json_encode($res);
 		break;
 	case "info" :
@@ -51,12 +51,13 @@ switch ($action) {
 		break;
 	case "zip" :
         $res = array ();
-        $res["result"] = json_encode($backup->zip($table));
+        $res["result"] = json_encode($backup->zip($table)) ? 1 : 0;
         echo json_encode($res);
         break;
 	case "get" :
+        $backupFileName = "backupAccounting".date("m-d-Y").".zip";
         header('Content-type: octet-stream');
-        header('Content-Disposition: attachment; filename="backup.zip"');
+        header('Content-Disposition: attachment; filename="'.$backupFileName);
         readfile("../backup/backup.zip");
 		break;
 }

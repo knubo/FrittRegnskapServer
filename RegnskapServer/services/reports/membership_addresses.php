@@ -32,7 +32,7 @@ switch ($action) {
         foreach($users as $one) {
 
         	if($one["address"]) {
-        		echo $one["firstname"].";".$one["lastname"].";".$one["address"].";".$one["postnmb"].";".$one["city"].";".$one["email"].";".$one["birthdate"].";".$one["cellphone"].";".$one["phone"].";\n";
+        		echo $one["firstname"].";".$one["lastname"].";".$one["address"].";".$one["postnmb"].";".$one["city"].";".$one["email"].";".$one["birthdate"].";".$one["cellphone"].";".$one["phone"].";".$one["gender"].";\n";
         	}
         }
 		break;

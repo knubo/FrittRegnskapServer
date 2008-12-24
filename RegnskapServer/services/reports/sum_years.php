@@ -8,7 +8,7 @@ include_once ("../../classes/auth/RegnSession.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2005;
 
-$db = new DB();
+$db = new DB(false);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 

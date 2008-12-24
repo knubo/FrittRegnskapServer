@@ -1,4 +1,4 @@
-<table>
+<table class="report">
 <?php
 foreach($data as $one) {
     if($one["sum"] == 0) {

@@ -32,7 +32,7 @@ function FordringPosts() {
 }
 #Posts that are to be transfered to next month.
 function EndPosts() {
-	return array(1904,1905,1920);
+	return array(1904,1905,1906, 1920,1921);
 }
 #Post that values are transfered to after end of month.
 const EndPostTransferPost=9000;

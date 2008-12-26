@@ -8,6 +8,9 @@ class ReportYear {
 	}
 
 	function fixNum($num) {
+        if($num == 0) {
+        	return "0.00";
+        }
         $exp = explode(".", $num);
 
         if(count($exp) == 1) {
@@ -15,7 +18,7 @@ class ReportYear {
         }
 
         if(strlen($exp[1]) == 1) {
-        	return "$num0";
+        	return "$num"."0";
         }
 
         return $num;
@@ -25,16 +28,16 @@ class ReportYear {
     	return $this->list_sums_int($year, $debet,"RP.post_type < 9000 and RP.post_type >= 3000");
     }
 
-
     function list_sums_3000($year, $debet) {
         return $this->list_sums_int($year, $debet,"RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050");
     }
 
+
     function list_sums_2000($year) {
         $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost  from regn_line RL, regn_post RP " .
-                "where RP.line = RL.id and debet = ? and year=? and month = 12 and RP.post_type < 2000 and " .
+                "where RP.line = RL.id and debet = ? and year=? and month = 12 and RP.post_type < 2000 and RP.amount > 0 and " .
                 "RL.id not in(select RL2.id from regn_line RL2, regn_post RP2 where RL2.month = 12 and " .
-                "RL2.year = ? and RP2.line = RL2.id and RP2.post_type = 8800) group by RP.post_type;");
+                "RL2.year = ? and RP2.line = RL2.id and RP2.post_type = 8800) group by RP.post_type");
 
         $prep->bind_params("sii", '1', $year, $year);
         $resDebet = $this->makeSumPerPostType($prep->execute());
@@ -64,14 +67,14 @@ class ReportYear {
     function sumDebetAndKreditValues($resDebet, $resKredit) {
     	$sums = array();
         foreach(array_keys($resDebet) as $debKey) {
-
             $sums[$debKey] = array("value" => $resDebet[$debKey]);
         }
+
         foreach(array_keys($resKredit) as $kredKey) {
             if(array_key_exists($kredKey, $sums)) {
                 $sums[$kredKey]["value"] -= $resKredit[$kredKey];
             } else {
-                $sums[$kredKey] = array("value" => 0 - $resKredit[$kredKey]);
+                $sums[$kredKey] = array("value" => (0 - $resKredit[$kredKey]));
             }
         }
         return $sums;

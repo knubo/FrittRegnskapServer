@@ -1,14 +1,14 @@
 <table class="report">
 <?php
-foreach($data as $one) {
-    if($one["sum"] == 0) {
+foreach(array_keys($data) as $post_type) {
+    if($data[$post_type]["value"] == 0) {
         continue;
     }
-    $sum+=$one["sum"];
+    $sum+=$data[$post_type]["value"];
 
     $class = $class == "showlineposts1" ? "showlineposts2" : "showlineposts1";
 ?>
-<tr class="<?=$class?>"><td><?=$one["post_type"]?></td><td><?=$one["description"]?></td><td><?=$one["sum"]?></td></tr>
+<tr class="<?=$class?>"><td><?=$post_type?></td><td><?=$data[$post_type]["description"]?></td><td><?=$data[$post_type]["value"]?></td></tr>
 <?php
 }
 ?>

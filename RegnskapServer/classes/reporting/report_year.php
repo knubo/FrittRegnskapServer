@@ -24,12 +24,16 @@ class ReportYear {
         return $num;
 	}
 
-    function list_sums($year, $debet) {
-    	return $this->list_sums_int($year, $debet,"RP.post_type < 9000 and RP.post_type >= 3000");
+    function list_sums_earnings($year) {
+    	return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400)", -1);
     }
 
-    function list_sums_3000($year, $debet) {
-        return $this->list_sums_int($year, $debet,"RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050");
+    function list_sums_cost($year) {
+        return $this->list_sums_int($year, "RP.post_type >= 4000 and RP.post_type <= 8500", 1);
+    }
+
+    function list_sums_ownings($year) {
+        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000", 1);
     }
 
 
@@ -45,7 +49,7 @@ class ReportYear {
         $prep->bind_params("sii", '-1', $year, $year);
         $resKredit = $this->makeSumPerPostType($prep->execute());
 
-        $sums = $this->sumDebetAndKreditValues($resDebet, $resKredit);
+        $sums = $this->sumDebetAndKreditValues($resDebet, $resKredit, 1);
 
         return $this->addDescriptionsAndFixSums2000($sums, $year);
     }
@@ -64,18 +68,19 @@ class ReportYear {
         return $sums;
     }
 
-    function sumDebetAndKreditValues($resDebet, $resKredit) {
+    function sumDebetAndKreditValues($resDebet, $resKredit, $sign) {
     	$sums = array();
         foreach(array_keys($resDebet) as $debKey) {
-            $sums[$debKey] = array("value" => $resDebet[$debKey]);
+            $sums[$debKey] = array("value" => $resDebet[$debKey]["sumpost"], "description" => $resDebet[$debKey]["description"]);
         }
 
         foreach(array_keys($resKredit) as $kredKey) {
             if(array_key_exists($kredKey, $sums)) {
-                $sums[$kredKey]["value"] -= $resKredit[$kredKey];
+                $sums[$kredKey]["value"] -= ($resKredit[$kredKey]["sumpost"] * $sign);
             } else {
-                $sums[$kredKey] = array("value" => (0 - $resKredit[$kredKey]));
+                $sums[$kredKey] = array("value" => (0 - ($resKredit[$kredKey]["sumpost"] * $sign)));
             }
+            $sums[$kredKey]["description"] = $resKredit[$kredKey]["description"];
         }
         return $sums;
     }
@@ -83,40 +88,24 @@ class ReportYear {
     function makeSumPerPostType($lines) {
         $res = array();
         foreach($lines as $one) {
-            $res[$one["post_type"]] = $one["sumpost"];
+            $res[$one["post_type"]] = array("sumpost" => $one["sumpost"], "description" => $one["description"]);
         }
         return $res;
     }
 
-	function list_sums_int($year, $debet, $ignore) {
+	function list_sums_int($year, $ignore, $sign) {
+		$prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from regn_post RP, regn_line RL,regn_post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = ? and $ignore and RPT.post_type = RP.post_type group by post_type,debet order by post_type");
+		$prep->bind_params("is", $year, '1');
+        $resDebet = $this->makeSumPerPostType($prep->execute());
 
-		$prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost,debet from regn_post RP, regn_line RL where RL.id=RP.line and RL.year=? and RP.debet = ? and $ignore group by post_type,debet order by post_type");
-		$prep->bind_params("is", $year, $debet);
 
-		$res = $prep->execute();
+        $prep->bind_params("is", $year, '-1');
+        $resKredit = $this->makeSumPerPostType($prep->execute());
 
-        return $this->result($res, $year);
+        $sums = $this->sumDebetAndKreditValues($resDebet, $resKredit, $sign);
+
+        return $sums;
     }
 
-    function result($res, $year) {
-		$arr = array ();
-		foreach ($res as $one) {
-			if (array_key_exists($one["post_type"], $arr)) {
-				$arr[$one["post_type"]] += $one["sumpost"];
-			} else {
-				$arr[$one["post_type"]] = $one["sumpost"];
-			}
-		}
-
-		$prep = $this->db->prepare("select distinct(RP.post_type),RPT.description from regn_post RP, regn_line RL,regn_post_type RPT where RL.id=RP.line and RL.year=? and RPT.post_type = RP.post_type group by post_type,debet order by post_type");
-		$prep->bind_params("i", $year);
-
-		$res = $prep->execute();
-
-		foreach ($res as & $one) {
-			$one["sum"] = $this->fixNum($arr[$one["post_type"]]);
-		}
-		return $res;
-	}
 
 }

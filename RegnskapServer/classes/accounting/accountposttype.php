@@ -9,7 +9,7 @@ class AccountPostType {
 	public $InUse;
 	private $AllEntries;
 	private $db;
-	
+
 	function AccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
 		$this->db = $db;
 		$this->PostType = & $a;
@@ -53,7 +53,7 @@ class AccountPostType {
 	function save($posttype, $desc, $collpost, $detailpost) {
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1) on duplicate key update coll_post=?, detail_post=?, description=?");
 
-		$prep->bind_params("iisiiis", $posttype, $collpost, $desc, $detailpost, $collpost, $detailpost, $desc);
+		$prep->bind_params("iiisiis", $posttype, $collpost, $detailpost, $desc,  $collpost, $detailpost, $desc);
 		$prep->execute();
         return $this->db->affected_rows() > 0 ? 1 : 0;
 	}
@@ -128,23 +128,23 @@ class AccountPostType {
 
 	/*! Call this only after you have fethced all posttypes */
 	function getAccountPostType($id) {
-		if(array_key_exists($id, $this->AllEntries)) {		
+		if(array_key_exists($id, $this->AllEntries)) {
 			return $this->AllEntries[$id];
 		}
 		return 0;
 	}
-    
-    
+
+
 
 	function getYearEndTransferPost() {
 		return AppConfig :: EndPostYearTransferPost;
 	}
-    
+
     function updateInUse($posttype, $inuse) {
 		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = ? where post_type = ?");
 		$prep->bind_params("ii", $inuse, $posttype);
         $prep->execute();
-        return $this->db->affected_rows();    	
+        return $this->db->affected_rows();
     }
 
 	function getEndTransferPost() {

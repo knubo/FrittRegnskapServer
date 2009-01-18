@@ -45,6 +45,8 @@ function RegisterMembershipPosts() {
 const YearMembershipCreditPost=3920;
 const CourseMembershipCreditPost=3925;
 const TrainMembershipCreditPost=3926;
+const YouthMembershipCreditPost=3927;
+
 #Membership group
 const MembershipGroup=4;
 #Fond - club account post

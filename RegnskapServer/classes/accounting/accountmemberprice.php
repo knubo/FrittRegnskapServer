@@ -13,14 +13,15 @@ class AccountMemberPrice {
     }
 
     function getCurrentPrices() {
-    	$prep = $this->db->prepare("select C.amount as course, T.amount as train, Y.amount as year from " .
+    	$prep = $this->db->prepare("select C.amount as course, T.amount as train, Y.amount as year, U.amount as youth from " .
                                     AppConfig :: DB_PREFIX . "course_price C,  " .
                                     AppConfig :: DB_PREFIX . "train_price T, ".
+                                    AppConfig :: DB_PREFIX . "youth_price U, ".
                                     AppConfig :: DB_PREFIX . "year_price Y, ".
                                     AppConfig :: DB_PREFIX . "standard SY,".
                                     AppConfig :: DB_PREFIX . "standard SS ".
                                     "where SS.id = 'STD_SEMESTER' and SY.id = 'STD_YEAR' and ".
-                                    "C.semester = SS.value and T.semester = SS.value and SY.value = Y.year");
+                                    "C.semester = SS.value and U.semester = SS.value and T.semester = SS.value and SY.value = Y.year");
         $res = $prep->execute();
 
         return $res[0];
@@ -33,6 +34,10 @@ class AccountMemberPrice {
 
         $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "train_price");
         $res["train"] = $prep->execute();
+
+        $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "youth_price");
+        $res["youth"] = $prep->execute();
+
 
         $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_price");
         $res["year"] = $prep->execute();
@@ -77,7 +82,7 @@ class AccountMemberPrice {
         return $this->db->affected_rows();
     }
 
-    function save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $fallCoursePrice, $fallTrainPrice) {
+    function save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $springYouthPrice, $fallCoursePrice, $fallTrainPrice, $fallYouthPrice) {
         $res = false;
 
         $res = $res | ($this->updateYear($yearPrice, $year) != 0);
@@ -85,6 +90,8 @@ class AccountMemberPrice {
         $res = $res | ($this->courseUpdate($year, $fallCoursePrice, 1, "course") != 0);
         $res = $res | ($this->courseUpdate($year, $springTrainPrice, 0, "train") != 0);
         $res = $res | ($this->courseUpdate($year, $fallTrainPrice, 1, "train") != 0);
+        $res = $res | ($this->courseUpdate($year, $springYouthPrice, 0, "youth") != 0);
+        $res = $res | ($this->courseUpdate($year, $fallYouthPrice, 1, "youth") != 0);
 
         return $res;
     }

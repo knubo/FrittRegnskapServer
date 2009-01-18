@@ -79,11 +79,27 @@ CREATE TABLE IF NOT EXISTS regn_course_price(
    amount NUMERIC(8,2) UNSIGNED
 );
 
+
+CREATE TABLE IF NOT EXISTS regn_youth_price(
+   semester INTEGER(4) UNSIGNED PRIMARY KEY,
+   amount NUMERIC(8,2) UNSIGNED
+);
+
+CREATE TABLE IF NOT EXISTS regn_youth_membership (
+   memberid INT(6) UNSIGNED,
+   semester INTEGER(4) UNSIGNED,
+   regn_line INT(8) UNSIGNED
+);
+
+
+
 CREATE TABLE IF NOT EXISTS regn_train_membership (
    memberid INT(6) UNSIGNED,
    semester INTEGER(4) UNSIGNED,
    regn_line INT(8) UNSIGNED
 );
+
+
 
 CREATE TABLE IF NOT EXISTS regn_train_price(
    semester INTEGER(4) UNSIGNED PRIMARY KEY,

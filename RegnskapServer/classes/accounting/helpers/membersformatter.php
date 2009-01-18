@@ -23,12 +23,13 @@ class MembersFormatter {
         }
     }
 
-    function group($yearData, $courseData, $trainData, $budgetData, $semesterInfo) {
+    function group($yearData, $courseData, $trainData, $youthData, $budgetData, $semesterInfo) {
         $grouped = array();
 
         MembersFormatter::loop(&$grouped, $yearData, "year");
         MembersFormatter::loop(&$grouped, $courseData, "course");
         MembersFormatter::loop(&$grouped, $trainData, "train");
+        MembersFormatter::loop(&$grouped, $youthData, "youth");
 
         $springSemester = array_shift($semesterInfo);
         $fallSemester = array_shift($semesterInfo);
@@ -53,7 +54,7 @@ class MembersFormatter {
         $grouped[$info[2]] = $userobj;
     }
 
-    function allInOne($yearData, $courseData, $trainData) {
+    function allInOne($yearData, $courseData, $trainData, $youthData) {
         function cmp($one, $two) {
             $res = strcmp($one["last"], $two["last"]);
 
@@ -75,6 +76,10 @@ class MembersFormatter {
 
         foreach($trainData as $one) {
         	Membersformatter::addForuser(&$grouped, $one, "train");
+        }
+
+        foreach($youthData as $one) {
+            Membersformatter::addForuser(&$grouped, $one, "youth");
         }
 
         $arr = array_values($grouped);

@@ -11,6 +11,7 @@ class Memberships {
 	private $Year;
 	private $Course;
 	private $Train;
+	private $Youth;
 	private $Day;
 	private $Memberid;
 	private $Post;
@@ -48,6 +49,11 @@ class Memberships {
 				Memberships :: find($perMemberId, substr($one, 5))->Train = true;
 			}
 
+            if (Memberships :: starts_with($one, "youth")) {
+                Memberships :: find($perMemberId, substr($one, 5))->Youth = true;
+            }
+
+
 			if (Memberships :: starts_with($one, "day")) {
 				Memberships :: find($perMemberId, substr($one, 3))->Day = $requestparams[$one];
 			}
@@ -71,6 +77,7 @@ class Memberships {
 		$memberPrice = $prices["year"];
 		$coursePrice = $prices["course"];
 		$trainPrice = $prices["train"];
+		$trainPrice = $prices["youth"];
 
 		foreach($objects as $one) {
 
@@ -116,6 +123,17 @@ class Memberships {
 		  			$courseM->addDebetPost($lineId, $one->post(), $coursePrice);
 				}
 			}
+
+
+            if($one->youth()) {
+                $courseM = new AccountSemesterMembership($db, AccountSemesterMembership::youth(), $one->memberid(), $active_semester, $lineId);
+                $courseM->store();
+                if($lineId) {
+                    $courseM->addCreditPost($lineId, $coursePrice);
+                    $courseM->addDebetPost($lineId, $one->post(), $coursePrice);
+                }
+            }
+
 		}
 		return 1;
 	}
@@ -132,6 +150,11 @@ class Memberships {
 	function train() {
 		return $this->Train;
 	}
+
+    function youth() {
+        return $this->Youth;
+    }
+
 
 	function day() {
 		return $this->Day;

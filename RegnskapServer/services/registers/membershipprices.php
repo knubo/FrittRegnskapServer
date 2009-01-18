@@ -14,8 +14,11 @@ $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $yearPrice = array_key_exists("yearPrice", $_REQUEST) ? $_REQUEST["yearPrice"] : 0;
 $springCoursePrice = array_key_exists("springCoursePrice", $_REQUEST) ? $_REQUEST["springCoursePrice"] : 0;
 $springTrainPrice = array_key_exists("springTrainPrice", $_REQUEST) ? $_REQUEST["springTrainPrice"] : 0;
+$springYouthPrice = array_key_exists("springYouthPrice", $_REQUEST) ? $_REQUEST["springYouthPrice"] : 0;
+
 $fallCoursePrice = array_key_exists("fallCoursePrice", $_REQUEST) ? $_REQUEST["fallCoursePrice"] : 0;
 $fallTrainPrice = array_key_exists("fallTrainPrice", $_REQUEST) ? $_REQUEST["fallTrainPrice"] : 0;
+$fallYouthPrice = array_key_exists("fallYouthPrice", $_REQUEST) ? $_REQUEST["fallYouthPrice"] : 0;
 
 $accPrice = new AccountMemberPrice($db);
 
@@ -36,7 +39,7 @@ switch ($action) {
     case "save" :
         $regnSession->checkWriteAccess();
         $db->begin();
-        $ret = $accPrice->save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $fallCoursePrice, $fallTrainPrice);
+        $ret = $accPrice->save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $springYouthPrice, $fallCoursePrice, $fallTrainPrice, $fallYouthPrice);
 
        	$db->commit();
 

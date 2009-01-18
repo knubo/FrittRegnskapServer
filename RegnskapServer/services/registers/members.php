@@ -76,22 +76,30 @@ switch ($action) {
 		$result["semester"] = $semester;
 		$result["text"] = $semesterAcc->getSemesterName($semester);
 		break;
+    case "youth" :
+        $acc = new AccountSemesterMembership($db, "youth");
+        $result["members"] = $acc->getAllMemberNames($semester);
+        $result["semester"] = $semester;
+        $result["text"] = $semesterAcc->getSemesterName($semester);
+        break;
      case "overview":
         $accYear = new AccountYearMembership($db);
         $accCourse = new AccountSemesterMembership($db, "course");
         $accTrain = new AccountSemesterMembership($db, "train");
+        $accYouth = new AccountSemesterMembership($db, "youth");
 
-        $result = MembersFormatter::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview());
+        $result = MembersFormatter::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview(), $accYouth->getOverview());
         break;
       case "all":
         $accTrain = new AccountSemesterMembership($db, "train");
+        $accYouth = new AccountSemesterMembership($db, "youth");
         $accCourse = new AccountSemesterMembership($db, "course");
         $accYear = new AccountYearMembership($db);
         $result["year"] = $year;
         $result["semester"] = $semester;
         $result["text"] = $semesterAcc->getSemesterName($semester);
 
-        $result["members"] = MembersFormatter::allInOne($accYear->getAllMemberNames($year), $accCourse->getAllMemberNames($semester),$accTrain->getAllMemberNames($semester));
+        $result["members"] = MembersFormatter::allInOne($accYear->getAllMemberNames($year), $accCourse->getAllMemberNames($semester), $accTrain->getAllMemberNames($semester), $accYouth->getAllMemberNames($semester));
 
         break;
 

@@ -48,10 +48,12 @@ switch ($action) {
 		$accPers->load($id);
         $accSemesterMembership = new AccountSemesterMembership($db);
         $accYearMembership = new AccountyearMembership($db);
+        $accYouthMembership = new AccountSemesterMembership($db);
         $memberships = array();
         $memberships["course"] = $accSemesterMembership->getUserMemberships($id, "course");
         $memberships["train"] = $accSemesterMembership->getUserMemberships($id, "train");
         $memberships["year"] = $accYearMembership->getUserMemberships($id, "train");
+        $memberships["youth"] = $accYouthMembership->getUserMemberships($id, "youth");
         $accPers->Memberships = $memberships;
 		echo json_encode($accPers);
 		break;

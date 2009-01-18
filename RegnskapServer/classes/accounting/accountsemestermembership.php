@@ -25,6 +25,9 @@ class AccountSemesterMembership {
 			case "train" :
 				$postType = AppConfig :: TrainMembershipCreditPost;
 				break;
+            case "youth" :
+                $postType = AppConfig :: YouthMembershipCreditPost;
+                break;
 		}
 
 		$post = new AccountPost($this->db, $line, "-1", $postType, $amount);
@@ -110,5 +113,9 @@ class AccountSemesterMembership {
 	function train() {
 		return "train";
 	}
+
+    function youth() {
+    	return "youth";
+    }
 }
 ?>

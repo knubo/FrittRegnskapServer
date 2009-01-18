@@ -33,7 +33,7 @@ class ReportYear {
     }
 
     function list_sums_ownings($year) {
-        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000", 1);
+        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <>2050", 1);
     }
 
 

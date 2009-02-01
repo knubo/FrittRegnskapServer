@@ -25,23 +25,24 @@ class ReportYear {
 	}
 
     function list_sums_earnings($year) {
-    	return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400)", -1);
+    	return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)", -1);
     }
 
     function list_sums_cost($year) {
-        return $this->list_sums_int($year, "RP.post_type >= 4000 and RP.post_type <= 8500", 1);
+        return $this->list_sums_int($year, "RP.post_type >= 4000 and RP.post_type <= 8500 and RP.post_type <> 8040", 1);
     }
 
     function list_sums_ownings($year) {
-        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <>2050", 1);
+        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050 and RL.id not in (select RLI.id from regn_line RLI, regn_post RPI where RLI.id = RPI.line and " .
+                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=$year)", 1);
     }
 
 
     function list_sums_2000($year) {
         $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost  from regn_line RL, regn_post RP " .
-                "where RP.line = RL.id and debet = ? and year=? and month = 12 and RP.post_type < 2000 and RP.amount > 0 and " .
-                "RL.id not in(select RL2.id from regn_line RL2, regn_post RP2 where RL2.month = 12 and " .
-                "RL2.year = ? and RP2.line = RL2.id and RP2.post_type = 8800) group by RP.post_type");
+                "where RP.line = RL.id and debet = ? and year=? and RP.post_type < 2000 and RP.amount > 0 and RL.id not in " .
+                "(select RLI.id from regn_line RLI, regn_post RPI where RLI.id = RPI.line and " .
+                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=?) group by RP.post_type ");
 
         $prep->bind_params("sii", '1', $year, $year);
         $resDebet = $this->makeSumPerPostType($prep->execute());

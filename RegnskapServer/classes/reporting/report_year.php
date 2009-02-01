@@ -34,7 +34,7 @@ class ReportYear {
 
     function list_sums_ownings($year) {
         return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050 and RL.id not in (select RLI.id from regn_line RLI, regn_post RPI where RLI.id = RPI.line and " .
-                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=$year)", 1);
+                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=$year and RLI.postnmb = (select max(YL.postnmb) from regn_line YL where YL.year=$year and YL.month=12) )", 1);
     }
 
 
@@ -42,12 +42,12 @@ class ReportYear {
         $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost  from regn_line RL, regn_post RP " .
                 "where RP.line = RL.id and debet = ? and year=? and RP.post_type < 2000 and RP.amount > 0 and RL.id not in " .
                 "(select RLI.id from regn_line RLI, regn_post RPI where RLI.id = RPI.line and " .
-                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=?) group by RP.post_type ");
+                "RLI.month = 12 and RLI.postnmb = (select max(YL.postnmb) from regn_line YL where YL.year=? and YL.month=12) and RPI.post_type = 2050 and RLI.year=?) group by RP.post_type ");
 
-        $prep->bind_params("sii", '1', $year, $year);
+        $prep->bind_params("siii", '1', $year, $year, $year);
         $resDebet = $this->makeSumPerPostType($prep->execute());
 
-        $prep->bind_params("sii", '-1', $year, $year);
+        $prep->bind_params("siii", '-1', $year, $year, $year);
         $resKredit = $this->makeSumPerPostType($prep->execute());
 
         $sums = $this->sumDebetAndKreditValues($resDebet, $resKredit, 1);

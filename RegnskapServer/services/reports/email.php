@@ -18,6 +18,7 @@ $query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "all";
 $subject = array_key_exists("subject", $_REQUEST) ? $_REQUEST["subject"] : "";
 $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
 $body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $attachments = array_key_exists("attachments", $_REQUEST) ? $_REQUEST["attachments"] : "";
 
 $db = new DB();
@@ -25,7 +26,9 @@ $regnSession = new RegnSession($db);
 $currentUser = $regnSession->auth();
 
 $standard = new AccountStandard($db);
-$year = $standard->getOneValue("STD_YEAR");
+if(!$year) {
+    $year = $standard->getOneValue("STD_YEAR");
+}
 
 switch ($action) {
 	case "list" :

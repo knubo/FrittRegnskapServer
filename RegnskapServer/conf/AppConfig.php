@@ -6,10 +6,15 @@ class AppConfig {
 const DB_HOST_NAME="localhost";
 const DB_USER="root";
 const DB_PASSWORD="";
-const DB_NAME="knubo";
+const DB_NAME="bsc_kopi";
 
 #Set to 1 if you want authentication.
 const USE_AUTHENTICATION=0;
+
+const TIMEZONE="Europe/Oslo";
+
+#Set to 1 if you want to validate email using checkdnsrr - some systems might not support it.
+const VALIDATE_EMAIL_USING_CHECKDNSRR=0;
 
 const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 

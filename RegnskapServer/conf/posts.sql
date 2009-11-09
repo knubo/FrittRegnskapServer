@@ -236,15 +236,15 @@ insert into regn_detail_post_type
 
 insert into regn_post_type
  (post_type, coll_post, detail_post, description) values 
- (1000, 1, 'Forskning og utvikling');
+ (1000, 1, null,  'Forskning og utvikling');
 
 insert into regn_post_type
  (post_type, coll_post, detail_post, description) values 
- (1020, 1, 'Konsesjoner');
+ (1020, 1, null,  'Konsesjoner');
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
-     (1030, 1, 'Patenter');
+     (1030, 1, null, 'Patenter');
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
@@ -434,10 +434,6 @@ insert into regn_post_type
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
-     (2160, 2, 218, 'Andre avsetninger for forpliktelser');
-
-insert into regn_post_type
-     (post_type, coll_post, detail_post, description) values 
      (2180, 2, 218, 'Andre avsetninger for forpliktelser');
 
 insert into regn_post_type
@@ -451,7 +447,7 @@ insert into regn_post_type
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
-     (2210, 2, 222, 'Gjeld til kredittinstitusjoner');
+     (2220, 2, 222, 'Gjeld til kredittinstitusjoner');
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
@@ -517,10 +513,6 @@ insert into regn_post_type
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 
      (2700, 2, 236, 'Utgående mva');
-
-insert into regn_post_type
-     (post_type, coll_post, detail_post, description) values 
-     (2710, 2, 236, 'Inngående mva');
 
 insert into regn_post_type
      (post_type, coll_post, detail_post, description) values 

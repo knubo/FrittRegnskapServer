@@ -60,7 +60,9 @@ class EndMonthHelper {
 		$daysInMonth = $lastDay->daysInMonth();
 
 		if ($active_month == 12) {
-			die("Can't end last month - use year");
+		    header("HTTP/1.0 514 Illegal state");
+		    
+			die("Can't end last month in year - use end year");
 		}
 
 		$amounts = $this->status();

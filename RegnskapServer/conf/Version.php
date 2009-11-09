@@ -1,6 +1,6 @@
 <?php
 class Version {
     /* This must match client side version set in AboutView.java */
-	const SERVER_VERSION = "1.2final";
+	const SERVER_VERSION = "1.3pre1";
 }
 ?>

@@ -33,7 +33,12 @@ class EmailValidator {
 				}
 			}
 		}
-		return checkdnsrr($email_array[1]);
+  
+  		if(!AppConfig::VALIDATE_EMAIL_USING_CHECKDNSRR) {
+            return true;
+        }
+  
+  		return checkdnsrr($email_array[1]);
 	}
 }
 ?>

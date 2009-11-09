@@ -72,8 +72,8 @@ class EndMonthHelper {
 				continue;
 			}
 
-			$this->transferPost(($active_month +1), $active_month, $active_year, $post, $amount, $daysInMonth, $endTransferPost, 1);
-			$this->transferPost($active_month, ($active_month +1), $active_year, $post, $amount, 1, $endTransferPost, -1);
+			$this->transferPost(($active_month + 1), $active_month, $active_year, $post, $amount, $daysInMonth, $endTransferPost, 1);
+			$this->transferPost($active_month, ($active_month + 1), $active_year, $post, $amount, 1, $endTransferPost, -1);
 		}
 
 		$acStandard->setValue("STD_MONTH", ($active_month +1));
@@ -89,8 +89,8 @@ class EndMonthHelper {
 			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (1 * $revFactor), $endTransferPost, $amount);
 			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (-1 * $revFactor), $post, $amount);
 		} else {
-			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (-1 * $revFactor), $endTransferPost, $amount);
-			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (1 * $revFactor), $post, $amount);
+			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (-1 * $revFactor), $endTransferPost, abs($amount));
+			$acAccountLine->addPostSingleAmount($acAccountLine->getId(), (1 * $revFactor), $post, abs($amount));
 		}
 	}
 }

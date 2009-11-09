@@ -51,13 +51,9 @@ class eZDate
     */
     function eZDate( $year = 0, $month = 0, $day = 0, $year_add = 0, $month_add = 0, $day_add = 0 )
     {
-        if ( get_class( $year ) == "ezdate" )
-        {
-            $this->setYear( $year->year() );
-            $this->setMonth( $year->month() );
-            $this->setDay( $year->day() );
-        }
-        else if ( ( $year == 0 )  && ( $month == 0 ) && ( $day == 0 ) )
+        date_default_timezone_set(AppConfig::TIMEZONE);
+        
+        if ( ( $year == 0 )  && ( $month == 0 ) && ( $day == 0 ) )
         {
             $now = getdate();
             $this->setYear( $now["year"] );

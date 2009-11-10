@@ -1,38 +1,45 @@
 <?php
 class ReportYear {
 
-	private $db;
+    private $db;
 
-	function ReportYear($db) {
-		$this->db = $db;
-	}
+    function ReportYear($db) {
+        $this->db = $db;
+    }
 
-	function fixNum($num) {
+    function fixNum($num) {
         if($num == 0) {
-        	return "0.00";
+            return "0.00";
         }
         $exp = explode(".", $num);
 
         if(count($exp) == 1) {
-        	return "$num.00";
+            return "$num.00";
         }
 
         if(strlen($exp[1]) == 1) {
-        	return "$num"."0";
+            return "$num"."0";
         }
 
         return $num;
-	}
+    }
 
     function list_sums_earnings($year) {
-    	return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)", -1);
+        return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)", -1);
+    }
+    
+    function list_sums_fond($year, $post) {
+        return $this->list_sums_int($year, "RP.post_type = $post", 1);
+    }
+    
+    function list_sums_2000_excluded_fond($year) {
+        return $this->list_sums_int($year, "RP.post_type >= 1000 and RP.post_type < 2000 and RP.post_type NOT IN (1926, 1927)", 1);
     }
 
-    function list_sums_1000($year) {
-        return $this->list_sums_int($year, "RP.post_type >= 1000 and RP.post_type < 2000", 1);
+    function list_sums_ownings_excluded_fond($year) {
+         return $this->list_sums_int($year, "RP.post_type >= 2000 and RP.post_type < 3000 and RP.post_type NOT IN (2050, 2002, 2001)", 1);
     }
-    
-    
+
     function list_sums_cost($year) {
         return $this->list_sums_int($year, "RP.post_type >= 4000 and RP.post_type <= 8500 and RP.post_type <> 8040", 1);
     }
@@ -67,7 +74,7 @@ class ReportYear {
         $res = $prep->execute();
 
         foreach($res as $one) {
-        	$sums[$one["post_type"]]["desc"] = $one["description"];
+            $sums[$one["post_type"]]["desc"] = $one["description"];
             $sums[$one["post_type"]]["value"] = $this->fixNum($sums[$one["post_type"]]["value"]);
         }
 
@@ -75,7 +82,7 @@ class ReportYear {
     }
 
     function sumDebetAndKreditValues($resDebet, $resKredit, $sign) {
-    	$sums = array();
+        $sums = array();
         foreach(array_keys($resDebet) as $debKey) {
             $sums[$debKey] = array("value" => $resDebet[$debKey]["sumpost"], "description" => $resDebet[$debKey]["description"]);
         }
@@ -99,9 +106,9 @@ class ReportYear {
         return $res;
     }
 
-	function list_sums_int($year, $ignore, $sign) {
-		$prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL," . AppConfig :: DB_PREFIX . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = ? and $ignore and RPT.post_type = RP.post_type group by post_type,debet order by post_type");
-		$prep->bind_params("is", $year, '1');
+    function list_sums_int($year, $ignore, $sign) {
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL," . AppConfig :: DB_PREFIX . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = ? and $ignore and RPT.post_type = RP.post_type group by post_type,debet order by post_type");
+        $prep->bind_params("is", $year, '1');
         $resDebet = $this->makeSumPerPostType($prep->execute());
 
 

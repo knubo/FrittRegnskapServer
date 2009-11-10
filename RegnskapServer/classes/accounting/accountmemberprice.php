@@ -20,7 +20,7 @@ class AccountMemberPrice {
                                     AppConfig :: DB_PREFIX . "year_price Y, ".
                                     AppConfig :: DB_PREFIX . "standard SY,".
                                     AppConfig :: DB_PREFIX . "standard SS ".
-                                    "where SS.id = 'STD_SEMESTER' and SY.id = 'STD_YEAR' and ".
+                                    "where SS.id = '".AccountStandard::CONST_SEMESTER."' and SY.id = '".AccountStandard::CONST_YEAR."' and ".
                                     "C.semester = SS.value and U.semester = SS.value and T.semester = SS.value and SY.value = Y.year");
         $res = $prep->execute();
 

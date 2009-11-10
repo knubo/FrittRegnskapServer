@@ -24,7 +24,7 @@ $regnSession->auth();
 $standard = new AccountStandard($db);
 
 if (!$year) {
-	$year = $standard->getOneValue("STD_YEAR");
+	$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 }
 
 $accPrices = new AccountMemberPrice($db);

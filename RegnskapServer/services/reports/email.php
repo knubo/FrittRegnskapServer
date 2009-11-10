@@ -27,7 +27,7 @@ $currentUser = $regnSession->auth();
 
 $standard = new AccountStandard($db);
 if(!$year) {
-    $year = $standard->getOneValue("STD_YEAR");
+    $year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 }
 
 switch ($action) {
@@ -81,7 +81,7 @@ switch ($action) {
         $body = urldecode($body);
         $attachments = urldecode($attachments);
         $attObjs = $attachments ? json_decode($attachments) : null;
-        $sender = $standard->getOneValue("STD_EMAIL_SENDER");
+        $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
 
         if($action == "email") {
 		  $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs);

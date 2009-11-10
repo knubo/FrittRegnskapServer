@@ -28,6 +28,11 @@ class ReportYear {
     	return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)", -1);
     }
 
+    function list_sums_1000($year) {
+        return $this->list_sums_int($year, "RP.post_type >= 1000 and RP.post_type < 2000", 1);
+    }
+    
+    
     function list_sums_cost($year) {
         return $this->list_sums_int($year, "RP.post_type >= 4000 and RP.post_type <= 8500 and RP.post_type <> 8040", 1);
     }

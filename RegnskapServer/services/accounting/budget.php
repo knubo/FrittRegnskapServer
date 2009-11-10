@@ -23,7 +23,7 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 $standard = new AccountStandard($db);
 
-$budgetyear = $standard->getOneValue("STD_YEAR") + 1;
+$budgetyear = $standard->getOneValue(AccountStandard::CONST_YEAR) + 1;
 
 switch ($action) {
     case "saveMemberships":

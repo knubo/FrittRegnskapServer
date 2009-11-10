@@ -27,11 +27,11 @@ $standard = new AccountStandard($db);
 $semesterAcc = new AccountSemester($db);
 
 if (!$year) {
-	$year = $standard->getOneValue("STD_YEAR");
+	$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 }
 
 if (!$semester) {
-	$semester = $standard->getOneValue("STD_SEMESTER");
+	$semester = $standard->getOneValue(AccountStandard::CONST_SEMESTER);
 }
 
 $result = array ();

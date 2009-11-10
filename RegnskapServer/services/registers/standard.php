@@ -27,11 +27,11 @@ $accStd = new AccountStandard($db);
 switch ($action) {
 	case "get" :
 		$res = array ();
-		$res["year"] = $accStd->getOneValue("STD_YEAR");
-		$res["month"] = $accStd->getOneValue("STD_MONTH");
-		$res["semester"] = $accStd->getOneValue("STD_SEMESTER");
-		$res["email_sender"] = $accStd->getOneValue("STD_EMAIL_SENDER");
-        $res["massletter_due_date"] = $accStd->getOneValue("MASSLETTER_DUE_DATE");
+		$res["year"] = $accStd->getOneValue(AccountStandard::CONST_YEAR);
+		$res["month"] = $accStd->getOneValue(AccountStandard::CONST_MONTH);
+		$res["semester"] = $accStd->getOneValue(AccountStandard::CONST_SEMESTER);
+		$res["email_sender"] = $accStd->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
+        $res["massletter_due_date"] = $accStd->getOneValue(AccountStandard::CONST_MASSLETTER_DUE_DATE);
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();
@@ -44,11 +44,11 @@ switch ($action) {
 	case "save" :
         $regnSession->checkWriteAccess();
 		$res = 0;
-		$res = $res | $accStd->setValue("STD_YEAR", $year);
-		$res = $res | $accStd->setValue("STD_MONTH", $month);
-		$res = $res | $accStd->setValue("STD_SEMESTER", $semester);
-		$res = $res | $accStd->setValue("STD_EMAIL_SENDER", $email_sender);
-        $res = $res | $accStd->setValue("MASSLETTER_DUE_DATE", $massletter_due_date);
+		$res = $res | $accStd->setValue(AccountStandard::CONST_YEAR, $year);
+		$res = $res | $accStd->setValue(AccountStandard::CONST_MONTH, $month);
+		$res = $res | $accStd->setValue(AccountStandard::CONST_SEMESTER, $semester);
+		$res = $res | $accStd->setValue(AccountStandard::CONST_EMAIL_SENDER, $email_sender);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_MASSLETTER_DUE_DATE, $massletter_due_date);
         $report = array();
         $report["result"] = $res ? 1 : 0;
 

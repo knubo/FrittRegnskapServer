@@ -20,8 +20,8 @@ $regnSession->auth();
 
 if (!$month || !$year) {
 	$standard = new AccountStandard($db);
-	$year = $standard->getOneValue("STD_YEAR");
-	$month = $standard->getOneValue("STD_MONTH");
+	$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
+	$month = $standard->getOneValue(AccountStandard::CONST_MONTH);
 }
 
 $accLines = new AccountLine($db);

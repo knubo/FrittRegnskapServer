@@ -27,8 +27,8 @@ class AccountLine {
 		} else
 			if ($day) {
 				$standard = new AccountStandard($db);
-				$month = $standard->getOneValue("STD_MONTH");
-				$year = $standard->getOneValue("STD_YEAR");
+				$month = $standard->getOneValue(AccountStandard::CONST_MONTH);
+				$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 
 				$this->Occured = & new eZDate();
 				$this->Occured->setDay($day);
@@ -169,10 +169,10 @@ class AccountLine {
 		$standard = new AccountStandard($this->db);
 
 		if (!$month) {
-			$month = $standard->getOneValue("STD_MONTH");
+			$month = $standard->getOneValue(AccountStandard::CONST_MONTH);
 		}
 		if (!$year) {
-			$year = $standard->getOneValue("STD_YEAR");
+			$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 		}
 
 		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?");
@@ -210,7 +210,7 @@ class AccountLine {
 
 	function getMonthSimple($month) {
 		$standard = new AccountStandard($this->db);
-		$year = $standard->getOneValue("STD_YEAR");
+		$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 
 		$prep = $this->db->prepare("select id, attachnmb, occured, description from " . AppConfig :: DB_PREFIX . "line where year = ? and month = ? order by postnmb");
 		$prep->bind_params("ii", $month, $year);

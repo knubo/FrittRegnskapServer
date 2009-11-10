@@ -48,8 +48,8 @@ $happening->load($post);
 
 
 $acStandard = new AccountStandard($db);
-$active_month = $acStandard->getOneValue("STD_MONTH");
-$active_year = $acStandard->getOneValue("STD_YEAR");
+$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
+$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
   
 $accLine = new AccountLine($db);
 $accLine->setNewLatest($desc, $day, $active_year, $active_month);

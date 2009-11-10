@@ -167,8 +167,8 @@ class AccountPerson {
 		if ($incMemberInfo) {
 			$accStandard = new AccountStandard($this->db);
 			$accSemester = new AccountSemester($this->db);
-			$active_semester = addslashes($accStandard->getOneValue("STD_SEMESTER"));
-			$active_year = addslashes($accStandard->getOneValue("STD_YEAR"));
+			$active_semester = addslashes($accStandard->getOneValue(AccountStandard::CONST_SEMESTER));
+			$active_year = addslashes($accStandard->getOneValue(AccountStandard::CONST_YEAR));
 			$cols = "*, (select distinct 1 from " . AppConfig :: DB_PREFIX . "train_membership where memberid=id and semester=$active_semester) as train" .
 			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "course_membership where memberid=id and semester=$active_semester) as course" .
 			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "year_membership where memberid=id and year=$active_year) as year";

@@ -1,55 +1,63 @@
 <?php
 class AccountStandard {
 
-	private $db;
 
-	function AccountStandard($db) {
-		$this->db = $db;
-	}
+    const CONST_YEAR = "STD_YEAR";
+    const CONST_MONTH = "STD_MONTH";
+    const CONST_SEMESTER = "STD_SEMESTER";
+    const CONST_EMAIL_SENDER = "STD_EMAIL_SENDER";
+    const CONST_MASSLETTER_DUE_DATE = "MASSLETTER_DUE_DATE";
 
-	function setValue($id, $value) {
 
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "standard where id=?");
-		$prep->bind_params("s", $id);
-		$query_array = $prep->execute();
+    private $db;
 
-		if (count($query_array) > 0) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "standard set value=? where id=?");
-			$prep->bind_params("ss", $value, $id);
-			$prep->execute();
+    function AccountStandard($db) {
+        $this->db = $db;
+    }
 
-			return $this->db->affected_rows();
-		} else {
-			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "standard (id, value) values (?,?)");
-			$prep->bind_params("ss", $id, $value);
-			$prep->execute();
+    function setValue($id, $value) {
 
-			return $this->db->affected_rows();
-		}
-	}
+        $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "standard where id=?");
+        $prep->bind_params("s", $id);
+        $query_array = $prep->execute();
 
-	function getValue($id) {
-		$prep = $this->db->prepare("select value from " . AppConfig :: DB_PREFIX . "standard where id=?");
-		$prep->bind_params("s", $id);
+        if (count($query_array) > 0) {
+            $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "standard set value=? where id=?");
+            $prep->bind_params("ss", $value, $id);
+            $prep->execute();
 
-		$return_array = array ();
+            return $this->db->affected_rows();
+        } else {
+            $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "standard (id, value) values (?,?)");
+            $prep->bind_params("ss", $id, $value);
+            $prep->execute();
 
-		$query_array = $prep->execute();
-		if (count($query_array) >= 0) {
-			for ($i = 0; $i < count($query_array); $i++) {
-				$return_array[$i] = $query_array[$i]["value"];
-			}
-		}
+            return $this->db->affected_rows();
+        }
+    }
 
-		return $return_array;
-	}
+    function getValue($id) {
+        $prep = $this->db->prepare("select value from " . AppConfig :: DB_PREFIX . "standard where id=?");
+        $prep->bind_params("s", $id);
 
-	function getOneValue($id) {
-		$res = $this->getValue($id);
+        $return_array = array ();
 
-		if (count($res)) {
-			return $res[0];
-		}
-	}
+        $query_array = $prep->execute();
+        if (count($query_array) >= 0) {
+            for ($i = 0; $i < count($query_array); $i++) {
+                $return_array[$i] = $query_array[$i]["value"];
+            }
+        }
+
+        return $return_array;
+    }
+
+    function getOneValue($id) {
+        $res = $this->getValue($id);
+
+        if (count($res)) {
+            return $res[0];
+        }
+    }
 }
 ?>

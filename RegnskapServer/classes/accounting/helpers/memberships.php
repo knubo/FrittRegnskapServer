@@ -67,9 +67,9 @@ class Memberships {
 
 	function store($db, $objects) {
 		$standard = new AccountStandard($db);
-      	$active_month = $standard->getOneValue("STD_MONTH");
-      	$active_year = $standard->getOneValue("STD_YEAR");
-      	$active_semester = $standard->getOneValue("STD_SEMESTER");
+      	$active_month = $standard->getOneValue(AccountStandard::CONST_MONTH);
+      	$active_year = $standard->getOneValue(AccountStandard::CONST_YEAR);
+      	$active_semester = $standard->getOneValue(AccountStandard::CONST_SEMESTER);
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();

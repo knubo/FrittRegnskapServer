@@ -17,8 +17,8 @@ $regnSession->auth();
 $accLine = new AccountLine($db);
 $standard = new AccountStandard($db);
 
-$year = $standard->getOneValue("STD_YEAR");
-$month = $standard->getOneValue("STD_MONTH");
+$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
+$month = $standard->getOneValue(AccountStandard::CONST_MONTH);
 $attachment = $accLine->getNextAttachmentNmb($year);
 $postnmb = $accLine->getNextPostnmb($year, $month);
 

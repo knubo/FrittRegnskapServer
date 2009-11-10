@@ -18,8 +18,8 @@ class EndMonthHelper {
 		$acPostType = new AccountPostType($this->db);
 		$acAccountLine = new AccountLine($this->db);
 
-		$active_year = $acStandard->getOneValue("STD_YEAR");
-		$active_month = $acStandard->getOneValue("STD_MONTH");
+		$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
+		$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
 		$endPostIds = AccountPostType :: getEndPosts();
 
 		$sumPosts = array ();
@@ -44,8 +44,8 @@ class EndMonthHelper {
 
 	function endMonth() {
 		$acStandard = new AccountStandard($this->db);
-		$active_month = $acStandard->getOneValue("STD_MONTH");
-		$active_year = $acStandard->getOneValue("STD_YEAR");
+		$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
+		$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
 		$endTransferPost = AccountPostType :: getEndTransferPost();
 
         $acPostType = new AccountPostType($this->db);
@@ -78,7 +78,7 @@ class EndMonthHelper {
 			$this->transferPost($active_month, ($active_month + 1), $active_year, $post, $amount, 1, $endTransferPost, -1);
 		}
 
-		$acStandard->setValue("STD_MONTH", ($active_month +1));
+		$acStandard->setValue(AccountStandard::CONST_MONTH, ($active_month +1));
 
 	}
 

@@ -17,12 +17,12 @@ $regnSession->auth();
 
 $accStandard = new AccountStandard($db);
 $accSemester = new AccountSemester($db);
-$active_semester = $accStandard->getOneValue("STD_SEMESTER");
+$active_semester = $accStandard->getOneValue(AccountStandard::CONST_SEMESTER);
 
 $data = array();
 $data["semester"] = $accSemester->getSemesterName($active_semester);
-$data["month"] = $accStandard->getOnevalue("STD_MONTH"); 
-$data["year"] = $accStandard->getOneValue("STD_YEAR");
+$data["month"] = $accStandard->getOnevalue(AccountStandard::CONST_MONTH); 
+$data["year"] = $accStandard->getOneValue(AccountStandard::CONST_YEAR);
 
 echo json_encode($data);
 ?>

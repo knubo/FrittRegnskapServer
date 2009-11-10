@@ -20,6 +20,7 @@ class EndYearHelper {
         $this->addForFond(1927, 2002);
         $this->addFor2000_to_3000();
 
+        
 
         return $this->result;
     }
@@ -42,17 +43,18 @@ class EndYearHelper {
         foreach(array_keys($data) as $one) {
             $total += $data[$one]["value"];
 
-            $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
 
             if($data[$one]["value"] > 0) {
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
                 $add["DEBET"] = -1;
                 $this->result[] = $add;
                 $this->result[] = array("post" => $balancePost, "DEBET" => 1, "value" => $data[$one]["value"]);
 
             } else if($data[$one]["value" < 0]) {
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => ~$data[$one]["value"]);
                 $add["DEBET"] = 1;
                 $this->result[] = $add;
-                $this->result[] = array("post" => $balancePost, "DEBET" => -1, "value" => $data[$one]["value"]);
+                $this->result[] = array("post" => $balancePost, "DEBET" => -1, "value" => ~$data[$one]["value"]);
             }
         }
 
@@ -71,12 +73,13 @@ class EndYearHelper {
         foreach(array_keys($data) as $one) {
             $total += $data[$one]["value"];
 
-            $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
 
             if($data[$one]["value"] > 0) {
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
                 $add["DEBET"] = -1;
                 $this->result[] = $add;
             } else if($data[$one]["value"] < 0) {
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => ~$data[$one]["value"]);
                 $add["DEBET"] = 1;
                 $this->result[] = $add;
             }
@@ -85,7 +88,7 @@ class EndYearHelper {
         if($total > 0) {
             $this->result[] = array("post" => 2050, "DEBET" => 1, "value" => $total);
         } else if($total < 0) {
-            $this->result[] = array("post" => 2050, "DEBET" => -1, "value" => $total);
+            $this->result[] = array("post" => 2050, "DEBET" => -1, "value" => ~$total);
         }
 
     }

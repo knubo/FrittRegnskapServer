@@ -26,7 +26,12 @@ switch ($action) {
 	case "status" :
         $year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
 	    
-        echo json_encode($endYearHelper->getEndYearData($year));
+        $data = array();
+        $data["data"] = $endYearHelper->getEndYearData($year);
+        $data["readonly"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH) != 12;
+        
+        
+        echo json_encode($data);
 		break;
     case "endyear" :
         $regnSession->checkWriteAccess();

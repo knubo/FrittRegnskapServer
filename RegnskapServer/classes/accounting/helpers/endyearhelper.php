@@ -10,6 +10,41 @@ class EndYearHelper {
         $this->db = $db;
     }
 
+    function endYear($db) {
+        $acStandard = new AccountStandard($this->db);
+		$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
+		$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
+
+	    $endYearData = $this->getEndYearData($active_year);
+		
+		
+        $acPostType = new AccountPostType($this->db);
+
+		$lastDay = new eZDate();
+		$lastDay->setDay(1);
+		$lastDay->setMonth($active_month);
+		$lastDay->setYear($active_year);
+		$daysInMonth = $lastDay->daysInMonth();
+
+		$accountLineCurrentYear = new AccountLine($this->db);
+		$accountLineCurrentYear->setNewLatest("UB ".$active_year, $daysInMonth, $active_year, $active_month);
+		$accountLineCurrentYear->store($active_month, $active_year);
+		
+		foreach ($endYearData as $onePost) {
+		    $accountLineCurrentYear->addPostSingleAmount($accountLineCurrentYear->getId(), $onePost["DEBET"], $onePost["post"], $onePost["value"]);
+		}
+
+		$accountLineNextYear = new AccountLine($this->db);
+		$accountLineNextYear->setNewLatest("IB ".$active_year, 1, ($active_year + 1), 1);
+		$accountLineNextYear->store(1, ($active_year + 1));
+		
+        foreach ($endYearData as $onePost) {
+		    $accountLineNextYear->addPostSingleAmount($accountLineNextYear->getId(), $onePost["DEBET"] == "1" ? "-1" : "1", $onePost["post"], $onePost["value"]);
+		}
+		
+    }
+    
+    
     function getEndYearData($year) {
         $this->result = array();
         $this->year = $year;

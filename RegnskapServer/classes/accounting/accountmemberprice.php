@@ -13,7 +13,7 @@ class AccountMemberPrice {
     }
 
     function getCurrentPrices() {
-    	$prep = $this->db->prepare("select C.amount as course, T.amount as train, Y.amount as year, U.amount as youth from " .
+    	$prep = $this->db->prepare("select C.amount as course, T.amount as train, Y.amount as year, U.amount as youth, Y.amountyouth as yearyouth from " .
                                     AppConfig :: DB_PREFIX . "course_price C,  " .
                                     AppConfig :: DB_PREFIX . "train_price T, ".
                                     AppConfig :: DB_PREFIX . "youth_price U, ".
@@ -45,23 +45,23 @@ class AccountMemberPrice {
         return $res;
     }
 
-    function updateYear($yearPrice, $year) {
+    function updateYear($yearPrice, $yearYouthPrice, $year) {
     	$prep = $this->db->prepare("select year from " . AppConfig :: DB_PREFIX . "year_price where year = ?");
         $prep->bind_params("i", $year);
         $c = $prep->execute();
 
         if(count($c) != 0) {
-            $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "year_price set amount=? where year = ?");
-            $prep->bind_params("di", $yearPrice, $year);
+            $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "year_price set amount=?,amountyouth=? where year = ?");
+            $prep->bind_params("ddi", $yearPrice, $yearYouthPrice, $year);
             $prep->execute();
         } else {
-            $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_price set amount=?, year = ?");
-            $prep->bind_params("di", $yearPrice, $year);
+            $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_price set amount=?, amountyouth=?, year = ?");
+            $prep->bind_params("ddi", $yearPrice, $yearYouthPrice, $year);
             $prep->execute();
         }
         return $this->db->affected_rows();
-
     }
+    
 
     function courseUpdate($year, $price, $fall, $type) {
         $countPrep = $this->db->prepare("select semester from " . AppConfig :: DB_PREFIX . $type."_price where semester = (select semester from " . AppConfig :: DB_PREFIX . "semester where year = ? and fall=?)");
@@ -82,10 +82,10 @@ class AccountMemberPrice {
         return $this->db->affected_rows();
     }
 
-    function save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $springYouthPrice, $fallCoursePrice, $fallTrainPrice, $fallYouthPrice) {
+    function save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $springYouthPrice, $fallCoursePrice, $fallTrainPrice, $fallYouthPrice, $yearYouthPrice) {
         $res = false;
 
-        $res = $res | ($this->updateYear($yearPrice, $year) != 0);
+        $res = $res | ($this->updateYear($yearPrice, $yearYouthPrice, $year) != 0);
         $res = $res | ($this->courseUpdate($year, $springCoursePrice, 0, "course") != 0);
         $res = $res | ($this->courseUpdate($year, $fallCoursePrice, 1, "course") != 0);
         $res = $res | ($this->courseUpdate($year, $springTrainPrice, 0, "train") != 0);

@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS regn_year_membership (
 
 CREATE TABLE IF NOT EXISTS regn_year_price(
    year INTEGER(4) UNSIGNED PRIMARY KEY,
-   amount NUMERIC(8,2) UNSIGNED
+   amount NUMERIC(8,2) UNSIGNED,
+   amountyouth NUMERIC(8,2) UNSIGNED
 );
 
 

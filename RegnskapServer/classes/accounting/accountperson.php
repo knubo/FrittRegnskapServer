@@ -171,13 +171,14 @@ class AccountPerson {
 			$active_year = addslashes($accStandard->getOneValue(AccountStandard::CONST_YEAR));
 			$cols = "*, (select distinct 1 from " . AppConfig :: DB_PREFIX . "train_membership where memberid=id and semester=$active_semester) as train" .
 			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "course_membership where memberid=id and semester=$active_semester) as course" .
+			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "youth_membership where memberid=id and semester=$active_semester) as youth" .
 			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "year_membership where memberid=id and year=$active_year) as year";
 		}
 
 		$searchWrap = $this->db->search("select $cols from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
 
-		$searchWrap->addAndParam("s", "firstname", $this->FirstName);
-		$searchWrap->addAndParam("s", "lastname", $this->LastName);
+		$searchWrap->addAndParam("s", "firstname", $this->FirstName."%");
+		$searchWrap->addAndParam("s", "lastname", $this->LastName."%");
 		$searchWrap->addAndParam("i", "employee", $this->IsEmployee);
 		$searchWrap->addAndParam("s", "address", $this->Address);
 		$searchWrap->addAndParam("s", "postnmb", $this->PostNmb);

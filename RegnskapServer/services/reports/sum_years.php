@@ -7,6 +7,7 @@ include_once ("../../classes/reporting/report_year.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2005;
+$month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 12;
 
 $db = new DB(false);
 $regnSession = new RegnSession($db);
@@ -15,13 +16,13 @@ $regnSession->auth();
 $rep = new ReportYear($db);
 
 $sum = 0;
-$data = $rep->list_sums_earnings($year);
+$data = $rep->list_sums_earnings($year, $month);
 echo "<h1>Inntekter</h1>";
 include("views/view_report_year.php");
 
 $sumInntekter = $sum;
 $sum = 0;
-$data = $rep->list_sums_cost($year);
+$data = $rep->list_sums_cost($year, $month);
 echo "<h1>Utgifter</h1>";
 include("views/view_report_year.php");
 
@@ -31,14 +32,14 @@ echo $resultat;
 
 echo "<h1>EK og forpliktelser</h1>";
 $sum = 0;
-$data = $rep->list_sums_ownings($year);
+$data = $rep->list_sums_ownings($year, $month);
 include("views/view_report_year.php");
 
 echo "<h2>Sum</h2>";
 echo $sum;
 
 echo "<h1>Eiendeler</h1>";
-$data = $rep->list_sums_2000($year);
+$data = $rep->list_sums_2000($year, $month);
 include("views/view_report_year_ownings.php");
 
 ?>

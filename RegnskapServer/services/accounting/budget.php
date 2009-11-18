@@ -40,11 +40,12 @@ switch ($action) {
 		$accYear = new AccountYearMembership($db);
 		$accCourse = new AccountSemesterMembership($db, "course");
 		$accTrain = new AccountSemesterMembership($db, "train");
+		$accYouth = new AccountSemesterMembership($db, "youth");
 		$accPrice = new AccountMemberPrice($db);
 		$accBudget = new AccountBudget($db);
         $accSemester = new AccountSemester($db);
 
-		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
+		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
 		$result["price"] = $accPrice->getAll();
 
 		echo json_encode($result);

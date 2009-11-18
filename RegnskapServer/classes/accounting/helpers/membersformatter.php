@@ -9,6 +9,7 @@ class MembersFormatter {
 
         foreach($info as $one) {
             $year = $one["year"];
+
             $fall = array_key_exists("fall", $one) ? $one["fall"] : 0;
 
             $prev = 0;

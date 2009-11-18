@@ -51,7 +51,7 @@ class ReportYear {
 
 
     function list_sums_2000($year, $month = 12) {
-        $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost  from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP " .
+        $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP " .
                 "where RP.line = RL.id and debet = ? and year=? and RP.post_type < 2000 and RP.amount > 0 and RL.id not in " .
                 "(select RLI.id from " . AppConfig :: DB_PREFIX . "line RLI, " . AppConfig :: DB_PREFIX . "post RPI where RLI.id = RPI.line and " .
                 "RLI.month = 12 and RLI.postnmb = (select max(YL.postnmb) from " . AppConfig :: DB_PREFIX . "line YL where YL.year=? and YL.month=12) and RPI.post_type = 2050 and RLI.year=?) and RL.month <= ? group by RP.post_type ");

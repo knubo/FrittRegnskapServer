@@ -114,7 +114,7 @@ class EndYearHelper {
                 $add["DEBET"] = -1;
                 $this->result[] = $add;
             } else if($data[$one]["value"] < 0) {
-                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => ~$data[$one]["value"]);
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => 0 - $data[$one]["value"]);
                 $add["DEBET"] = 1;
                 $this->result[] = $add;
             }
@@ -123,7 +123,7 @@ class EndYearHelper {
         if($total > 0) {
             $this->result[] = array("post" => 2050, "DEBET" => 1, "value" => $total);
         } else if($total < 0) {
-            $this->result[] = array("post" => 2050, "DEBET" => -1, "value" => ~$total);
+            $this->result[] = array("post" => 2050, "DEBET" => -1, "value" => 0 - $total);
         }
 
     }

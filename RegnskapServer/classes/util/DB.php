@@ -66,6 +66,16 @@ class DB {
     }
 
     function prepare($query) {
+        
+        if(AppConfig::LOG_DB_STATEMENTS) {
+            $mysqliLog = mysqli_prepare($this->link, "insert into  ".AppConfig :: DB_PREFIX . "log (occured,username,category,action,message)  values (now(),?,?,?,?)");
+
+            $u =  $_SESSION["username"];
+            $d = "dbtrace";
+            mysqli_stmt_bind_param($mysqliLog, "ssss", $u, $d, $d, $query);
+            $mysqliLog->execute();
+        }
+        
         $mysqli = mysqli_prepare($this->link, $query);
 
         if (!$mysqli) {

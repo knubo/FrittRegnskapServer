@@ -21,6 +21,9 @@ const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 #Common db prefix for all database.
 const DB_PREFIX = "regn_";
 
+
+const LOG_DB_STATEMENTS = true;
+
 #Values for count. Must match CountCoulumns.
 function CountValues() {
 	return array(1000,500,200,100,50,20,10,5,1,0.5);

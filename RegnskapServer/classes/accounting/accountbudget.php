@@ -12,9 +12,55 @@ class AccountBudget {
         $this->Amount = $amount;
 	}
 
-    function getBudgetlines($year) {
-
+    function getEarningsAndCostsFromAllYears() {
+        
+        $result = array();
+        
+        $addedWhere = "RP.post_type >= 4000 and RP.post_type <= 8500 and RP.post_type <> 8040";
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
+        $prep->bind_params("i", 1);
+        $costDebet = $prep->execute();
+        
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
+        $prep->bind_params("i", -1);
+        $costKredit = $prep->execute();
+        
+        $result["cost"] = $this->sumPerYear($costDebet, $costKredit);
+        
+        $addedWhere = "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)";
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
+        $prep->bind_params("i", 1);
+        $earningsDebet = $prep->execute();
+        
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
+        $prep->bind_params("i", -1);
+        $earningsKredit = $prep->execute();
+        
+        $result["earnings"] = $this->sumPerYear($earningsKredit, $earningsDebet);
+        
+        return $result;
     }
+    
+    function sumPerYear($oneList, $twoList) {
+        $result = array();
+
+        foreach ($oneList as $one) {
+            $k = $one["year"]."-".$one["post_type"];
+            $result[$k] = $one["sumpost"];
+        }
+        
+        foreach($twoList as $one) {
+            $k = $one["year"]."-".$one["post_type"];
+            
+            if(array_key_exists($k, $result)) {
+                $result[$k] -= $one["sumpost"];
+            } else {
+                $result[$k] = 0 - $one["sumpost"];
+            }
+        }
+        return $result;
+    }
+    
 
 	function getMemberships($year) {
 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "budget_membership where year = ?");

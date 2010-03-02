@@ -230,7 +230,7 @@ CREATE TABLE IF NOT EXISTS regn_budsjett (
    year INT(4) UNSIGNED NOT NULL,
    post_type INTEGER(5) UNSIGNED NOT NULL,
    amount NUMERIC(8,2) UNSIGNED,
-   predict NUMERIC(8,2) UNSIGNED
+   earning tinyints
 );
 
 CREATE TABLE IF NOT EXISTS regn_fond_action (

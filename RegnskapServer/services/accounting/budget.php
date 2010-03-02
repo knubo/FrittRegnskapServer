@@ -17,6 +17,7 @@ $course = array_key_exists("course", $_REQUEST) ? $_REQUEST["course"] : "0";
 $train = array_key_exists("train", $_REQUEST) ? $_REQUEST["train"] : "0";
 $keyYear = array_key_exists("keyYear", $_REQUEST) ? $_REQUEST["keyYear"] : "0";
 $keyFall = array_key_exists("keyFall", $_REQUEST) ? $_REQUEST["keyFall"] : "0";
+$budget = array_key_exists("budget", $_REQUEST) ? $_REQUEST["budget"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -34,23 +35,31 @@ switch ($action) {
 
         echo json_encode($result);
         break;
-	case "init" :
+    case "init" :
 
-		$result = array ();
-		$accBudget = new AccountBudget($db);
-		$accPrice = new AccountMemberPrice($db);
+        $result = array ();
+        $accBudget = new AccountBudget($db);
+        $accPrice = new AccountMemberPrice($db);
 
-//		$accYear = new AccountYearMembership($db);
-//		$accCourse = new AccountSemesterMembership($db, "course");
-//		$accTrain = new AccountSemesterMembership($db, "train");
-//		$accYouth = new AccountSemesterMembership($db, "youth");
-//        $accSemester = new AccountSemester($db);
-//
-//		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
-		$result["price"] = $accPrice->getAll();
-
-		$result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
-		echo json_encode($result);
-		break;
+        //		$accYear = new AccountYearMembership($db);
+        //		$accCourse = new AccountSemesterMembership($db, "course");
+        //		$accTrain = new AccountSemesterMembership($db, "train");
+        //		$accYouth = new AccountSemesterMembership($db, "youth");
+        //        $accSemester = new AccountSemester($db);
+        //
+        //		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
+        $result["price"] = $accPrice->getAll();
+        $result["budget"] = $accBudget->getBudgetData();
+        $result["budgetYears"] = $accBudget->getAllBudgetYears();
+        $result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
+        echo json_encode($result);
+        break;
+    case "save":
+        $budgetObj = json_decode($budget);
+        $accBudget = new AccountBudget($db);
+        echo json_encode($accBudget->save($year, $budgetObj));
+        break;
+         
+         
 }
 ?>

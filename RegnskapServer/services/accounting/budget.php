@@ -41,15 +41,14 @@ switch ($action) {
         $accBudget = new AccountBudget($db);
         $accPrice = new AccountMemberPrice($db);
 
-        //		$accYear = new AccountYearMembership($db);
-        //		$accCourse = new AccountSemesterMembership($db, "course");
-        //		$accTrain = new AccountSemesterMembership($db, "train");
-        //		$accYouth = new AccountSemesterMembership($db, "youth");
-        //        $accSemester = new AccountSemester($db);
-        //
-        //		$result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
+        $accYear = new AccountYearMembership($db);
+        $accCourse = new AccountSemesterMembership($db, "course");
+        $accTrain = new AccountSemesterMembership($db, "train");
+        $accYouth = new AccountSemesterMembership($db, "youth");
+        $accSemester = new AccountSemester($db);
+        $result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
         $result["price"] = $accPrice->getAll();
-        $result["budget"] = $accBudget->getBudgetData();
+        $result["budget"] = $accBudget->getBudgetData($year);
         $result["budgetYears"] = $accBudget->getAllBudgetYears();
         $result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
         echo json_encode($result);

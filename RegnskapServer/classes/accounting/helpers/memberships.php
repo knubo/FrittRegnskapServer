@@ -102,7 +102,7 @@ class Memberships {
             }
 
             if($one->yearYouth()) {
-                $yearMY = new AccountYearMembership($db, $one->memberid(), $active_year, $lineId);
+                $yearMY = new AccountYearMembership($db, $one->memberid(), $active_year, $lineId, 1);
                 $yearMY->store();
                 if($lineId) {
                     $yearMY->addCreditPost($lineId, $memberYouthPrice);

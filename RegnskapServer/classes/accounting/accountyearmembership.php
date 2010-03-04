@@ -3,13 +3,15 @@ class AccountyearMembership {
 	public $Year;
 	public $User;
 	public $Regn_line;
+	public $Youth;
 	private $db;
 
-	function AccountyearMembership($db, $user = 0, $year = 0, $regn_line = 0) {
+	function AccountyearMembership($db, $user = 0, $year = 0, $regn_line = 0, $youth = 0) {
 		$this->db = $db;
 		$this->Year = $year;
 		$this->User = $user;
 		$this->Regn_line = $regn_line;
+		$this->Youth = $youth;
 	}
 
 	function addCreditPost($line, $amount) {
@@ -27,7 +29,7 @@ class AccountyearMembership {
 
 	function getAllMemberNames($year) {
 		/* Using group by here due to previous bug which added duplicate entries. */
-		$prep = $this->db->prepare("select firstname, lastname,id from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
+		$prep = $this->db->prepare("select firstname, lastname,id, youth from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
 		$prep->bind_params("i", $year);
 		$query_array = $prep->execute();
 
@@ -37,7 +39,8 @@ class AccountyearMembership {
 			$result[] = array (
                 $one["firstname"],
 				$one["lastname"],
-				$one["id"]
+				$one["id"],
+				$one["youth"]
 			);
 		}
 		return $result;
@@ -74,9 +77,9 @@ class AccountyearMembership {
 			return;
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_membership set year = ?, memberid=?, regn_line=?");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_membership set year = ?, memberid=?, regn_line=?, youth=?");
 
-		$prep->bind_params("iii", $this->Year, $this->User, $this->Regn_line);
+		$prep->bind_params("iiii", $this->Year, $this->User, $this->Regn_line, $this->Youth);
 
 		$prep->execute();
 
@@ -113,7 +116,7 @@ class AccountyearMembership {
     }
 
     function getOverview() {
-        $prep = $this->db->prepare("select count(*) as C, year from " . AppConfig :: DB_PREFIX . "year_membership group by year;");
+        $prep = $this->db->prepare("select count(*) as C, year, youth from " . AppConfig :: DB_PREFIX . "year_membership group by year,youth");
     	return $prep->execute();
     }
 }

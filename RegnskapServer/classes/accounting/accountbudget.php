@@ -108,11 +108,16 @@ class AccountBudget {
             return array (
 				"year" => $year,
 				"year_members" => 0,
+                "year_youth" => 0,
 				"spring_train" => 0,
 				"spring_course" => 0,
+				"spring_youth" => 0,
+				"fall_youth" => 0,
 				"fall_train" => 0,
 				"fall_course" => 0
             );
+            
+            
         }
 
         return array_shift($res);

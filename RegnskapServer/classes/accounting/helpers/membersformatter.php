@@ -18,7 +18,13 @@ class MembersFormatter {
             } else {
                 $prev = array();
             }
-            $prev[$type] = $one["C"];
+
+            if(array_key_exists("youth", $one) && $one["youth"]) {
+                $prev["yearyouth"] = $one["C"]; 
+            } else {
+                $prev[$type] = $one["C"];                
+            }
+            
             $prev["semester"] = $one["semester"];
             $grouped["$year-$fall"] = $prev;
         }

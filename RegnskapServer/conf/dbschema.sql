@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS regn_fordring (
 CREATE TABLE IF NOT EXISTS regn_year_membership (
    memberid INT(6) UNSIGNED,
    year INT(4) UNSIGNED,
-   regn_line INT(8) UNSIGNED
+   regn_line INT(8) UNSIGNED,
+   youth tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_year_price(
@@ -222,7 +223,10 @@ create table if not exists regn_budget_membership (
   spring_train int(5) unsigned,
   spring_course int(5) unsigned,
   fall_train int(5) unsigned,
-  fall_course int(5) unsigned
+  fall_course int(5) unsigned,
+  fall_youth int(5) unsigned,
+  spring_youth int(5) unsigned,
+  year_youth int(5) unsigned
 );
   
 

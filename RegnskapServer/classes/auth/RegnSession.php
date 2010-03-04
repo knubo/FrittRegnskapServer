@@ -21,6 +21,21 @@ class RegnSession {
         return $_SESSION["username"];
     }
     
+    function projectRequired() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return 0;
+        }
+    	return $_SESSION["project_required"];
+    }
+    
+    function getPersonId() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return 0;
+        }
+
+        return $_SESSION["person_id"];
+    }
+    
     function hasReducedWriteAccess() {
         if(!AppConfig::USE_AUTHENTICATION) {
             return 0;

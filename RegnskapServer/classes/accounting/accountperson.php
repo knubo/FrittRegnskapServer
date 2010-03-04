@@ -96,6 +96,19 @@ class AccountPerson {
 		return $this->Id;
 	}
 
+	function getName($id) {
+		$sql = "select firstname,lastname from " . AppConfig :: DB_PREFIX . "person where id = ?";
+		$prep = $this->db->prepare($sql);
+		$prep->bind_params("i", $id);
+		$res = $prep->execute();
+	    
+		if(count($res) == 0) {
+		    return "";
+		}
+		
+		return $res[0]["firstname"]." ".$res[0]["lastname"]; 
+	}
+	
 	function getOne($id) {
 		$sql = "select * from " . AppConfig :: DB_PREFIX . "person where id = ?";
 		$prep = $this->db->prepare($sql);

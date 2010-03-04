@@ -10,6 +10,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $db = new DB();
@@ -24,6 +25,7 @@ if(array_key_exists("line", $_GET)) {
 }
 $line = new AccountLine($db);
 $line->read($lineId);
+$line->loadEditedByPersonName();
 $line->fetchAllPosts();
 
 echo json_encode($line);

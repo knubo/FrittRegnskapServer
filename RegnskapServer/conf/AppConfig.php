@@ -9,7 +9,7 @@ const DB_PASSWORD="";
 const DB_NAME="bsc_kopi";
 
 #Set to 1 if you want authentication.
-const USE_AUTHENTICATION=0;
+const USE_AUTHENTICATION=1;
 
 const TIMEZONE="Europe/Oslo";
 

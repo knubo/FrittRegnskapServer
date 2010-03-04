@@ -5,6 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/accounting/accountcolumn.php");

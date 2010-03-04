@@ -11,6 +11,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/auth/RegnSession.php");
 
@@ -49,7 +50,7 @@ switch ($action) {
 		if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
 			die("Missing params for insert of accountline.");
 		}
-		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
+		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
 		$insertAC->store();
 
         $res = array();
@@ -62,7 +63,7 @@ switch ($action) {
 		if (!$postnmb || !$day ||  !$desc || !$line || !$occured || !$attachment) {
 			die("Missing params for update of accountline.");
 		}
-		$updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured);
+		$updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
 
         $res = array();
         $res["result"] = $updateAcc->update();

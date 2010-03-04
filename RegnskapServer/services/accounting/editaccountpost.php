@@ -10,6 +10,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountpost.php");
+include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "query";
@@ -26,7 +27,7 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 
 
-$accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $project, $person);
+$accPost = new AccountPost($db, $line, $debet, $post_type, $amount, $id, $project, $person, $regnSession->getPersonId());
 
 switch ($action) {
 	case "delete" :
@@ -44,6 +45,13 @@ switch ($action) {
 		break;
 	case "insert" :
         $regnSession->checkWriteAccess();
+        
+        $validator = new ValidatorStatus();
+        if($project == 0 && $regnSession->projectRequired()) {
+        	$validator->addInvalidField("project");
+        }
+        $validator->dieIfNotValidated();
+        
 		$accPost->store();
 
         $arr = array();

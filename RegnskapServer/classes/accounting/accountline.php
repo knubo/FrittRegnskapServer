@@ -2,6 +2,8 @@
 class AccountLine {
 	public $Id;
 	public $Description;
+	public $EditedByPerson;
+	public $EditedByPersonName;
 	public $Attachment;
 	public $Postnmb;
 	private $Occured;
@@ -15,11 +17,12 @@ class AccountLine {
 	public $date;
 	public $sum;
 
-	function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id = 0, $occured = 0) {
+	function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id = 0, $occured = 0, $editedByPerson = 0) {
 		$this->db = $db;
 		$this->Postnmb = $postnmb;
 		$this->Attachment = $attachment;
 		$this->Description = $description;
+		$this->EditedByPerson = $editedByPerson;
 		if ($occured) {
 			$this->Occured = $occured;
 			$this->date = $occured->displayAccount();
@@ -76,7 +79,7 @@ class AccountLine {
     }
 
 	function read($id) {
-		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig :: DB_PREFIX . "line where id = ?");
+		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description, edited_by_person from " . AppConfig :: DB_PREFIX . "line where id = ?");
 		$prep->bind_params("i", $id);
 		$line_query = $prep->execute($prep);
 
@@ -88,6 +91,7 @@ class AccountLine {
 			$this->date = $this->Occured->displayAccount();
 			$this->Postnmb = $one["postnmb"];
 			$this->Description = $one["description"];
+			$this->EditedByPerson = $one["edited_by_person"];
 		}
 	}
 
@@ -149,9 +153,9 @@ class AccountLine {
 	}
 
 	function update() {
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "line set attachnmb = ?, postnmb = ?, occured = ?, description = ? where id = ?");
+		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "line set attachnmb = ?, postnmb = ?, occured = ?, description = ?, edited_by_person=? where id = ?");
 
-		$prep->bind_params("iissi", $this->Attachment, $this->Postnmb, $this->Occured->mySQLDate(), $this->Description, $this->Id);
+		$prep->bind_params("iissii", $this->Attachment, $this->Postnmb, $this->Occured->mySQLDate(), $this->Description, $this->EditedByPerson, $this->Id);
 
 		$prep->execute();
 		return $this->db->affected_rows();
@@ -175,8 +179,8 @@ class AccountLine {
 			$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?");
-		$prep->bind_params("iisiis", $this->Attachment, $this->Postnmb, $this->Description, $month, $year, $this->Occured->mySQLDate());
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?,edited_by_person=?");
+		$prep->bind_params("iisiisi", $this->Attachment, $this->Postnmb, $this->Description, $month, $year, $this->Occured->mySQLDate(), $this->EditedByPerson);
 		$prep->execute();
 		$this->Id = $this->db->insert_id();
 	}
@@ -470,6 +474,11 @@ class AccountLine {
 	function fetchAllPosts() {
 		$this->postArray = $this->getAllPosts();
 
+		$accperson = new AccountPerson($this->db);
+		
+		$idGivesName = array($this->EditedByPerson => $this->EditedByPersonName);
+		
+		
 		$sum = 0;
 		foreach ($this->postArray as $post) {
 			if (!is_object($post)) {
@@ -480,6 +489,17 @@ class AccountLine {
 				$sum += $post->getAmount();
 			} else {
 				$sum -= $post->getAmount();
+			}
+			
+			/* Load edited by names */
+			if($post->EditedByPerson > 0) {
+			    if(array_key_exists($post->EditedByPerson, $idGivesName)) {
+			        $post->EditedByPersonName = $idGivesName[$post->EditedByPerson];
+			    } else {
+			        $name = $accperson->getName($post->EditedByPerson);
+			        $post->EditedByPersonName = $name;
+			        $idGivesName[$post->EditedByPerson] = $name;
+			    }
 			}
 		}
 		$this->sum = $sum;
@@ -565,6 +585,12 @@ class AccountLine {
 	function listOfYearMonths() {
 		$prep = $this->db->prepare("select year,month from " . AppConfig :: DB_PREFIX . "line group by year,month order by year,month;");
 		return $prep->execute();
+	}
+	
+	function loadEditedByPersonName() {
+        $accperson = new AccountPerson($this->db);
+
+        $this->EditedByPersonName = $accperson->getName($this->EditedByPerson);
 	}
 }
 ?>

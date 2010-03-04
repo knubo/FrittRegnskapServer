@@ -7,9 +7,12 @@ class AccountPost {
 	public $Amount;
 	public $Project;
 	public $Person;
+    public $EditedByPerson;
+    public $EditedByPersonName;
+	
 	private $db;
 
-	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0) {
+	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0, $edited_by_person = 0) {
 		$this->db = $db;
 		$this->Line = $line;
 		$this->Debet = $debet;
@@ -17,7 +20,8 @@ class AccountPost {
 		$this->Amount = $amount;
 		$this->Project = $project;
 		$this->Person = $person;
-
+        $this->EditedByPerson = $edited_by_person;
+		
 		$this->Id = $id;
 	}
 
@@ -47,9 +51,9 @@ class AccountPost {
 
 	function store() {
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?");
+		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?, edited_by_person=?");
 
-		$prep->bind_params("isidii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project);
+		$prep->bind_params("isidiii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project, $this->EditedByPerson);
 
 		$prep->execute();
 	    $this->Id = $this->db->insert_id();
@@ -73,7 +77,7 @@ class AccountPost {
 		$return_array = array ();
 
 		foreach ($group_array as $one) {
-			$return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"]);
+			$return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"]);
 		}
 		return $return_array;
 	}

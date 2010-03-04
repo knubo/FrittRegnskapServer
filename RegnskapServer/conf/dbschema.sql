@@ -27,8 +27,8 @@ create table if not exists regn_user(
   pass varchar(15),
   person INT(11) unsigned,
   readonly tinyint,
-  reducedwrite tinyint
-
+  reducedwrite tinyint,
+  project_required tinyint
 );
 
 CREATE TABLE IF NOT EXISTS regn_grouping_head (
@@ -129,7 +129,8 @@ CREATE TABLE IF NOT EXISTS regn_line (
    postnmb INT(5) UNSIGNED,
    description VARCHAR(40),
    month INT(5) UNSIGNED,
-   year INT(5) UNSIGNED
+   year INT(5) UNSIGNED,
+   edited_by_person INT(11) unsigned
 );
 
 CREATE TABLE IF NOT EXISTS regn_post (
@@ -139,7 +140,8 @@ CREATE TABLE IF NOT EXISTS regn_post (
    post_type INT(5) UNSIGNED,
    project INT(8) UNSIGNED,
    person INT(11) UNSIGNED,
-   amount NUMERIC(8,2) UNSIGNED
+   amount NUMERIC(8,2) UNSIGNED,
+   edited_by_person INT(11) unsigned
 );
 
 create table if not exists regn_project (

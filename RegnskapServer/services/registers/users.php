@@ -15,6 +15,8 @@ $password = array_key_exists("password", $_REQUEST) ? $_REQUEST["password"] : ""
 $person = array_key_exists("person", $_REQUEST) ? $_REQUEST["person"] : "";
 $readonly = array_key_exists("readonly", $_REQUEST) ? $_REQUEST["readonly"] : "";
 $reducedwrite = array_key_exists("reducedwrite", $_REQUEST) ? $_REQUEST["reducedwrite"] : "";
+$project_required = array_key_exists("project_required", $_REQUEST) ? $_REQUEST["project_required"] : "";
+
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -36,7 +38,7 @@ switch ($action) {
         } else {
             $regnSession->checkWriteAccess();
     		$accUsers = new User($db);
-    		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite);        	
+    		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite, $project_required);        	
     		$res["result"] = $rowsAffected;
         }
     

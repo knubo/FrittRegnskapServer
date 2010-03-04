@@ -30,7 +30,9 @@ switch ($action) {
 			$_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
-			$arr = array (
+            $_SESSION["project_required"] = $auth->hasProjectRequired();
+            $_SESSION["person_id"] = $auth->getPersonId();
+            $arr = array (
 				'result' => 'ok'
 			);
 

@@ -53,26 +53,26 @@ class AccountBudget {
         $result = array();
 
         $addedWhere = "RP.post_type >= 4000 and RP.post_type <= 8500 and RP.post_type <> 8040";
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
-        $prep->bind_params("i", 1);
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere group by year, post_type order by post_type");
+        $prep->bind_params("s", "1");
         $costDebet = $prep->execute();
 
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
-        $prep->bind_params("i", -1);
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere group by year, post_type order by post_type");
+        $prep->bind_params("s", "-1");
         $costKredit = $prep->execute();
 
         $result["cost"] = $this->sumPerYear($costDebet, $costKredit);
 
         $addedWhere = "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)";
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
-        $prep->bind_params("i", 1);
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere group by year, post_type order by post_type");
+        $prep->bind_params("s", "1");
         $earningsDebet = $prep->execute();
 
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere  group by year, post_type order by post_type");
-        $prep->bind_params("i", -1);
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, year from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL where RL.id=RP.line and RP.debet = ? and $addedWhere group by year, post_type order by post_type");
+        $prep->bind_params("s", "-1");
         $earningsKredit = $prep->execute();
 
-        $result["earnings"] = $this->sumPerYear($earningsDebet, $earningsKredit);
+        $result["earnings"] = $this->sumPerYear($earningsKredit, $earningsDebet);
 
         return $result;
     }

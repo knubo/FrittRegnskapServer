@@ -51,6 +51,7 @@ switch ($action) {
         $result["budget"] = $accBudget->getBudgetData($year);
         $result["budgetYears"] = $accBudget->getAllBudgetYears();
         $result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
+        $result["semesters"] = $accSemester->getAll();
         echo json_encode($result);
         break;
     case "save":

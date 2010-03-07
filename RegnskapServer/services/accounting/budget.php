@@ -13,23 +13,18 @@ include_once ("../../classes/auth/RegnSession.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "init";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";
-$course = array_key_exists("course", $_REQUEST) ? $_REQUEST["course"] : "0";
-$train = array_key_exists("train", $_REQUEST) ? $_REQUEST["train"] : "0";
-$keyYear = array_key_exists("keyYear", $_REQUEST) ? $_REQUEST["keyYear"] : "0";
-$keyFall = array_key_exists("keyFall", $_REQUEST) ? $_REQUEST["keyFall"] : "0";
 $budget = array_key_exists("budget", $_REQUEST) ? $_REQUEST["budget"] : "0";
+$memberships = array_key_exists("memberships", $_REQUEST) ? $_REQUEST["memberships"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 $standard = new AccountStandard($db);
 
-$budgetyear = $standard->getOneValue(AccountStandard::CONST_YEAR) + 1;
-
 switch ($action) {
     case "saveMemberships":
         $accBudget = new AccountBudget($db);
-        $res = $accBudget->saveMemberships($keyYear,  $keyFall,  $year, $course, $train);
+        $res = $accBudget->saveMemberships(json_decode($memberships));
         $result = array();
         $result["result"] = $res;
 
@@ -46,9 +41,15 @@ switch ($action) {
         $accTrain = new AccountSemesterMembership($db, "train");
         $accYouth = new AccountSemesterMembership($db, "youth");
         $accSemester = new AccountSemester($db);
-        $result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview(), $accBudget->getMemberships($budgetyear), $accSemester->getForYear($budgetyear));
-        $result["price"] = $accPrice->getAll();
         $result["budget"] = $accBudget->getBudgetData($year);
+        
+        if($year == 0 && count($result["budget"]) > 0) {
+            $year = $result["budget"][0]["year"];
+        }
+        
+        $result["membersbudget"] = $accBudget->getMemberships($year);
+        $result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview());
+        $result["price"] = $accPrice->getAll();
         $result["budgetYears"] = $accBudget->getAllBudgetYears();
         $result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
         $result["semesters"] = $accSemester->getAll();

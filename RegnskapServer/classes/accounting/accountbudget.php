@@ -26,7 +26,7 @@ class AccountBudget {
             $savePrep->bind_params("iidi", $year, $oneRow->postType, str_replace(",","", $oneRow->value), $oneRow->earning == "true" ? "1" : 0);
             $savePrep->execute();
         }
-        
+
         $this->db->commit();
         return 1;
     }
@@ -116,14 +116,14 @@ class AccountBudget {
 				"fall_train" => 0,
 				"fall_course" => 0
             );
-            
-            
         }
 
         return array_shift($res);
     }
 
-    function saveMemberships($keyYear, $keyFall, $year, $course, $train) {
+    function saveMemberships($memberships) {
+        $keyYear = $memberships->year;
+
         $prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "budget_membership where year = ?");
         $prep->bind_params("i", $keyYear);
 
@@ -135,16 +135,8 @@ class AccountBudget {
             $res = $prep->execute();
         }
 
-        if ($keyFall == 0) {
-            $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "budget_membership set spring_train=?,spring_course=?,year_members=? where year=?");
-            $prep->bind_params("iiii", $train, $course, $year, $keyYear);
-            $prep->execute();
-
-            return $this->db->affected_rows();
-        }
-
-        $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "budget_membership set fall_train=?,fall_course=? where year=?");
-        $prep->bind_params("iii", $train, $course, $keyYear);
+        $prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "budget_membership set fall_train=?,fall_course=?,fall_youth=?, spring_train=?,spring_course=?,spring_youth=?,year_members=?,year_youth=? where year=?");
+        $prep->bind_params("iiiiiiiii", $memberships->fall_train,$memberships->fall_course,$memberships->fall_youth,$memberships->spring_train,$memberships->spring_course,$memberships->spring_youth,$memberships->year_members,$memberships->year_youth, $keyYear);
         $prep->execute();
 
         return $this->db->affected_rows();

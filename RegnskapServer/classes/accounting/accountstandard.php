@@ -7,6 +7,8 @@ class AccountStandard {
     const CONST_SEMESTER = "STD_SEMESTER";
     const CONST_EMAIL_SENDER = "STD_EMAIL_SENDER";
     const CONST_MASSLETTER_DUE_DATE = "MASSLETTER_DUE_DATE";
+    const CONST_BUDGET_YEAR_POST = "BDG_YEAR_POST";
+    const CONST_BUDGET_COURSE_POST = "BDG_COURSE_POST";
 
 
     private $db;

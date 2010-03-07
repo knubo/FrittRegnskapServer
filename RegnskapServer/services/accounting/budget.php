@@ -52,7 +52,9 @@ switch ($action) {
         $result["budgetYears"] = $accBudget->getAllBudgetYears();
         $result["result"] = $accBudget->getEarningsAndCostsFromAllYears();
         $result["semesters"] = $accSemester->getAll();
-        echo json_encode($result);
+        $result["year_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
+        $result["course_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
+                echo json_encode($result);
         break;
     case "save":
         $budgetObj = json_decode($budget);

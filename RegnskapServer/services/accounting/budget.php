@@ -42,11 +42,11 @@ switch ($action) {
         $accYouth = new AccountSemesterMembership($db, "youth");
         $accSemester = new AccountSemester($db);
         $result["budget"] = $accBudget->getBudgetData($year);
-        
+
         if($year == 0 && count($result["budget"]) > 0) {
             $year = $result["budget"][0]["year"];
         }
-        
+
         $result["membersbudget"] = $accBudget->getMemberships($year);
         $result["members"] = MembersFormatter :: group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview());
         $result["price"] = $accPrice->getAll();
@@ -55,14 +55,24 @@ switch ($action) {
         $result["semesters"] = $accSemester->getAll();
         $result["year_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
         $result["course_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
-                echo json_encode($result);
+        echo json_encode($result);
         break;
     case "save":
         $budgetObj = json_decode($budget);
         $accBudget = new AccountBudget($db);
         echo json_encode($accBudget->save($year, $budgetObj));
         break;
-         
+    case "simplestatus":
+        $accBudget = new AccountBudget($db);
+        $result = array();
+        $result["budget"] = $accBudget->getBudgetData($year);
+        $result["result"] = $accBudget->getEarningsAndCostsFromGivenYear($year);
+        echo json_encode($result);
+        break;
+    case "years":
+        $accBudget = new AccountBudget($db);
+        echo json_encode($accBudget->getAllBudgetYears());
+        break;
          
 }
 ?>

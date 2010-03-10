@@ -19,6 +19,8 @@ $email_sender = array_key_exists("email_sender", $_REQUEST) ? $_REQUEST["email_s
 $massletter_due_date = array_key_exists("massletter_due_date", $_REQUEST) ? $_REQUEST["massletter_due_date"] : "0";
 $year_post = array_key_exists("year_post", $_REQUEST) ? $_REQUEST["year_post"] : "0";
 $course_post = array_key_exists("course_post", $_REQUEST) ? $_REQUEST["course_post"] : "0";
+$train_post = array_key_exists("train_post", $_REQUEST) ? $_REQUEST["train_post"] : "0";
+$youth_post = array_key_exists("youth_post", $_REQUEST) ? $_REQUEST["youth_post"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -37,6 +39,8 @@ switch ($action) {
 
         $res["year_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
         $res["course_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
+        $res["train_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_TRAIN_POST);
+        $res["youth_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_YOUTH_POST);
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();
@@ -56,6 +60,8 @@ switch ($action) {
         $res = $res | $accStd->setValue(AccountStandard::CONST_MASSLETTER_DUE_DATE, $massletter_due_date);
         $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_YEAR_POST, $year_post);
         $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_COURSE_POST, $course_post);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_TRAIN_POST, $train_post);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_YOUTH_POST, $youth_post);
         $report = array();
         $report["result"] = $res ? 1 : 0;
 

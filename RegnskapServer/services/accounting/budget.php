@@ -55,6 +55,9 @@ switch ($action) {
         $result["semesters"] = $accSemester->getAll();
         $result["year_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
         $result["course_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
+        $result["train_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_TRAIN_POST);
+        $result["youth_post"] = $standard->getOneValue(AccountStandard::CONST_BUDGET_YOUTH_POST);
+
         echo json_encode($result);
         break;
     case "save":

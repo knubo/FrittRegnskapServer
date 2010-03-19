@@ -42,21 +42,12 @@ function FordringPosts() {
 function EndPosts() {
 	return array(1904,1905,1906, 1920,1921);
 }
-#Post that values are transfered to after end of month.
-const EndPostTransferPost=9000;
-#Post that values are transferred to after end of year.
-const EndPostYearTransferPost=8800;
+
 #Posts available in select when registering a membership.
 function RegisterMembershipPosts() {
 	return array(1920,1905, 2910, 2990);
 }
-const YearMembershipCreditPost=3920;
-const CourseMembershipCreditPost=3925;
-const TrainMembershipCreditPost=3926;
-const YouthMembershipCreditPost=3927;
 
-#Membership group
-const MembershipGroup=4;
 #Fond - club account post
 const ClubAccountPost=1920;
 #
@@ -66,9 +57,6 @@ const BBC_FondKreditPost=3995;
 #
 const TSO_FondKreditPost=3397;
 #
-function DivPosts() {
-	return array(3999,7990,8400,8500,1370,1380,1390);
-}
 }
 
 /* Disable magic quotes */

@@ -190,6 +190,7 @@ class AccountPerson {
 
 		$searchWrap = $this->db->search("select $cols from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
 
+		$searchWrap->addAndParam("i", "id", $this->Id);
 		$searchWrap->addAndParam("s", "firstname", $this->FirstName."%");
 		$searchWrap->addAndParam("s", "lastname", $this->LastName."%");
 		$searchWrap->addAndParam("i", "employee", $this->IsEmployee);

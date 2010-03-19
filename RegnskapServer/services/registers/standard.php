@@ -21,6 +21,11 @@ $year_post = array_key_exists("year_post", $_REQUEST) ? $_REQUEST["year_post"] :
 $course_post = array_key_exists("course_post", $_REQUEST) ? $_REQUEST["course_post"] : "0";
 $train_post = array_key_exists("train_post", $_REQUEST) ? $_REQUEST["train_post"] : "0";
 $youth_post = array_key_exists("youth_post", $_REQUEST) ? $_REQUEST["youth_post"] : "0";
+$end_month_post = array_key_exists("end_month_post", $_REQUEST) ? $_REQUEST["end_month_post"] : "0";
+$end_year_post = array_key_exists("end_year_post", $_REQUEST) ? $_REQUEST["end_year_post"] : "0";
+$fordringer_posts = array_key_exists("fordringer_posts", $_REQUEST) ? $_REQUEST["fordringer_posts"] : "0";
+$register_membership_posts = array_key_exists("register_membership_posts", $_REQUEST) ? $_REQUEST["register_membership_posts"] : "0";
+$end_month_transfer_posts = array_key_exists("end_month_transfer_posts", $_REQUEST) ? $_REQUEST["end_month_transfer_posts"] : "0"; 
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -41,6 +46,11 @@ switch ($action) {
         $res["course_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
         $res["train_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_TRAIN_POST);
         $res["youth_post"] = $accStd->getOneValue(AccountStandard::CONST_BUDGET_YOUTH_POST);
+        $res["end_month_post"] = $accStd->getOneValue(AccountStandard::CONST_END_MONTH_POST);
+        $res["end_year_post"] = $accStd->getOneValue(AccountStandard::CONST_END_YEAR_POST);
+        $res["fordringer_posts"] = $accStd->getOneValue(AccountStandard::CONST_FORDRINGER_POSTS);
+        $res["register_membership_posts"] = $accStd->getOneValue(AccountStandard::CONST_REGISTER_MEMBERSHIP_POSTS);
+        $res["end_month_transfer_posts"] = $accStd->getOneValue(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS);
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();
@@ -62,6 +72,11 @@ switch ($action) {
         $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_COURSE_POST, $course_post);
         $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_TRAIN_POST, $train_post);
         $res = $res | $accStd->setValue(AccountStandard::CONST_BUDGET_YOUTH_POST, $youth_post);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_END_MONTH_POST, $end_month_post);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_END_YEAR_POST, $end_year_post);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_FORDRINGER_POSTS, $fordringer_posts);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_REGISTER_MEMBERSHIP_POSTS, $register_membership_posts);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS, $end_month_transfer_posts);
         $report = array();
         $report["result"] = $res ? 1 : 0;
 

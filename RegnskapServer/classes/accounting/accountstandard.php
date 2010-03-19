@@ -11,8 +11,12 @@ class AccountStandard {
     const CONST_BUDGET_COURSE_POST = "BDG_COURSE_POST";
     const CONST_BUDGET_TRAIN_POST = "BDG_TRAIN_POST";
     const CONST_BUDGET_YOUTH_POST = "BDG_YOUTH_POST";
-
-
+    const CONST_END_YEAR_POST = "END_YEAR_POST";
+    const CONST_END_MONTH_POST = "END_MONTH_POST";
+    const CONST_FORDRINGER_POSTS = "FORDRINGER_POSTS";
+    const CONST_END_MONTH_TRANSFER_POSTS = "END_MONTH_TRPOSTS";
+    const CONST_REGISTER_MEMBERSHIP_POSTS = "REGI_MEMB_POSTS";
+    
     private $db;
 
     function AccountStandard($db) {
@@ -39,7 +43,7 @@ class AccountStandard {
             return $this->db->affected_rows();
         }
     }
-
+    
     function getValue($id) {
         $prep = $this->db->prepare("select value from " . AppConfig :: DB_PREFIX . "standard where id=?");
         $prep->bind_params("s", $id);
@@ -56,12 +60,19 @@ class AccountStandard {
         return $return_array;
     }
 
+    
     function getOneValue($id) {
         $res = $this->getValue($id);
 
         if (count($res)) {
             return $res[0];
         }
+    }
+    
+    function getOneValueAsArray($id) {
+        $res = $this->getOneValue($id);
+        
+        return explode(",", $res);
     }
 }
 ?>

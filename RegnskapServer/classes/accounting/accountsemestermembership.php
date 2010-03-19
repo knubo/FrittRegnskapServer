@@ -18,15 +18,17 @@ class AccountSemesterMembership {
 
 	function addCreditPost($line, $amount) {
 
+	    $standard = new AccountStandard($this->db);
+	    
 		switch ($this->Type) {
 			case "course" :
-				$postType = AppConfig :: CourseMembershipCreditPost;
+				$postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
 				break;
 			case "train" :
-				$postType = AppConfig :: TrainMembershipCreditPost;
+				$postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_TRAIN_POST);
 				break;
             case "youth" :
-                $postType = AppConfig :: YouthMembershipCreditPost;
+                $postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_YOUTH_POST);
                 break;
 		}
 

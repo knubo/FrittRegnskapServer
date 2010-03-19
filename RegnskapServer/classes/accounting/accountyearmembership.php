@@ -16,7 +16,10 @@ class AccountyearMembership {
 
 	function addCreditPost($line, $amount) {
 
-		$postType = AppConfig :: YearMembershipCreditPost;
+	    $standard = new AccountStandard($this->db);
+	    
+		$postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
+		
 		$post = new AccountPost($this->db, $line, "-1", $postType, $amount);
 		return $post->store();
 

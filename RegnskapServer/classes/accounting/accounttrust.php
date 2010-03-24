@@ -33,14 +33,14 @@ class AccountTrust {
 
 		$date = $this->Occured->mySQLDate();
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?,accountline=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "fond SET fond=?,description=?,occured=?,fond_account=?,club_account=?,accountline=?");
 		$prep->bind_params("sssddi", $this->Fond, $this->Description, $date,$this->Fond_account, $this->Club_account, $this->AccountLine);
     	$prep->execute();
 		return $this->db->insert_id();
 	}
 
     function saveFondType($fond, $description) {
-        $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond_type set fond=?, description=? on duplicate key update description=?");
+        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "fond_type set fond=?, description=? on duplicate key update description=?");
         $prep->bind_params("sss",$fond,$description,$description);
         $prep->execute();
 
@@ -49,7 +49,7 @@ class AccountTrust {
 
 	function getFondtypes() {
 
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "fond_type");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "fond_type");
 		$arr = $prep->execute();
 
 		$result = array ();
@@ -68,7 +68,7 @@ class AccountTrust {
 
 		$field = $club ? "club_account" : "fond_account";
 
-		$prep = $this->db->prepare("select sum($field) as s from " . AppConfig :: DB_PREFIX . "fond where fond = ?");
+		$prep = $this->db->prepare("select sum($field) as s from " . AppConfig::pre() . "fond where fond = ?");
 		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 
@@ -78,7 +78,7 @@ class AccountTrust {
 	}
 
 	function getFondInfo($fond) {
-		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account, accountline from " . AppConfig :: DB_PREFIX . "fond where fond=? order by occured,id");
+		$prep = $this->db->prepare("select id, description, occured, fond_account, club_account, accountline from " . AppConfig::pre() . "fond where fond=? order by occured,id");
 		$prep->bind_params("s", $fond);
 		$arr = $prep->execute();
 

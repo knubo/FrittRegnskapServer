@@ -51,7 +51,7 @@ class AccountPostType {
 	}
 
 	function save($posttype, $desc, $collpost, $detailpost) {
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1) on duplicate key update coll_post=?, detail_post=?, description=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "post_type (post_type, coll_post, detail_post, description, in_use) values (?, ?, ?, ?, 1) on duplicate key update coll_post=?, detail_post=?, description=?");
 
 		$prep->bind_params("iiisiis", $posttype, $collpost, $detailpost, $desc,  $collpost, $detailpost, $desc);
 		$prep->execute();
@@ -66,11 +66,11 @@ class AccountPostType {
 		$prep = 0;
 
 		if ($from && $to) {
-			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type WHERE post_type >= ? and post_type <= ? order by post_type");
+			$prep = $this->db->prepare("SELECT * FROM " . AppConfig::pre() . "post_type WHERE post_type >= ? and post_type <= ? order by post_type");
 			$prep->bind_params("ii", $from, $to);
 		} else {
 			$params = implode(",", array_fill(0, count($ids), "?"));
-			$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type where post_type IN ($params)");
+			$prep = $this->db->prepare("SELECT * FROM " . AppConfig::pre() . "post_type where post_type IN ($params)");
 
 			$prep->bind_array_params(str_repeat("i", count($ids)), $ids);
 		}
@@ -104,9 +104,9 @@ class AccountPostType {
 		$q = 0;
 
 		if ($disableFilter) {
-			$q = "SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type order by in_use DESC, post_type, description";
+			$q = "SELECT * FROM " . AppConfig::pre() . "post_type order by in_use DESC, post_type, description";
 		} else {
-			$q = "SELECT * FROM " . AppConfig :: DB_PREFIX . "post_type where in_use = 1 order by description";
+			$q = "SELECT * FROM " . AppConfig::pre() . "post_type where in_use = 1 order by description";
 		}
 		$prep = $this->db->prepare($q);
 		$group_array = $prep->execute();
@@ -141,7 +141,7 @@ class AccountPostType {
 	}
 
     function updateInUse($posttype, $inuse) {
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "post_type set in_use = ? where post_type = ?");
+		$prep = $this->db->prepare("update " . AppConfig::pre() . "post_type set in_use = ? where post_type = ?");
 		$prep->bind_params("ii", $inuse, $posttype);
         $prep->execute();
         return $this->db->affected_rows();

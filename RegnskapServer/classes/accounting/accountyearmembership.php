@@ -32,7 +32,7 @@ class AccountyearMembership {
 
 	function getAllMemberNames($year) {
 		/* Using group by here due to previous bug which added duplicate entries. */
-		$prep = $this->db->prepare("select firstname, lastname,id, youth from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
+		$prep = $this->db->prepare("select firstname, lastname,id, youth from " . AppConfig::pre() . "person P," . AppConfig::pre() . "year_membership C where C.memberid = P.id and C.year=? group by P.firstname,P.lastname order by P.lastname, P.firstname");
 		$prep->bind_params("i", $year);
 		$query_array = $prep->execute();
 
@@ -51,7 +51,7 @@ class AccountyearMembership {
 	}
 
     function delete($year, $person) {
-    	$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? and year=?");
+    	$prep = $this->db->prepare("delete from " . AppConfig::pre() . "year_membership where memberid = ? and year=?");
         $prep->bind_params("ii", $person, $year);
         $prep->execute();
         return $this->db->affected_rows();
@@ -59,7 +59,7 @@ class AccountyearMembership {
 
 	function getUserMemberships($user) {
 
-		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig :: DB_PREFIX . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
+		$prep = $this->db->prepare("select memberid, year, regn_line from " . AppConfig::pre() . "year_membership where memberid = ? group by memberid, year, regn_line order by year");
         $prep->bind_params("i", $user);
 		$query_array = $prep->execute();
 
@@ -72,7 +72,7 @@ class AccountyearMembership {
 	}
 
 	function store() {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "year_membership where year = ? and memberid=?");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "year_membership where year = ? and memberid=?");
 		$prep->bind_params("ii", $this->Year, $this->User);
 		$res = $prep->execute();
 
@@ -80,7 +80,7 @@ class AccountyearMembership {
 			return;
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "year_membership set year = ?, memberid=?, regn_line=?, youth=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "year_membership set year = ?, memberid=?, regn_line=?, youth=?");
 
 		$prep->bind_params("iiii", $this->Year, $this->User, $this->Regn_line, $this->Youth);
 
@@ -90,7 +90,7 @@ class AccountyearMembership {
 	}
 
 	function getReportUsersBirthdate($year) {
-		$prep = $this->db->prepare("select distinct id as id, firstname as firstname, lastname as lastname, birthdate as birthdate, gender from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by birthdate desc,lastname,firstname");
+		$prep = $this->db->prepare("select distinct id as id, firstname as firstname, lastname as lastname, birthdate as birthdate, gender from " . AppConfig::pre() . "year_membership, " . AppConfig::pre() . "person where memberid=id and year=? order by birthdate desc,lastname,firstname");
 		$prep->bind_params("i", $year);
 		$res = $prep->execute();
 
@@ -111,7 +111,7 @@ class AccountyearMembership {
 	}
 
     function getReportUsersFull($year) {
-        $prep = $this->db->prepare("select distinct * from " . AppConfig :: DB_PREFIX . "year_membership, " . AppConfig :: DB_PREFIX . "person where memberid=id and year=? order by lastname,firstname");
+        $prep = $this->db->prepare("select distinct * from " . AppConfig::pre() . "year_membership, " . AppConfig::pre() . "person where memberid=id and year=? order by lastname,firstname");
         $prep->bind_params("i", $year);
         $res = $prep->execute();
 
@@ -119,7 +119,7 @@ class AccountyearMembership {
     }
 
     function getOverview() {
-        $prep = $this->db->prepare("select count(*) as C, year, youth from " . AppConfig :: DB_PREFIX . "year_membership group by year,youth");
+        $prep = $this->db->prepare("select count(*) as C, year, youth from " . AppConfig::pre() . "year_membership group by year,youth");
     	return $prep->execute();
     }
 }

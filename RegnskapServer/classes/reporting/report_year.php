@@ -45,16 +45,16 @@ class ReportYear {
     }
 
     function list_sums_ownings($year, $month = 12) {
-        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050 and RL.id not in (select RLI.id from " . AppConfig :: DB_PREFIX . "line RLI, " . AppConfig :: DB_PREFIX . "post RPI where RLI.id = RPI.line and " .
-                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=$year and RLI.postnmb = (select max(YL.postnmb) from " . AppConfig :: DB_PREFIX . "line YL where YL.year=$year and YL.month=12) )", 1, $month);
+        return $this->list_sums_int($year, "RP.post_type < 3000 and RP.post_type >= 2000 and RP.post_type <> 2050 and RL.id not in (select RLI.id from " . AppConfig::pre() . "line RLI, " . AppConfig::pre() . "post RPI where RLI.id = RPI.line and " .
+                "RLI.month = 12 and RPI.post_type = 2050 and RLI.year=$year and RLI.postnmb = (select max(YL.postnmb) from " . AppConfig::pre() . "line YL where YL.year=$year and YL.month=12) )", 1, $month);
     }
 
 
     function list_sums_2000($year, $month = 12) {
-        $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP " .
+        $prep = $this->db->prepare("select RP.post_type, sum(RP.amount) as sumpost from " . AppConfig::pre() . "line RL, " . AppConfig::pre() . "post RP " .
                 "where RP.line = RL.id and debet = ? and year=? and RP.post_type < 2000 and RP.amount > 0 and RL.id not in " .
-                "(select RLI.id from " . AppConfig :: DB_PREFIX . "line RLI, " . AppConfig :: DB_PREFIX . "post RPI where RLI.id = RPI.line and " .
-                "RLI.month = 12 and RLI.postnmb = (select max(YL.postnmb) from " . AppConfig :: DB_PREFIX . "line YL where YL.year=? and YL.month=12) and RPI.post_type = 2050 and RLI.year=?) and RL.month <= ? group by RP.post_type ");
+                "(select RLI.id from " . AppConfig::pre() . "line RLI, " . AppConfig::pre() . "post RPI where RLI.id = RPI.line and " .
+                "RLI.month = 12 and RLI.postnmb = (select max(YL.postnmb) from " . AppConfig::pre() . "line YL where YL.year=? and YL.month=12) and RPI.post_type = 2050 and RLI.year=?) and RL.month <= ? group by RP.post_type ");
 
         $prep->bind_params("siiii", '1', $year, $year, $year, $month);
         $resDebet = $this->makeSumPerPostType($prep->execute());
@@ -68,7 +68,7 @@ class ReportYear {
     }
 
     function addDescriptionsAndFixSums2000($sums, $year) {
-        $prep = $this->db->prepare("select distinct(RP.post_type),RPT.description from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL," . AppConfig :: DB_PREFIX . "post_type RPT where RL.id=RP.line and RL.year=? and RPT.post_type = RP.post_type and RP.post_type <= 2000 group by post_type,debet order by post_type");
+        $prep = $this->db->prepare("select distinct(RP.post_type),RPT.description from " . AppConfig::pre() . "post RP, " . AppConfig::pre() . "line RL," . AppConfig::pre() . "post_type RPT where RL.id=RP.line and RL.year=? and RPT.post_type = RP.post_type and RP.post_type <= 2000 group by post_type,debet order by post_type");
         $prep->bind_params("i", $year);
 
         $res = $prep->execute();
@@ -109,14 +109,14 @@ class ReportYear {
     }
 
     function list_sums_int($year, $ignore, $sign, $month) {
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL," . AppConfig :: DB_PREFIX . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig::pre() . "post RP, " . AppConfig::pre() . "line RL," . AppConfig::pre() . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
         $prep->bind_params("ii", $year, $month);
         
         $debRes = $prep->execute();
         
         $resDebet = $this->makeSumPerPostType($debRes);
 
-        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig :: DB_PREFIX . "post RP, " . AppConfig :: DB_PREFIX . "line RL," . AppConfig :: DB_PREFIX . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '-1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
+        $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig::pre() . "post RP, " . AppConfig::pre() . "line RL," . AppConfig::pre() . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '-1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
        
         $prep->bind_params("ii", $year, $month);
 

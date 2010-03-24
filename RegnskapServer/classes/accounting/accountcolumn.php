@@ -13,7 +13,7 @@ class AccountColumn {
 	}
 
 	function getColPostIds() {
-		$prep = $this->db->prepare("select id from " . AppConfig :: DB_PREFIX . "coll_post_type order by name");
+		$prep = $this->db->prepare("select id from " . AppConfig::pre() . "coll_post_type order by name");
 		$dbQuery = $prep->execute();
 
 		$res = array ();
@@ -28,7 +28,7 @@ class AccountColumn {
 	function getLookupMap() {
 		$return_array = array ();
 
-		$prep = $this->db->prepare("select id from " . AppConfig :: DB_PREFIX . "coll_post_type");
+		$prep = $this->db->prepare("select id from " . AppConfig::pre() . "coll_post_type");
 		$query_arr = $prep->execute();
 
 		foreach ($query_arr as $one) {
@@ -41,7 +41,7 @@ class AccountColumn {
 	function getAllColumns() {
 		$return_array = array ();
 
-		$prep = $this->db->prepare("select id,name from " . AppConfig :: DB_PREFIX . "coll_post_type order by display_order");
+		$prep = $this->db->prepare("select id,name from " . AppConfig::pre() . "coll_post_type order by display_order");
 		$query_arr = $prep->execute();
 
 		if (count($query_arr) >= 0) {

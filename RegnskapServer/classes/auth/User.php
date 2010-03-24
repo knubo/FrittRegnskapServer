@@ -39,7 +39,10 @@ class User {
  
 	function authenticate($username, $password) {
 
-		$toBind = $this->db->prepare("select pass,readonly,reducedwrite,project_required,person from ". AppConfig :: DB_PREFIX ."user where username = ?");
+	    $master = new Master($db);
+	    $prefix = $master->calculate_prefix();
+	    
+		$toBind = $this->db->prepare("select pass,readonly,reducedwrite,project_required,person from ". $prefix ."user where username = ?");
 		
 		$toBind->bind_params("s", $username);
 		
@@ -80,14 +83,14 @@ class User {
     
     
     function getAll() {
-    	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly,reducedwrite,project_required from ". AppConfig :: DB_PREFIX ."user, ".AppConfig :: DB_PREFIX."person where id=person");
+    	$bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly,reducedwrite,project_required from ". AppConfig::pre() ."user, ".AppConfig::pre()."person where id=person");
         return $bind->execute();
     }
     
     function updatePassword($user, $password) {
         $pass = crypt($password, $this->makesalt());
 
-        $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set pass=? where username=?");
+        $bind = $this->db->prepare("update ". AppConfig::pre() ."user set pass=? where username=?");
         $bind->bind_params("ss", $pass, $user);
         $bind->execute();
         
@@ -96,14 +99,14 @@ class User {
     
     function save($user, $password, $person, $readonly, $reducedwrite, $project_required) {
         if(!$password) {
-            $bind = $this->db->prepare("update ". AppConfig :: DB_PREFIX ."user set person=?,readonly=?,reducedwrite=?,project_required=? where username=?");
+            $bind = $this->db->prepare("update ". AppConfig::pre() ."user set person=?,readonly=?,reducedwrite=?,project_required=? where username=?");
             $bind->bind_params("iiiis", $person, $readonly, $reducedwrite, $project_required, $user);
             $bind->execute();
         
             return $this->db->affected_rows();
         }
         
-    	$bind = $this->db->prepare("insert into ". AppConfig :: DB_PREFIX ."user set pass=?, person=?, username=?,readonly=?,project_required=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?");
+    	$bind = $this->db->prepare("insert into ". AppConfig::pre() ."user set pass=?, person=?, username=?,readonly=?,project_required=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?");
         $pass = crypt($password, $this->makesalt());
         
         $bind->bind_params("sisiisiiii", $pass, $person, $user, $readonly, $project_required, $pass, $person, $readonly,$reducedwrite, $project_required);
@@ -113,7 +116,7 @@ class User {
     }
     
     function delete($user) {
-        $bind = $this->db->prepare("delete from ". AppConfig :: DB_PREFIX ."user where username=?");
+        $bind = $this->db->prepare("delete from ". AppConfig::pre() ."user where username=?");
         
         $bind->bind_params("s", $user);
         $bind->execute();

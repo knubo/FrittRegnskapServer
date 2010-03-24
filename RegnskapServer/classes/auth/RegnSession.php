@@ -75,8 +75,8 @@ class RegnSession {
 	function __construct($db) {
 		$this->db = $db;
  
-		if(!$db->table_exists(AppConfig :: DB_PREFIX ."sessions")) {
-            $query = 'CREATE TABLE '.AppConfig :: DB_PREFIX .'sessions (
+		if(!$db->table_exists(AppConfig::pre() ."sessions")) {
+            $query = 'CREATE TABLE '.AppConfig::pre() .'sessions (
                   SessionID     char(255)   not null,
                   LastUpdated   datetime    not null,
                   DataValue     text,
@@ -106,7 +106,7 @@ class RegnSession {
 
     function sessao_read( $aKey ) {
 	
-	   $prep = $this->db->prepare("SELECT DataValue FROM ".AppConfig :: DB_PREFIX ."sessions WHERE SessionID=?");
+	   $prep = $this->db->prepare("SELECT DataValue FROM ".AppConfig::pre() ."sessions WHERE SessionID=?");
        
        $prep->bind_params("s", $aKey);
        
@@ -116,7 +116,7 @@ class RegnSession {
            return $res[0]['DataValue'];
        } else {
 		   $prep = $this->db->prepare       	
-             ("INSERT INTO ".AppConfig :: DB_PREFIX ."sessions (SessionID, LastUpdated, DataValue)
+             ("INSERT INTO ".AppConfig::pre() ."sessions (SessionID, LastUpdated, DataValue)
                        VALUES (?, NOW(), '')");
            $prep->bind_params("s", $aKey);
            
@@ -127,7 +127,7 @@ class RegnSession {
 
 	function sessao_write( $aKey, $aVal ) {
        $prep = $this->db->prepare       	
-             ("UPDATE ".AppConfig :: DB_PREFIX ."sessions SET DataValue = ?, LastUpdated = NOW() WHERE SessionID = ?");
+             ("UPDATE ".AppConfig::pre() ."sessions SET DataValue = ?, LastUpdated = NOW() WHERE SessionID = ?");
        $prep->bind_params("ss", $aVal, $aKey);
        $prep->execute($prep);
        return TRUE;
@@ -135,7 +135,7 @@ class RegnSession {
 
 	function sessao_destroy( $aKey ) {
        $prep = $this->db->prepare       	
-             ("DELETE FROM ".AppConfig :: DB_PREFIX ."sessions WHERE SessionID = ?");
+             ("DELETE FROM ".AppConfig::pre() ."sessions WHERE SessionID = ?");
        $prep->bind_params("s", $aKey);
        $prep->execute($prep);
        return TRUE;
@@ -143,7 +143,7 @@ class RegnSession {
 
 	function sessao_gc( $aMaxLifeTime ) {
        $prep = $this->db->prepare       	
-             ("DELETE FROM ".AppConfig :: DB_PREFIX ."sessions WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(LastUpdated) > ?");
+             ("DELETE FROM ".AppConfig::pre() ."sessions WHERE UNIX_TIMESTAMP(NOW()) - UNIX_TIMESTAMP(LastUpdated) > ?");
        $prep->bind_params("i", $aMaxLifeTime);
        $prep->execute($prep);
        return TRUE;

@@ -13,13 +13,13 @@ class AccountSemester {
 			if (!($p % 2)) {
 				$i++;
 			}
-			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "semester values ($p, '$s $i');");
+			$prep = $this->db->prepare("insert into " . AppConfig::pre() . "semester values ($p, '$s $i');");
 			$prep->execute();
 		}
 	}
 
 	function getSemesterName($id) {
-		$prep = $this->db->prepare("select semester, description from " . AppConfig :: DB_PREFIX . "semester where semester = ?");
+		$prep = $this->db->prepare("select semester, description from " . AppConfig::pre() . "semester where semester = ?");
 
 		$prep->bind_params("i", $id);
 
@@ -33,18 +33,18 @@ class AccountSemester {
 	}
 
 	function getAll() {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "semester");
 		return $prep->execute();
 	}
 
     function getForYear($year) {
-    	$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "semester where year=? order by fall");
+    	$prep = $this->db->prepare("select * from " . AppConfig::pre() . "semester where year=? order by fall");
         $prep->bind_params("i", $year);
         return $prep->execute();
     }
 
 	function hasEntry($year, $fall) {
-		$prep = $this->db->prepare("select description from " . AppConfig :: DB_PREFIX . "semester where year=? and fall=?");
+		$prep = $this->db->prepare("select description from " . AppConfig::pre() . "semester where year=? and fall=?");
 		$prep->bind_params("ii", $year, $fall);
 		$res = $prep->execute();
 
@@ -52,8 +52,8 @@ class AccountSemester {
 	}
 
 	function save($year, $fall, $spring) {
-		$updatePrep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "semester set description = ? where year = ? and fall = ?");
-		$insertPrep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "semester set description = ?, year = ?, fall = ?");
+		$updatePrep = $this->db->prepare("update " . AppConfig::pre() . "semester set description = ? where year = ? and fall = ?");
+		$insertPrep = $this->db->prepare("insert into " . AppConfig::pre() . "semester set description = ?, year = ?, fall = ?");
 
 		$res = 0;
 

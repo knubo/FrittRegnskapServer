@@ -5,6 +5,7 @@
 
 include_once ("../conf/AppConfig.php");
 include_once ("../classes/auth/User.php");
+include_once ("../classes/auth/Master.php");
 include_once ("../classes/util/DB.php");
 include_once ("../classes/auth/RegnSession.php");
 
@@ -27,13 +28,17 @@ switch ($action) {
 
 		if ($auth->authenticate($user, $password) == User :: AUTH_OK) {
 			session_start();
+			
+			$master = new Master($db);
+			
+			$_SESSION["prefix"] = $master->calculate_prefix();
 			$_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
             $_SESSION["project_required"] = $auth->hasProjectRequired();
             $_SESSION["person_id"] = $auth->getPersonId();
             $arr = array (
-				'result' => 'ok'
+				'result' => 'ok', 
 			);
 
 		} else {

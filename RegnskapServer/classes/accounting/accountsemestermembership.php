@@ -44,7 +44,7 @@ class AccountSemesterMembership {
 
 	function getAllMemberNames($semester) {
 		/* Using group by here due to previous bug which added duplicate entries. */
-		$prep = $this->db->prepare("select firstname, lastname, id from " . AppConfig :: DB_PREFIX . "person P," . AppConfig :: DB_PREFIX . $this->Type . "_membership C where C.memberid = P.id and semester=? group by lastname, firstname,id order by lastname, firstname");
+		$prep = $this->db->prepare("select firstname, lastname, id from " . AppConfig::pre() . "person P," . AppConfig::pre() . $this->Type . "_membership C where C.memberid = P.id and semester=? group by lastname, firstname,id order by lastname, firstname");
 		$prep->bind_params("i", $semester);
 		$query_array = $prep->execute();
 
@@ -63,7 +63,7 @@ class AccountSemesterMembership {
 
 
     function delete($semester, $person) {
-        $prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . $this->Type."_membership where memberid = ? and semester=?");
+        $prep = $this->db->prepare("delete from " . AppConfig::pre() . $this->Type."_membership where memberid = ? and semester=?");
         $prep->bind_params("ii", $person, $semester);
         $prep->execute();
         return $this->db->affected_rows();
@@ -71,7 +71,7 @@ class AccountSemesterMembership {
 
 	function getUserMemberships($user, $type) {
 
-		$prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig :: DB_PREFIX . $type."_membership M, " . AppConfig :: DB_PREFIX ."semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");
+		$prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig::pre() . $type."_membership M, " . AppConfig::pre() ."semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");
         $prep->bind_params("i", $user);
 		$query_array = $prep->execute();
 
@@ -84,7 +84,7 @@ class AccountSemesterMembership {
 	}
 
 	function store() {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . $this->Type . "_membership where semester = ? and memberid=?");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . $this->Type . "_membership where semester = ? and memberid=?");
 		$prep->bind_params("ii", $this->Semester, $this->User);
 		$res = $prep->execute();
 
@@ -92,7 +92,7 @@ class AccountSemesterMembership {
 			return;
 		}
 
-		$sql = "insert into " . AppConfig :: DB_PREFIX . $this->Type . "_membership set semester = ?, memberid=?, regn_line=?";
+		$sql = "insert into " . AppConfig::pre() . $this->Type . "_membership set semester = ?, memberid=?, regn_line=?";
 		$prep = $this->db->prepare($sql);
 
 		$prep->bind_params("iii", $this->Semester, $this->User, $this->Regn_line);
@@ -103,7 +103,7 @@ class AccountSemesterMembership {
 	}
 
     function getOverview() {
-        $prep = $this->db->prepare("select count(*) as C, M.semester,fall,year from " . AppConfig :: DB_PREFIX . $this->Type . "_membership M," . AppConfig :: DB_PREFIX ."semester S where S.semester=M.semester group by semester;");
+        $prep = $this->db->prepare("select count(*) as C, M.semester,fall,year from " . AppConfig::pre() . $this->Type . "_membership M," . AppConfig::pre() ."semester S where S.semester=M.semester group by semester;");
         return $prep->execute();
     }
 

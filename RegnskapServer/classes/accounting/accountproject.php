@@ -27,25 +27,25 @@ class AccountProject {
 	}
 
 	function getAll() {
-		$prep = $this->db->prepare("select project, description from " . AppConfig :: DB_PREFIX . "project order by description");
+		$prep = $this->db->prepare("select project, description from " . AppConfig::pre() . "project order by description");
 
 		return $prep->execute();
 	}
 
 	function delete($id) {
-		$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "project where project = ?");
+		$prep = $this->db->prepare("delete from " . AppConfig::pre() . "project where project = ?");
 		$prep->bind_params("i", $id);
 		$prep->execute();
 	}
 
 	function save() {
 		if (!$this->Project) {
-			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "project (description) values (?)");
+			$prep = $this->db->prepare("insert into " . AppConfig::pre() . "project (description) values (?)");
 			$prep->bind_params("s", $this->Description);
 			$prep->execute();
 			$this->Project = $this->db->insert_id();
 		} else {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "project set description = ? where project = ?");
+			$prep = $this->db->prepare("update " . AppConfig::pre() . "project set description = ? where project = ?");
 			$prep->bind_params("si", $this->Description, $this->Project);
 			$prep->execute();
 		}

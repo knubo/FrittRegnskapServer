@@ -45,7 +45,7 @@ class AccountLine {
 	function readLineAndPosts($ids) {
 
 		$params = implode(",", array_fill(0, sizeof($ids), "?"));
-		$prep = $this->db->prepare("select L.id, L.attachnmb, L.occured, L.postnmb, L.description, P.debet, P.post_type, P.amount, PT.description as postdesc FROM " . AppConfig :: DB_PREFIX . "line L, " . AppConfig :: DB_PREFIX . "post P, " . AppConfig :: DB_PREFIX . "post_type PT where L.id = P.line and L.id IN (" . $params . ") and PT.post_type = P.post_type order by L.id, P.debet");
+		$prep = $this->db->prepare("select L.id, L.attachnmb, L.occured, L.postnmb, L.description, P.debet, P.post_type, P.amount, PT.description as postdesc FROM " . AppConfig::pre() . "line L, " . AppConfig::pre() . "post P, " . AppConfig::pre() . "post_type PT where L.id = P.line and L.id IN (" . $params . ") and PT.post_type = P.post_type order by L.id, P.debet");
 
 		$prep->bind_array_params(str_repeat("i", sizeof($ids)), $ids);
 
@@ -55,11 +55,11 @@ class AccountLine {
     function findLine($action, $line) {
         switch($action) {
         	case "next":
-               $prep = $this->db->prepare("select min(id) as navid from " . AppConfig :: DB_PREFIX . "line where id > ?");
+               $prep = $this->db->prepare("select min(id) as navid from " . AppConfig::pre() . "line where id > ?");
                $prep->bind_params("i", $line);
                break;
             case "previous":
-               $prep = $this->db->prepare("select max(id) as navid from " . AppConfig :: DB_PREFIX . "line where id < ?");
+               $prep = $this->db->prepare("select max(id) as navid from " . AppConfig::pre() . "line where id < ?");
                $prep->bind_params("i", $line);
                break;
             default:
@@ -79,7 +79,7 @@ class AccountLine {
     }
 
 	function read($id) {
-		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description, edited_by_person from " . AppConfig :: DB_PREFIX . "line where id = ?");
+		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description, edited_by_person from " . AppConfig::pre() . "line where id = ?");
 		$prep->bind_params("i", $id);
 		$line_query = $prep->execute($prep);
 
@@ -96,7 +96,7 @@ class AccountLine {
 	}
 
 	function sumOneLinePosts($lineId, $debkred) {
-		$prep = $this->db->prepare("select sum(" . AppConfig :: DB_PREFIX . "post.amount) as s from " . AppConfig :: DB_PREFIX . "post where line=? and debet=?");
+		$prep = $this->db->prepare("select sum(" . AppConfig::pre() . "post.amount) as s from " . AppConfig::pre() . "post where line=? and debet=?");
 		$prep->bind_params("is", $lineId, $debkred);
 		$result_lines = $prep->execute($prep);
 
@@ -109,10 +109,10 @@ class AccountLine {
 	}
 
 	function sumPostsYear($posttype, $year, $debkred) {
-		$prep = $this->db->prepare("select sum(" . AppConfig :: DB_PREFIX . "post.amount) as s from " . AppConfig :: DB_PREFIX . "post, " . AppConfig :: DB_PREFIX . "line " .
-		"WHERE " . AppConfig :: DB_PREFIX . "post.post_type=? and " . AppConfig :: DB_PREFIX . "post.debet=? " .
-		"and " . AppConfig :: DB_PREFIX . "line.year=? " .
-		"and " . AppConfig :: DB_PREFIX . "line.id = " . AppConfig :: DB_PREFIX . "post.line");
+		$prep = $this->db->prepare("select sum(" . AppConfig::pre() . "post.amount) as s from " . AppConfig::pre() . "post, " . AppConfig::pre() . "line " .
+		"WHERE " . AppConfig::pre() . "post.post_type=? and " . AppConfig::pre() . "post.debet=? " .
+		"and " . AppConfig::pre() . "line.year=? " .
+		"and " . AppConfig::pre() . "line.id = " . AppConfig::pre() . "post.line");
 
 		$prep->bind_params("isi", $posttype, $debkred, $year);
 		$result_lines = $prep->execute($prep);
@@ -126,10 +126,10 @@ class AccountLine {
 	}
 
 	function sumPosts($posttype, $year, $month, $debkred) {
-		$prep = $this->db->prepare("select sum(" . AppConfig :: DB_PREFIX . "post.amount) as s from " . AppConfig :: DB_PREFIX . "post, " . AppConfig :: DB_PREFIX . "line " .
-		"WHERE " . AppConfig :: DB_PREFIX . "post.post_type=? and " . AppConfig :: DB_PREFIX . "post.debet=? " .
-		"and " . AppConfig :: DB_PREFIX . "line.year=? and " . AppConfig :: DB_PREFIX . "line.month=? " .
-		"and " . AppConfig :: DB_PREFIX . "line.id = " . AppConfig :: DB_PREFIX . "post.line");
+		$prep = $this->db->prepare("select sum(" . AppConfig::pre() . "post.amount) as s from " . AppConfig::pre() . "post, " . AppConfig::pre() . "line " .
+		"WHERE " . AppConfig::pre() . "post.post_type=? and " . AppConfig::pre() . "post.debet=? " .
+		"and " . AppConfig::pre() . "line.year=? and " . AppConfig::pre() . "line.month=? " .
+		"and " . AppConfig::pre() . "line.id = " . AppConfig::pre() . "post.line");
 		$prep->bind_params("isii", $posttype, $debkred, $year, $month);
 		$result_lines = $prep->execute();
 
@@ -153,7 +153,7 @@ class AccountLine {
 	}
 
 	function update() {
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "line set attachnmb = ?, postnmb = ?, occured = ?, description = ?, edited_by_person=? where id = ?");
+		$prep = $this->db->prepare("update " . AppConfig::pre() . "line set attachnmb = ?, postnmb = ?, occured = ?, description = ?, edited_by_person=? where id = ?");
 
 		$prep->bind_params("iissii", $this->Attachment, $this->Postnmb, $this->Occured->mySQLDate(), $this->Description, $this->EditedByPerson, $this->Id);
 
@@ -162,7 +162,7 @@ class AccountLine {
 	}
 
 	function updateAttachment($id, $attachment) {
-		$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "line set attachnmb = ? where id = ?");
+		$prep = $this->db->prepare("update " . AppConfig::pre() . "line set attachnmb = ? where id = ?");
 
 		$prep->bind_params("ii", $attachment, $id);
 		$prep->execute();
@@ -179,7 +179,7 @@ class AccountLine {
 			$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?,edited_by_person=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "line SET id=null,attachnmb=?,postnmb=?,description=?,month=?,year=?,occured=?,edited_by_person=?");
 		$prep->bind_params("iisiisi", $this->Attachment, $this->Postnmb, $this->Description, $month, $year, $this->Occured->mySQLDate(), $this->EditedByPerson);
 		$prep->execute();
 		$this->Id = $this->db->insert_id();
@@ -216,7 +216,7 @@ class AccountLine {
 		$standard = new AccountStandard($this->db);
 		$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 
-		$prep = $this->db->prepare("select id, attachnmb, occured, description from " . AppConfig :: DB_PREFIX . "line where year = ? and month = ? order by postnmb");
+		$prep = $this->db->prepare("select id, attachnmb, occured, description from " . AppConfig::pre() . "line where year = ? and month = ? order by postnmb");
 		$prep->bind_params("ii", $month, $year);
 
 		$line_query = $prep->execute();
@@ -239,10 +239,10 @@ class AccountLine {
 		$prep = 0;
 
 		if ($fromline && $toline) {
-			$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig :: DB_PREFIX . "line where month=? and year=? and id >= ? and id <= ? order by postnmb");
+			$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig::pre() . "line where month=? and year=? and id >= ? and id <= ? order by postnmb");
 			$prep->bind_params("iiii", $year, $month, $fromline, $toline);
 		} else {
-			$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig :: DB_PREFIX . "line where month=? and year=? order by postnmb");
+			$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig::pre() . "line where month=? and year=? order by postnmb");
 			$prep->bind_params("ii", $month, $year);
 		}
 
@@ -313,9 +313,9 @@ class AccountLine {
 
 
 		if ($account || $person || $project) {
-			$stat = "select distinct RL.id as id, RL.attachnmb as attachnmb, RL.occured as occured, RL.postnmb as postnmb, RL.description as description from " . AppConfig :: DB_PREFIX . "line RL, " . AppConfig :: DB_PREFIX . "post RP";
+			$stat = "select distinct RL.id as id, RL.attachnmb as attachnmb, RL.occured as occured, RL.postnmb as postnmb, RL.description as description from " . AppConfig::pre() . "line RL, " . AppConfig::pre() . "post RP";
 		} else {
-			$stat = "select distinct RL.id as id, attachnmb as attachnmb, RL.occured as occured, RL.postnmb as postnmb, RL.description as description from " . AppConfig :: DB_PREFIX . "line RL";
+			$stat = "select distinct RL.id as id, attachnmb as attachnmb, RL.occured as occured, RL.postnmb as postnmb, RL.description as description from " . AppConfig::pre() . "line RL";
 		}
 		
         $searchWrap = $this->db->search($stat, "order by occured, postnmb");
@@ -414,7 +414,7 @@ class AccountLine {
 
 		$postListString = implode(",", $cashPosts);
 
-		$prep = $this->db->prepare("select sum(amount) as sum FROM " . AppConfig :: DB_PREFIX . "post WHERE" .
+		$prep = $this->db->prepare("select sum(amount) as sum FROM " . AppConfig::pre() . "post WHERE" .
 		" line = ? AND debet='1' AND post_type IN ($postListString)");
 		$prep->bind_params("i", $this->Id);
 
@@ -425,7 +425,7 @@ class AccountLine {
 			$debet = $result_array[0]["sum"];
 		}
 
-		$prep = $this->prepare("select sum(amount) as sum FROM " . AppConfig :: DB_PREFIX . "post WHERE" .
+		$prep = $this->prepare("select sum(amount) as sum FROM " . AppConfig::pre() . "post WHERE" .
 		" line = ? AND debet='-1' AND post_type IN ($postListString)");
 
 		$prep->bind_params("i", $this->Id);
@@ -442,7 +442,7 @@ class AccountLine {
 
 	function getNextAttachmentNmb($year) {
 
-		$prep = $this->db->prepare("select max(attachnmb) as m from " . AppConfig :: DB_PREFIX . "line where year=?");
+		$prep = $this->db->prepare("select max(attachnmb) as m from " . AppConfig::pre() . "line where year=?");
 		$prep->bind_params("i", $year);
 
 		$result_array = $prep->execute();
@@ -456,7 +456,7 @@ class AccountLine {
 
 	function getNextPostnmb($year, $month) {
 
-		$prep = $this->db->prepare("select max(postnmb) as m from " . AppConfig :: DB_PREFIX . "line where year=? and month=?");
+		$prep = $this->db->prepare("select max(postnmb) as m from " . AppConfig::pre() . "line where year=? and month=?");
 		$prep->bind_params("ii", $year, $month);
 		$result_array = $prep->execute();
 
@@ -536,7 +536,7 @@ class AccountLine {
 
 	function search($desc) {
 
-		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig :: DB_PREFIX . "line where description like ?");
+		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description from " . AppConfig::pre() . "line where description like ?");
 		$prep->bind_params("s", $desc);
 
 		$line_query = $prep->execute();
@@ -583,7 +583,7 @@ class AccountLine {
 	}
 
 	function listOfYearMonths() {
-		$prep = $this->db->prepare("select year,month from " . AppConfig :: DB_PREFIX . "line group by year,month order by year,month;");
+		$prep = $this->db->prepare("select year,month from " . AppConfig::pre() . "line group by year,month order by year,month;");
 		return $prep->execute();
 	}
 	

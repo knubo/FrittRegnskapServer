@@ -29,19 +29,19 @@ class AccountTrustAction {
 	}
 
 	function getAll() {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "fond_action");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "fond_action");
 
 		return $prep->execute();
 	}
 
     function save() {
         if($this->id) {
-        	$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "fond_action set fond = ?, description = ?, defaultdesc = ?, actionclub = ?, actionfond = ?, debetpost = ?, creditpost = ? where id = ?");
+        	$prep = $this->db->prepare("update " . AppConfig::pre() . "fond_action set fond = ?, description = ?, defaultdesc = ?, actionclub = ?, actionfond = ?, debetpost = ?, creditpost = ? where id = ?");
             $prep->bind_params("sssiiiii", $this->fond, $this->description, $this->defaultdesc, $this->actionclub, $this->actionfond, $this->debetpost, $this->creditpost, $this->id);
             $prep->execute();
             return $db->affected_rows();        	
         } else {
-        	$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "fond_action set fond = ?, description = ?, defaultdesc = ?, actionclub = ?, actionfond = ?, debetpost = ?, creditpost = ?");
+        	$prep = $this->db->prepare("insert into " . AppConfig::pre() . "fond_action set fond = ?, description = ?, defaultdesc = ?, actionclub = ?, actionfond = ?, debetpost = ?, creditpost = ?");
             $prep->bind_params("sssiiii", $this->fond, $this->description, $this->defaultdesc, $this->actionclub, $this->actionfond, $this->debetpost, $this->creditpost);
             $this->id = $this->db->insert_id();
             $prep->execute();
@@ -50,7 +50,7 @@ class AccountTrustAction {
     }
 
 	function load($id) {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "fond_action where id = ?");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "fond_action where id = ?");
 		$prep->bind_params("i", $id);
 
 		$res = $prep->execute();

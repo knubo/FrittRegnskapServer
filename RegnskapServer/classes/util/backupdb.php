@@ -17,7 +17,7 @@ class BackupDB {
 	}
 
 	function tables() {
-		$prep = $this->db->prepare("show tables like '" . AppConfig :: DB_PREFIX . "%'");
+		$prep = $this->db->prepare("show tables like '" . AppConfig::pre() . "%'");
 		$res = $prep->execute();
 
 		$tables = array ();

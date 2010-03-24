@@ -20,7 +20,7 @@ class AccountHappening {
 	}
 
 	function load($id) {
-		$prep = $this->db->prepare("select debetpost,kredpost from " . AppConfig :: DB_PREFIX . "happeningv2 where id = ?");
+		$prep = $this->db->prepare("select debetpost,kredpost from " . AppConfig::pre() . "happeningv2 where id = ?");
 		$prep->bind_params("i", $id);
 		$res =  $prep->execute();
 		
@@ -31,7 +31,7 @@ class AccountHappening {
 	}
 
 	function getAll() {
-		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "happeningv2");
+		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "happeningv2");
 		return $prep->execute();
 	}
 
@@ -62,13 +62,13 @@ class AccountHappening {
 
 	function save() {
 		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "happeningv2 set description = ?, linedesc=?, debetpost=?, kredpost=?,count_req=?  where id = ?");
+			$prep = $this->db->prepare("update " . AppConfig::pre() . "happeningv2 set description = ?, linedesc=?, debetpost=?, kredpost=?,count_req=?  where id = ?");
 			$prep->bind_params("ssiiii", $this->description, $this->linedesc, $this->debetpost, $this->kredpost, $this->count_req, $this->Id);
 			$prep->execute();
 			return $this->db->affected_rows();
 			
 		} else {
-			$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "happeningv2 (description, linedesc, debetpost, kredpost,count_req) values (?,?,?,?,?)");
+			$prep = $this->db->prepare("insert into " . AppConfig::pre() . "happeningv2 (description, linedesc, debetpost, kredpost,count_req) values (?,?,?,?,?)");
 			$prep->bind_params("ssiii", $this->description, $this->linedesc, $this->debetpost, $this->kredpost, $this->count_req);
 			$prep->execute();
 			$this->Id = $this->db->insert_id();

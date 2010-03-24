@@ -12,7 +12,7 @@ class AccountPlan {
     }
 
     function getCollectionPosts() {
-    	$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "detail_post_type");
+    	$prep = $this->db->prepare("select * from " . AppConfig::pre() . "detail_post_type");
         return $prep->execute();
     }
 }

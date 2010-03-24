@@ -14,16 +14,16 @@ class Logger {
     }
 
     function log($category, $action, $message) {
-        $prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "log (occured,username,category,action,message) values (now(),?,?,?,?)");
+        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "log (occured,username,category,action,message) values (now(),?,?,?,?)");
         $prep->bind_params("ssss", $_SESSION["username"], $category, $action, $message);
         $prep->execute();
     }
 
     function list_entries($pos) {
     	if(!$pos) {
-    		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "log order by id desc limit 30");
+    		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "log order by id desc limit 30");
     	} else {
-    		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "log where id>= ? order by id desc limit 30");
+    		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "log where id>= ? order by id desc limit 30");
             $prep->bind_params("i", $pos);
     	}
 

@@ -10,13 +10,13 @@
     	$this->db = $db;
     }
  	function getAll() {
- 		$prep = $this->db->prepare("select * from " . AppConfig :: DB_PREFIX . "accounttrack");
+ 		$prep = $this->db->prepare("select * from " . AppConfig::pre() . "accounttrack");
         
         return $prep->execute();
  	}
     
     function addPosts($posts) {
-    	$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "accounttrack set post=?");
+    	$prep = $this->db->prepare("insert into " . AppConfig::pre() . "accounttrack set post=?");
         
         foreach($posts as $one) {
             $prep->bind_params("i", $one);
@@ -29,7 +29,7 @@
     }
     
     function removePosts($posts) {
-        $prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "accounttrack where post=?");
+        $prep = $this->db->prepare("delete from " . AppConfig::pre() . "accounttrack where post=?");
         
         foreach($posts as $one) {
             $prep->bind_params("i", $one);

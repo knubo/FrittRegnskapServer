@@ -97,7 +97,7 @@ class AccountPerson {
 	}
 
 	function getName($id) {
-		$sql = "select firstname,lastname from " . AppConfig :: DB_PREFIX . "person where id = ?";
+		$sql = "select firstname,lastname from " . AppConfig::pre() . "person where id = ?";
 		$prep = $this->db->prepare($sql);
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
@@ -110,7 +110,7 @@ class AccountPerson {
 	}
 	
 	function getOne($id) {
-		$sql = "select * from " . AppConfig :: DB_PREFIX . "person where id = ?";
+		$sql = "select * from " . AppConfig::pre() . "person where id = ?";
 		$prep = $this->db->prepare($sql);
 		$prep->bind_params("i", $id);
 		$res = $prep->execute();
@@ -146,7 +146,7 @@ class AccountPerson {
 	}
 
 	function getAll($isEmpoyee = 0) {
-		$sql = "select * from " . AppConfig :: DB_PREFIX . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
+		$sql = "select * from " . AppConfig::pre() . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
 		$prep = $this->db->prepare($sql);
 		$res = $prep->execute();
 
@@ -161,13 +161,13 @@ class AccountPerson {
 		$mysqlDate = $bdSave->mySQLDate();
 
 		if ($this->Id) {
-			$prep = $this->db->prepare("update " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=? where id = ?");
+			$prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=? where id = ?");
 			$prep->bind_params("sssssssssssiisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Id);
 			$prep->execute();
 			return $this->db->affected_rows();
 		}
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?");
 		$prep->bind_params("sssssssssssiis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender);
 		$prep->execute();
 
@@ -182,13 +182,13 @@ class AccountPerson {
 			$accSemester = new AccountSemester($this->db);
 			$active_semester = addslashes($accStandard->getOneValue(AccountStandard::CONST_SEMESTER));
 			$active_year = addslashes($accStandard->getOneValue(AccountStandard::CONST_YEAR));
-			$cols = "*, (select distinct 1 from " . AppConfig :: DB_PREFIX . "train_membership where memberid=id and semester=$active_semester) as train" .
-			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "course_membership where memberid=id and semester=$active_semester) as course" .
-			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "youth_membership where memberid=id and semester=$active_semester) as youth" .
-			", (select distinct 1 from " . AppConfig :: DB_PREFIX . "year_membership where memberid=id and year=$active_year) as year";
+			$cols = "*, (select distinct 1 from " . AppConfig::pre() . "train_membership where memberid=id and semester=$active_semester) as train" .
+			", (select distinct 1 from " . AppConfig::pre() . "course_membership where memberid=id and semester=$active_semester) as course" .
+			", (select distinct 1 from " . AppConfig::pre() . "youth_membership where memberid=id and semester=$active_semester) as youth" .
+			", (select distinct 1 from " . AppConfig::pre() . "year_membership where memberid=id and year=$active_year) as year";
 		}
 
-		$searchWrap = $this->db->search("select $cols from " . AppConfig :: DB_PREFIX . "person", "order by lastname,firstname");
+		$searchWrap = $this->db->search("select $cols from " . AppConfig::pre() . "person", "order by lastname,firstname");
 
 		$searchWrap->addAndParam("i", "id", $this->Id);
 		$searchWrap->addAndParam("s", "firstname", $this->FirstName."%");
@@ -214,13 +214,13 @@ class AccountPerson {
         if($this->Hidden) {
         	$searchWrap->addOnlySql("(hidden is null or hidden <> 1)");
         }
-		$searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig :: DB_PREFIX . "user where person=id and username=?)");
+		$searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig::pre() . "user where person=id and username=?)");
 
 		return $searchWrap->execute();
 	}
 
 	function allWithEmail() {
-		$searchWrap = $this->db->search("select firstname, lastname, email,newsletter from " . AppConfig :: DB_PREFIX . "person where email is not null order by newsletter desc, lastname, firstname, email");
+		$searchWrap = $this->db->search("select firstname, lastname, email,newsletter from " . AppConfig::pre() . "person where email is not null order by newsletter desc, lastname, firstname, email");
 		return $searchWrap->execute();
 	}
 

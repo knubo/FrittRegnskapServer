@@ -58,7 +58,7 @@ class AccountPost {
 
 	function store() {
 
-		$prep = $this->db->prepare("insert into " . AppConfig :: DB_PREFIX . "post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?, edited_by_person=?");
+		$prep = $this->db->prepare("insert into " . AppConfig::pre() . "post set id=null, line=?, debet=?,post_type=?, amount=?, person=?, project=?, edited_by_person=?");
 
 		$prep->bind_params("isidiii", $this->Line, $this->Debet, $this->Post_type, $this->Amount, $this->Person, $this->Project, $this->EditedByPerson);
 
@@ -69,14 +69,14 @@ class AccountPost {
 	function getRange($start, $stop) {
 		$prep = $this->db->prepare("SELECT *, (select post_type >= 4000 and post_type <= 8500 and post_type <> 8040) as cost,".
 		                            "((post_type >= 3000 and post_type < 4000) or post_type=8400 or post_type = 8040) as earning ".
-		" FROM " . AppConfig :: DB_PREFIX . "post where line >= ? and line <= ?");
+		" FROM " . AppConfig::pre() . "post where line >= ? and line <= ?");
 		$prep->bind_params("ii", $start, $stop);
 
 		return $this->filled_result($prep->execute());
 	}
 
 	function getAll($parent) {
-		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line=?");
+		$prep = $this->db->prepare("SELECT * FROM " . AppConfig::pre() . "post where line=?");
 		$prep->bind_params("i", $parent);
 
 		return $this->filled_result($prep->execute());
@@ -92,15 +92,15 @@ class AccountPost {
 	}
 
 	function delete($lineId, $postId) {
-		$prep = $this->db->prepare("delete from " . AppConfig :: DB_PREFIX . "post where line=? and id=?");
+		$prep = $this->db->prepare("delete from " . AppConfig::pre() . "post where line=? and id=?");
 		$prep->bind_params("ii", $lineId, $postId);
 		$prep->execute();
     	return $this->db->affected_rows();
 	}
     
     function sumForPostType($postType) {
-        $prep = $this->db->prepare("select (select sum(amount) from " . AppConfig :: DB_PREFIX . "post where post_type=? and debet='1') - ".
-                                           "(select sum(amount) from " . AppConfig :: DB_PREFIX . "post where post_type=? and debet='-1') as D");
+        $prep = $this->db->prepare("select (select sum(amount) from " . AppConfig::pre() . "post where post_type=? and debet='1') - ".
+                                           "(select sum(amount) from " . AppConfig::pre() . "post where post_type=? and debet='-1') as D");
     	$prep->bind_params("ii", $postType, $postType);
         $res = $prep->execute();
         
@@ -110,11 +110,11 @@ class AccountPost {
     }
 	
 	function sumForLine($lineId) {
-		$prep = $this->db->prepare("select sum(amount) as D from " . AppConfig :: DB_PREFIX . "post where line=? and debet='1'");
+		$prep = $this->db->prepare("select sum(amount) as D from " . AppConfig::pre() . "post where line=? and debet='1'");
 		$prep->bind_params("d", $lineId);
 		$debet = $prep->execute();
 
-		$prep = $this->db->prepare("select sum(amount) as K from " . AppConfig :: DB_PREFIX . "post where line=? and debet='-1'");
+		$prep = $this->db->prepare("select sum(amount) as K from " . AppConfig::pre() . "post where line=? and debet='-1'");
 		$prep->bind_params("d", $lineId);
 		$prep->execute();
 		$kredit=$prep->execute();

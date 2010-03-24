@@ -22,7 +22,7 @@ const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 const DB_PREFIX = "regn_";
 
 
-const LOG_DB_STATEMENTS = true;
+const LOG_DB_STATEMENTS = false;
 
 #Values for count. Must match CountCoulumns.
 function CountValues() {

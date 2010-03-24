@@ -68,7 +68,7 @@ class AccountPost {
 
 	function getRange($start, $stop) {
 		$prep = $this->db->prepare("SELECT *, (select post_type >= 4000 and post_type <= 8500 and post_type <> 8040) as cost,".
-		                            "((post_type >= 3000 and post_type < 4000) or post_type=8400 or post_type=8040) as earning".
+		                            "((post_type >= 3000 and post_type < 4000) or post_type=8400 or post_type = 8040) as earning ".
 		" FROM " . AppConfig :: DB_PREFIX . "post where line >= ? and line <= ?");
 		$prep->bind_params("ii", $start, $stop);
 
@@ -76,7 +76,7 @@ class AccountPost {
 	}
 
 	function getAll($parent) {
-		$prep = $this->db->prepare("SELECT * as earning FROM " . AppConfig :: DB_PREFIX . "post where line=?");
+		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line=?");
 		$prep->bind_params("i", $parent);
 
 		return $this->filled_result($prep->execute());

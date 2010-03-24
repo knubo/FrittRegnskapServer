@@ -9,10 +9,12 @@ class AccountPost {
 	public $Person;
     public $EditedByPerson;
     public $EditedByPersonName;
+    public $Earning;
+    public $Cost;
 	
 	private $db;
 
-	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0, $edited_by_person = 0) {
+	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0, $edited_by_person = 0, $earning = 0,$cost = 0) {
 		$this->db = $db;
 		$this->Line = $line;
 		$this->Debet = $debet;
@@ -21,7 +23,8 @@ class AccountPost {
 		$this->Project = $project;
 		$this->Person = $person;
         $this->EditedByPerson = $edited_by_person;
-		
+	    $this->Earning = $earning;
+	    $this->Cost = $cost;
 		$this->Id = $id;
 	}
 
@@ -31,6 +34,10 @@ class AccountPost {
 
 	function getPerson() {
 		return $this->Person;
+	}
+	
+	function getEarning() {
+        return $this->Earning;	    
 	}
 
 	function getId() {
@@ -60,14 +67,16 @@ class AccountPost {
 	}
 
 	function getRange($start, $stop) {
-		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line >= ? and line <= ?");
+		$prep = $this->db->prepare("SELECT *, (select post_type >= 4000 and post_type <= 8500 and post_type <> 8040) as cost,".
+		                            "((post_type >= 3000 and post_type < 4000) or post_type=8400 or post_type=8040) as earning".
+		" FROM " . AppConfig :: DB_PREFIX . "post where line >= ? and line <= ?");
 		$prep->bind_params("ii", $start, $stop);
 
 		return $this->filled_result($prep->execute());
 	}
 
 	function getAll($parent) {
-		$prep = $this->db->prepare("SELECT * FROM " . AppConfig :: DB_PREFIX . "post where line=?");
+		$prep = $this->db->prepare("SELECT * as earning FROM " . AppConfig :: DB_PREFIX . "post where line=?");
 		$prep->bind_params("i", $parent);
 
 		return $this->filled_result($prep->execute());
@@ -77,7 +86,7 @@ class AccountPost {
 		$return_array = array ();
 
 		foreach ($group_array as $one) {
-			$return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"]);
+		    $return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"], $one["earning"], $one["cost"]);
 		}
 		return $return_array;
 	}

@@ -151,8 +151,5 @@ class AccountPostType {
 		return AppConfig :: EndPostTransferPost;
 	}
 
-	function getEndPosts() {
-		return AppConfig :: EndPosts();
-	}
 }
 ?>

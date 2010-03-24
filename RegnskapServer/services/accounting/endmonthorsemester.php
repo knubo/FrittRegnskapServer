@@ -26,8 +26,9 @@ $endHelper = new EndMonthHelper($db);
 
 switch ($action) {
 	case "test":
+        $acStandard = new AccountStandard($db);
         $acPostType = new AccountPostType($db);
-        $endPostIds = AccountPostType :: getEndPosts();
+        $endPostIds = $acStandard->getOneValueAsArray(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS);
         $endPosts = $acPostType->getSomeIndexedById($endPostIds);
         echo json_encode($endPosts);
         break;

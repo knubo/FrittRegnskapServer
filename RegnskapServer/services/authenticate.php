@@ -12,60 +12,68 @@ include_once ("../classes/auth/RegnSession.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
 switch ($action) {
-	case "login" :
-		$db = new DB();
-		$sess = new RegnSession($db);
+    case "login" :
+        $db = new DB();
+        $sess = new RegnSession($db);
 
-		$user = $_REQUEST["user"];
+        $user = $_REQUEST["user"];
 
-		$password = $_REQUEST["password"];
+        $password = $_REQUEST["password"];
 
-		if (!$user || !$password) {
-			die("Must supply user and password.");
-		}
+        $dbid = $_REQUEST["dbid"];
 
-		$auth = new User($db);
+        if (!$user || !$password) {
+            die("Must supply user and password.");
+        }
 
-		if ($auth->authenticate($user, $password) == User :: AUTH_OK) {
-			session_start();
-			
-			$master = new Master($db);
-			
-			$_SESSION["prefix"] = $master->calculate_prefix();
-			$_SESSION["username"] = $user;
+        
+        $auth = new User($db);
+
+        if ($auth->authenticate($user, $password) == User :: AUTH_OK) {
+            session_start();
+            	
+            $master = new Master($db);
+            $_SESSION["prefix"] = $master->calculate_prefix($dbid);
+            $_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
             $_SESSION["project_required"] = $auth->hasProjectRequired();
             $_SESSION["person_id"] = $auth->getPersonId();
             $arr = array (
 				'result' => 'ok', 
-			);
+            );
 
-		} else {
-			$arr = array (
+        } else {
+            $arr = array (
 				'error' => 'Ugyldig brukernavn eller passord.'
-			);
-		}
-		echo json_encode($arr);
-		break;
-	case "logout" :
-		$db = new DB();
-		$sess = new RegnSession($db);
+				);
+        }
+        echo json_encode($arr);
+        break;
+    case "installations":
+        $db = new DB();
+        $master = new Master($db);
+        echo json_encode($master->getAllInstallations());
+        break;
+        
+    case "logout" :
+        $db = new DB();
+        $sess = new RegnSession($db);
 
         $sessionName = session_name();
-		$CookieInfo = session_get_cookie_params();
-		if ((empty ($CookieInfo['domain'])) && (empty ($CookieInfo['secure']))) {
-			setcookie(session_name(), '', time() - 3600, $CookieInfo['path']);
-		}
-		elseif (empty ($CookieInfo['secure'])) {
-			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain']);
-		} else {
-			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
-		}
-		unset ($_COOKIE[$sessionName]);
+        $CookieInfo = session_get_cookie_params();
+        if ((empty ($CookieInfo['domain'])) && (empty ($CookieInfo['secure']))) {
+            setcookie(session_name(), '', time() - 3600, $CookieInfo['path']);
+        }
+        elseif (empty ($CookieInfo['secure'])) {
+            setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain']);
+        } else {
+            setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
+        }
+        unset ($_COOKIE[$sessionName]);
 
         $arr = array('result' => 1);
         echo json_encode($arr);
-		break;
+        break;
 }
 ?>

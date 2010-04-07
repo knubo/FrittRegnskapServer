@@ -8,6 +8,7 @@ include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/accounting/accountcolumn.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $month = array_key_exists("month", $_REQUEST) ? $_REQUEST["month"] : 0;
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;

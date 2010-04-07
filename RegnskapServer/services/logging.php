@@ -4,6 +4,7 @@ include_once ("../classes/auth/User.php");
 include_once ("../classes/util/DB.php");
 include_once ("../classes/util/logger.php");
 include_once ("../classes/auth/RegnSession.php");
+include_once ("../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $category = array_key_exists("category", $_REQUEST) ? $_REQUEST["category"] : "error";

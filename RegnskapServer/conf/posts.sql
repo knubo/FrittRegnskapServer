@@ -227,13 +227,6 @@ insert into regn_detail_post_type
  (id, name, category, subcategory) values 
  (850, 'Ekstraordinær kostnad','Finansposter og ekstraordinære poster', 'Finansposter og ekstraordinære poster');
 
--- insert into regn_detail_post_type 
--- (id, name, category, subcategory) values 
--- (880, 'Årsresultat','Avslutningskontoer', 'Årsresultat');
-
-
-
-
 insert into regn_post_type
  (post_type, coll_post, detail_post, description) values 
  (1000, 1, null,  'Forskning og utvikling');

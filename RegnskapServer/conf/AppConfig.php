@@ -19,9 +19,6 @@ const VALIDATE_EMAIL_USING_CHECKDNSRR=0;
 const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 
 function pre() {
-    if(!$_SESSION || !array_key_exists("prefix", $_SESSION)) {
-        return "regn_";
-    }
     return $_SESSION["prefix"];
 }
 

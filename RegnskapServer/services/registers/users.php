@@ -8,6 +8,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $user = array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : "";

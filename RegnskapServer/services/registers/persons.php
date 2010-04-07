@@ -11,6 +11,8 @@ include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/validators/emailvalidator.php");
 include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
+
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $firstname = array_key_exists("firstname", $_REQUEST) ? trim($_REQUEST["firstname"]) : "";

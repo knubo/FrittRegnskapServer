@@ -15,6 +15,7 @@ include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/reporting/report_year.php");
 include_once ("../../classes/accounting/helpers/endyearhelper.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "status";
 

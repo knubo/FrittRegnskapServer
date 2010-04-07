@@ -37,11 +37,8 @@ class User {
         return $saltprefix.$salt.$saltsuffix;
 }
  
-	function authenticate($username, $password) {
+	function authenticate($username, $password, $prefix) {
 
-	    $master = new Master($db);
-	    $prefix = $master->calculate_prefix();
-	    
 		$toBind = $this->db->prepare("select pass,readonly,reducedwrite,project_required,person from ". $prefix ."user where username = ?");
 		
 		$toBind->bind_params("s", $username);

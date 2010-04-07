@@ -10,6 +10,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounttrackaccount.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $values = array_key_exists("values", $_REQUEST) ? $_REQUEST["values"] : 0;

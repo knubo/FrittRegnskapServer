@@ -10,6 +10,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";

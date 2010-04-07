@@ -73,6 +73,30 @@ class Memberships {
         $trainPrice = $prices["train"];
         $youthPrice = $prices["youth"];
 
+        if(!$memberPrice) {
+            header("HTTP/1.0 514 Missing data ".json_encode($prices));
+            die("missing_member_price");
+        }
+
+        if(!$memberYouthPrice) {
+            header("HTTP/1.0 514 Missing data");
+            die("missing_member_youth_price");
+        }
+
+        if(!$coursePrice) {
+            header("HTTP/1.0 514 Missing data");
+            die("missing_course_price");
+        }
+
+        if(!$trainPrice) {
+            header("HTTP/1.0 514 Missing data");
+            die("missing_train_price");
+        }
+        if(!$youthPrice) {
+            header("HTTP/1.0 514 Missing data");
+            die("missing_youth_price");
+        }
+        
         foreach($objects as $one) {
 
             $line = 0;

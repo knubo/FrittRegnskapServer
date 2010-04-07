@@ -6,6 +6,7 @@ include_once ("../classes/accounting/accountstandard.php");
 include_once ("../classes/util/backupdb.php");
 include_once ("../classes/util/logger.php");
 include_once ("../classes/auth/RegnSession.php");
+include_once ("../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "tables";
 $table = array_key_exists("table", $_REQUEST) ? $_REQUEST["table"] : "";

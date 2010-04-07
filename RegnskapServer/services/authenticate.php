@@ -13,27 +13,32 @@ $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
 switch ($action) {
     case "login" :
-        $db = new DB();
-        $sess = new RegnSession($db);
-
         $user = $_REQUEST["user"];
-
         $password = $_REQUEST["password"];
-
-        $dbid = $_REQUEST["dbid"];
 
         if (!$user || !$password) {
             die("Must supply user and password.");
         }
 
+        $db = new DB();
+        $master = new Master($db);
+        $prefix = $master->calculate_prefix();
+        
+        if(!$prefix) {
+             $arr = array (
+				'error' => 'Ikke identifisert database.'
+				);
+				echo json_encode($arr);
+            break;
+        }
+        $sess = new RegnSession($db, $prefix);
         
         $auth = new User($db);
 
-        if ($auth->authenticate($user, $password) == User :: AUTH_OK) {
+        if ($auth->authenticate($user, $password, $prefix) == User :: AUTH_OK) {
             session_start();
             	
-            $master = new Master($db);
-            $_SESSION["prefix"] = $master->calculate_prefix($dbid);
+            $_SESSION["prefix"] = $prefix;
             $_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
@@ -42,6 +47,8 @@ switch ($action) {
             $arr = array (
 				'result' => 'ok', 
             );
+            
+            session_write_close(); 
 
         } else {
             $arr = array (

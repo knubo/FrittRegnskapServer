@@ -5,6 +5,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "json";

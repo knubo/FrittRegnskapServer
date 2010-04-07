@@ -13,6 +13,7 @@ include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $fromdate = array_key_exists("fromdate", $_REQUEST) ? $_REQUEST["fromdate"] : 0;
 $todate = array_key_exists("todate", $_REQUEST) ? $_REQUEST["todate"] : 0;

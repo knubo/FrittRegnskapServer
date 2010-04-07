@@ -6,6 +6,7 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/reporting/reportuserbirthdate.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $db = new DB();

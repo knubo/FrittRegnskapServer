@@ -9,6 +9,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounthappening.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $description = array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : "";

@@ -6,6 +6,7 @@
  *
  */
 include_once ("../../conf/AppConfig.php");
+
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/helpers/membersformatter.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
@@ -13,6 +14,7 @@ include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : "0";

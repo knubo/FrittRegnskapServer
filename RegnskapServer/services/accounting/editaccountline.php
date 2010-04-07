@@ -14,6 +14,7 @@ include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "query";
 $line = array_key_exists("line", $_REQUEST) ? $_REQUEST["line"] : 1;

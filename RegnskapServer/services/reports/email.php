@@ -12,6 +12,7 @@ include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/reporting/emailer.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "all";

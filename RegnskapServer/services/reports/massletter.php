@@ -12,6 +12,7 @@ include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/reporting/massletterhelper.php");
 include_once ("../../pdf/class.ezpdf.php");
+include_once ("../../classes/auth/Master.php");
 
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";

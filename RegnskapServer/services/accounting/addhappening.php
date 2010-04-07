@@ -11,7 +11,8 @@ include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accounthappening.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
- 
+include_once ("../../classes/auth/Master.php");
+
  
  $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "";
  $day = array_key_exists("day", $_REQUEST) ? $_REQUEST["day"] : 0;

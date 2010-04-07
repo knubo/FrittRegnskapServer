@@ -13,14 +13,18 @@
     }
 
 
-    function calculate_prefix($dbid = 0) {
+    function calculate_prefix() {
         /* Do not understand this bug, why is this needed?... */
         if(!$this->db) {
             $this->db = new DB();
         }
-        $prep = $this->db->prepare("select dbprefix from installations where id = ?");
+        $prep = $this->db->prepare("select dbprefix from installations where hostprefix = ?");
 
-        $prep->bind_params("i", $dbid);
+        $host = $_SERVER["SERVER_NAME"];
+        
+        $split = explode(".",$host);
+        
+        $prep->bind_params("s", $split[0]);
 
         $res = $prep->execute();
 

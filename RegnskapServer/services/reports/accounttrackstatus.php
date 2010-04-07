@@ -9,7 +9,8 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounttrackaccount.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/auth/RegnSession.php");
- 
+include_once ("../../classes/auth/Master.php");
+
 $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();

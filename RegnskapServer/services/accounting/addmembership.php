@@ -14,6 +14,7 @@ include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/accounting/helpers/memberships.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $db = new DB();
 $regnSession = new RegnSession($db);

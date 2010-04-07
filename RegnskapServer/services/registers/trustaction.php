@@ -11,6 +11,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accounttrustaction.php");
 include_once ("../../classes/accounting/accounttrust.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : null;

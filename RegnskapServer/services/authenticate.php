@@ -22,23 +22,24 @@ switch ($action) {
 
         $db = new DB();
         $master = new Master($db);
-        $prefix = $master->calculate_prefix();
+        $masterRecord = $master->get_master_record();
         
-        if(!$prefix) {
+        if(!$masterRecord) {
              $arr = array (
 				'error' => 'Ikke identifisert database.'
 				);
 				echo json_encode($arr);
             break;
         }
-        $sess = new RegnSession($db, $prefix);
+        $sess = new RegnSession($db, $masterRecord["dbprefix"]);
         
         $auth = new User($db);
 
-        if ($auth->authenticate($user, $password, $prefix) == User :: AUTH_OK) {
+        if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == User :: AUTH_OK) {
             session_start();
             	
-            $_SESSION["prefix"] = $prefix;
+            $_SESSION["prefix"] = $masterRecord["dbprefix"];
+            $_SESSION["diskquota"] = $masterRecord["diskquota"];
             $_SESSION["username"] = $user;
             $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
@@ -52,7 +53,8 @@ switch ($action) {
 
         } else {
             $arr = array (
-				'error' => 'Ugyldig brukernavn eller passord.'
+				'error' => 'Ugyldig brukernavn eller passord.',
+                'dbprefix' => $masterRecord["dbprefix"]
 				);
         }
         echo json_encode($arr);

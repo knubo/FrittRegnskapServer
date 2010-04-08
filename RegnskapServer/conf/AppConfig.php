@@ -11,6 +11,8 @@ const DB_NAME="bsc_kopi";
 #Set to 1 if you want authentication.
 const USE_AUTHENTICATION=1;
 
+const USE_QUOTA=1;
+
 const TIMEZONE="Europe/Oslo";
 
 #Set to 1 if you want to validate email using checkdnsrr - some systems might not support it.

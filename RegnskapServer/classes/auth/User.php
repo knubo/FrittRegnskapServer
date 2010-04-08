@@ -14,6 +14,7 @@ class User {
     private $reduced_write;
     private $project_required;
     private $personId;
+    private $diskQuota;
     
 	function __construct($dbi) {
 		$this->db = $dbi;

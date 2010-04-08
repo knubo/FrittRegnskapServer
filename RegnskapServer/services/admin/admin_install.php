@@ -8,9 +8,10 @@ include_once ("../../classes/admin/installer.php");
 $db = new DB();
 $installer = new Installer($db);
 
-$installer->createTables("wj_");
-$installer->createIndexes("wj_");
-$installer->addAccountPlan("wj_");
+$installer->dropTables("wj");
+$installer->createTables("wj");
+$installer->createIndexes("wj");
+$installer->addAccountPlan("wj");
 
 echo "OK";
 

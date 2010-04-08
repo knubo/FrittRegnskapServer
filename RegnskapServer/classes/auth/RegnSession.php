@@ -16,7 +16,7 @@ class RegnSession {
         session_start();
 
         if(!$_SESSION["username"]) {
-            header("HTTP/1.0 510 Not Authenticated");
+            header("HTTP/1.0 510 Not Authenticated :".json_encode($_SESSION));
             die("Not authenticated");           
         }
         return $_SESSION["username"];
@@ -79,7 +79,8 @@ class RegnSession {
 		
 		if(!$prefix) {
 		    $master = new Master($db);
-		    $prefix = $master->calculate_prefix();
+		    $masterRecord = $master->get_master_record();
+		    $prefix = $masterRecord["dbprefix"];
 		}
 
         $this->prefix = $prefix;

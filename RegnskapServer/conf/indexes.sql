@@ -1,10 +1,10 @@
 
-CREATE INDEX Regn_Post_Type_coll_post ON regn_post_type(coll_post);
-CREATE INDEX Regn_Post_Type_detail_post ON regn_post_type(detail_post);
+CREATE INDEX XXX_Post_Type_coll_post on XXX_post_type(coll_post);
+CREATE INDEX XXX_Post_Type_detail_post on XXX_post_type(detail_post);
 
-create INDEX Regn_Post_line ON regn_post(line);
+create INDEX XXX_Post_line on XXX_post(line);
 
-create INDEX Regn_Line_year ON regn_line(year);
-create INDEX Regn_Line_year_month ON regn_line(year,month);
+create INDEX XXX_Line_year on XXX_line(year);
+create INDEX XXX_Line_year_month on XXX_line(year,month);
 
-create INDEX Regn_Post_debet ON regn_post(debet);
+create INDEX XXX_Post_debet on XXX_post(debet);

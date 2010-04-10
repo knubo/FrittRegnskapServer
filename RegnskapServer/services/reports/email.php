@@ -85,7 +85,12 @@ switch ($action) {
         $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
 
         if($action == "email") {
-		  $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs);
+           $prefix = "";
+           if(AppConfig::USE_QUOTA) {
+               $prefix = $regnSession->getPrefix()."/";
+           }
+            
+		   $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix);
         } else {
         	$status = true;
         }

@@ -36,6 +36,15 @@ class RegnSession {
 
         return $_SESSION["person_id"];
     }
+
+    function getPrefix() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return "no_prefix";
+        }
+
+        return $_SESSION["prefix"];
+    }
+    
     
     function hasReducedWriteAccess() {
         if(!AppConfig::USE_AUTHENTICATION) {

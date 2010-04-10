@@ -13,7 +13,7 @@ class Emailer {
 		$this->db = $db;
 	}
 
-	function sendEmail($subject, $email, $body, $sender, $attachObj) {
+	function sendEmail($subject, $email, $body, $sender, $attachObj, $prefix="") {
       $eol="\r\n";
       $mime_boundary=md5(time());
 
@@ -44,7 +44,9 @@ class Emailer {
                  die("Illegal file name");
               }
 
-              $fileData = chunk_split(base64_encode(file_get_contents("../../storage/$one")), 68, $eol);
+              
+              
+              $fileData = chunk_split(base64_encode(file_get_contents("../../storage/".$prefix.$one)), 68, $eol);
               $fileName = $one;
 
               $msg.= "--".$bndp.$eol;

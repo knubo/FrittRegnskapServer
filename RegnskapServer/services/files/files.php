@@ -29,13 +29,25 @@ switch($action) {
         $directory = dir("../../storage/$prefix");
 
         $res = array();
+        $total = 0;
         while(false !== ($data = $directory->read())) {
             if($data[0] != '.') {
-                $res[] = array("name"=> $data, "size" => Strings::formatBytes(filesize("../../storage/$prefix/$data")));
+                $size = filesize("../../storage/$prefix/$data");
+                $total += $size;
+                $res[] = array("name"=> $data, "size" => Strings::formatBytes($size));
             }
         }
 
-        echo json_encode($res);
+        $percentUsed = 0;
+        
+        if(AppConfig::USE_QUOTA) {
+            $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
+        }
+        
+        echo json_encode(array("files" => $res, 
+        					"totalsize" => Strings::formatBytes($total), 
+        					"quota" => $regnSession->getQuota(). " MB", 
+        					"used" => $percentUsed));
 
         break;
     case "get":
@@ -91,12 +103,34 @@ switch($action) {
         $result = array();
 
         $prefix = "";
+        $percentUsed = 0;
+
         if(AppConfig::USE_QUOTA) {
             $prefix = $regnSession->getPrefix()."/";
+
+            if(!is_dir("../../storage/$prefix")) {
+                mkdir("../../storage/$prefix");
+            }
+
+            $directory = dir("../../storage/$prefix");
+
+            $total = 0;
+            while(false !== ($data = $directory->read())) {
+                if($data[0] != '.') {
+                    $size = filesize("../../storage/$prefix/$data");
+                    $total += $size;
+                }
+            }
+
+            $total += filesize($_FILES['uploadFormElement']['tmp_name']);
+            
+            $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
+            
         }
 
-
-        if($fileName[0] == '.') {
+        if($total > 100) {
+            $result["status"] = -1;
+        } else if($fileName[0] == '.') {
             $result["status"] = 0;
         } else {
             $result["status"] = copy($_FILES['uploadFormElement']['tmp_name'], "../../storage/".$prefix.$fileName) ? 1 : 0;

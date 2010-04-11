@@ -37,6 +37,14 @@ class RegnSession {
         return $_SESSION["person_id"];
     }
 
+    function getQuota() {
+        if(!AppConfig::USE_AUTHENTICATION || !AppConfig::USE_QUOTA) {
+            return 0;
+        }
+
+        return $_SESSION["diskquota"];
+    }
+
     function getPrefix() {
         if(!AppConfig::USE_AUTHENTICATION) {
             return "no_prefix";

@@ -7,11 +7,11 @@
 
 class MassLetterHelper {
 
-	private $pdf;
-	private $fonts;
-	private $wrapopts;
-	private $encoding;
-	private $fontSize;
+    private $pdf;
+    private $fonts;
+    private $wrapopts;
+    private $encoding;
+    private $fontSize;
     private $all;
     private $db;
     private $users;
@@ -26,7 +26,7 @@ class MassLetterHelper {
     private $tablerows;
 
     function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate) {
-    	$this->db = $db;
+        $this->db = $db;
         $this->year = $year;
         $this->date = new eZDate();
         $this->yearprice = $yearprice;
@@ -35,8 +35,25 @@ class MassLetterHelper {
         $this->dueDate = $dueDate;
     }
 
+    function readTemplate($filename) {
+        $filename = Strings::whitelist($filename);
+        if(!file_exists("templates/$filename")) {
+            return "";
+        }
+        return file_get_contents("templates/$filename");
+    }
 
-	function listTemplates() {
+    function saveTemplate($template, $data) {
+        $template = Strings::whitelist($template);
+
+        file_put_contents("templates/$template", $data);
+
+        return "1";
+
+    }
+
+
+    function listTemplates() {
         $filenames = array();
         $d = dir("templates/");
 
@@ -47,8 +64,8 @@ class MassLetterHelper {
         }
         $d->close();
 
-		return $filenames;
-	}
+        return $filenames;
+    }
 
     function getParams($args) {
         $pairs = explode(",", $args);
@@ -77,67 +94,67 @@ class MassLetterHelper {
     }
 
     function setEncoding($args) {
-    	if($args == "latin-1") {
-    		$this->encoding = array (
-                190 => "ae",
-                174 => "AE",
-                191 => "oslash",
-                175 => "Oslash",
-                129 => "Aring",
-                140 => "aring"
+        if($args == "latin-1") {
+            $this->encoding = array (
+            190 => "ae",
+            174 => "AE",
+            191 => "oslash",
+            175 => "Oslash",
+            129 => "Aring",
+            140 => "aring"
             );
-    	}
+        }
     }
 
     function trimExplode($args) {
         $arr = explode(",", $args);
         $res = array();
         foreach($arr as $one) {
-        	$res[] = trim($one);
+            $res[] = trim($one);
         }
-    	return $res;
+        return $res;
     }
 
     function setMargins($args) {
-    	$margs = $this->trimExplode($args);
+        $margs = $this->trimExplode($args);
 
         $this->pdf->ezSetMargins(array_shift($margs),array_shift($margs),array_shift($margs),array_shift($margs));
     }
 
     function addFont($args) {
-    	$opts = $this->trimExplode($args);
+        $opts = $this->trimExplode($args);
         $id = array_shift($opts);
         $this->fonts[$id] = array_shift($opts);
     }
 
     function text($args) {
-    	$parts = explode(",",$args);
+        $parts = explode(",",$args);
 
         $t = 0;
        	$y = array_shift($parts);
         $x = array_shift($parts);
 
         if(count($parts) > 1) {
-        	$t = implode(",",$parts);
+            $t = implode(",",$parts);
         } else {
-        	$t = array_shift($parts);
+            $t = array_shift($parts);
         }
 
         $this->pdf->addText($this->fontSize, $y, $x, $t);
     }
 
     function wrapopts($opts) {
-    	if(strlen(trim($opts)) == 0) {
-    		$this->wrapopts = array();
-    	} else {
-    		$this->wrapopts = $this->getParams($opts);
-    	}
+        if(strlen(trim($opts)) == 0) {
+            $this->wrapopts = array();
+        } else {
+            $this->wrapopts = $this->getParams($opts);
+        }
     }
 
     function str($str) {
-    	if(!$str) {
-    		return " ";
-    	}
+        if(!$str) {
+            return " ";
+        }
         return $str;
     }
 
@@ -153,8 +170,8 @@ class MassLetterHelper {
         $text = str_replace("#email", $rep, $text);
 
         if ($this->currentUser["birthdate"] && $this->currentUser["birthdate"] != "0000-00-00") {
-           $this->date->setMySQLDate($this->currentUser["birthdate"]);
-           $rep = $this->date->display();
+            $this->date->setMySQLDate($this->currentUser["birthdate"]);
+            $rep = $this->date->display();
         } else {
             $rep = "mangler";
         }
@@ -163,9 +180,9 @@ class MassLetterHelper {
     }
 
     function replaceCommons($text) {
-    	$text = str_replace("#courseprice", $this->courseprice, $text);
-    	$text = str_replace("#yearprice", $this->yearprice, $text);
-    	$text = str_replace("#trainprice", $this->trainprice, $text);
+        $text = str_replace("#courseprice", $this->courseprice, $text);
+        $text = str_replace("#yearprice", $this->yearprice, $text);
+        $text = str_replace("#trainprice", $this->trainprice, $text);
         $text = str_replace("#duedate", $this->dueDate, $text);
 
         return $text;
@@ -175,14 +192,14 @@ class MassLetterHelper {
         if($this->currentUser) {
             $text = $this->personText($text);
         } else {
-        	$text = $this->replaceCommons($text);
+            $text = $this->replaceCommons($text);
         }
 
-    	$this->pdf->ezText($text, $this->fontSize, $this->wrapopts);
+        $this->pdf->ezText($text, $this->fontSize, $this->wrapopts);
     }
 
     function setColor($args) {
-    	$opts = $this->trimExplode($args);
+        $opts = $this->trimExplode($args);
 
         $this->pdf->setColor(array_shift($opts),array_shift($opts),array_shift($opts));
     }
@@ -190,19 +207,19 @@ class MassLetterHelper {
     function startTable($args) {
         # $tabopts = array("fontSize" => 12, "showHeadings"=>0, "showLines"=>1, "xPos"=>"left", "xOrientation"=>"right");
 
-    	$this->tableopts = $this->getParams($args);
+        $this->tableopts = $this->getParams($args);
         $this->tablerows = array();
     }
 
     function row($text) {
         if($this->currentUser) {
-    	   $text = $this->personText($text);
+            $text = $this->personText($text);
         }
         $this->tablerows[] = explode("|",$text);
     }
 
     function endTable() {
-    	$this->pdf->ezTable($this->tablerows,'','',$this->tableopts);
+        $this->pdf->ezTable($this->tablerows,'','',$this->tableopts);
     }
 
     function relrectangle($args) {
@@ -215,7 +232,7 @@ class MassLetterHelper {
 
         $pdf = $this->pdf;
 
-    	$pdf->rectangle($p1,$pdf->y + $p2, $p3, $p4);
+        $pdf->rectangle($p1,$pdf->y + $p2, $p3, $p4);
     }
 
     function reltext($args) {
@@ -228,7 +245,7 @@ class MassLetterHelper {
         $t = $this->replaceCommons($t);
 
         $pdf = $this->pdf;
-    	$pdf->addText($p1, ($pdf->y)+$p2, $this->fontSize, $t);
+        $pdf->addText($p1, ($pdf->y)+$p2, $this->fontSize, $t);
     }
 
     function image($args) {
@@ -239,12 +256,12 @@ class MassLetterHelper {
         $just= $opts["just"];
         $img = $opts["file"];
         $pad = $opts["padding"];
-    	$this->pdf->ezImage($img, $pad, $width, $resize, $just,0);
+        $this->pdf->ezImage($img, $pad, $width, $resize, $just,0);
     }
 
     function query($args) {
         if($args == "memberships") {
-        	$accYearMem = new AccountYearMembership($this->db);
+            $accYearMem = new AccountYearMembership($this->db);
 
             $this->users = $accYearMem->getReportUsersFull($this->year);
         } else {
@@ -257,47 +274,47 @@ class MassLetterHelper {
         $this->pdf->addObject($this->all, 'all');
     }
 
-	function useTemplate($template) {
-		$arr = $this->listtemplates();
+    function useTemplate($template) {
+        $arr = $this->listtemplates();
 
         if(!in_array($template, $arr)) {
-        	die("Unknown template $template - valid templates are:".implode(',', $arr).".");
+            die("Unknown template $template - valid templates are:".implode(',', $arr).".");
         }
 
-		$this->fonts = array ();
-		$this->wrapopts = array ();
+        $this->fonts = array ();
+        $this->wrapopts = array ();
 
-		$lines = file("templates/$template");
+        $lines = file("templates/$template");
 
         if(!$lines) {
-        	die("Failed to open $template");
+            die("Failed to open $template");
         }
 
-		$wrapopts = array ();
-		$this->encoding = 0;
-		$this->fontSize = 12;
+        $wrapopts = array ();
+        $this->encoding = 0;
+        $this->fontSize = 12;
 
         $record = 0;
         $toLoop = array();
 
-		foreach ($lines as $one) {
+        foreach ($lines as $one) {
             if($record) {
-            	$toLoop[] = $one;
+                $toLoop[] = $one;
                 continue;
             }
 
             $record = $this->handleOne($one);
-		}
+        }
 
         if(!($this->users)) {
-        	die("Query not set up.");
+            die("Query not set up.");
         }
 
         foreach($this->users as $user) {
-        	$this->currentUser = $user;
+            $this->currentUser = $user;
 
             foreach($toLoop as $one) {
-            	$this->handleOne($one);
+                $this->handleOne($one);
             }
             $this->pdf->newPage();
         }
@@ -307,7 +324,7 @@ class MassLetterHelper {
     }
 
     function handleOne($one) {
-    	if (strlen(trim($one)) == 0 || substr($one, 0, 1) == "#") {
+        if (strlen(trim($one)) == 0 || substr($one, 0, 1) == "#") {
             return 0;
         }
 

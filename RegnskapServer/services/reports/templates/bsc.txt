@@ -7,31 +7,31 @@ font=bold,../../pdf/fonts/Times-Bold.afm
 
 fontsize=30
 fontselect=bold
-text=790,30,BÅRDAR SWING CLUB
+text=790,30,B√ÖRDAR SWING CLUB
 
 fontsize=10
 wrapopts=right:200,left:-10
 ezSetY=770
-wraptext=Årsmedlemsskap: #yearprice kr
+wraptext=√Örsmedlemsskap: #yearprice kr
 
 fontselect=normal
-wraptext=Gjelder fra betalingsdato til 31.12. Medlemskortet er gyldig med kvittering fra bank (girobetaling) eller med signatur fra et styremedlem (kontant betaling). Medlemskap gir rabatt på dansekvelder og helgekurs arrangert av klubben. 50% rabatt for ungdom under 18 år.
+wraptext=Gjelder fra betalingsdato til 31.12. Medlemskortet er gyldig med kvittering fra bank (girobetaling) eller med signatur fra et styremedlem (kontant betaling). Medlemskap gir rabatt p√• dansekvelder og helgekurs arrangert av klubben. 50% rabatt for ungdom under 18 √•r.
 
 fontselect=bold
 wraptext=Kursavgift: #courseprice kr per semester (kommer i tillegg til meldmeskap)
 
 fontselect=normal
-wraptext=Med betalt kursavgift kan du delta på alle ukentlige kurs klubben arrangerer og benytte deg av treningstidene. 50% rabatt for ungdom under 18 pr. Betalt kursavgift gir også 20% rabatt på Bårdar Danseinsitutts kurs.
+wraptext=Med betalt kursavgift kan du delta p√• alle ukentlige kurs klubben arrangerer og benytte deg av treningstidene. 50% rabatt for ungdom under 18 pr. Betalt kursavgift gir ogs√• 20% rabatt p√• B√•rdar Danseinsitutts kurs.
 
 fontselect=bold
 wraptext=Treningsavgift: #trainprice kr per semester (kommer i tillegg til medlmeskap)
 
 fontselect=normal
-wraptext=Med betalt treningsavgift kan du benytte deg av klubbens treningstider. 50% rabatt for ungdom under 18 år.
+wraptext=Med betalt treningsavgift kan du benytte deg av klubbens treningstider. 50% rabatt for ungdom under 18 √•r.
 
 ezSetDy=-10;
 wrapopts=right:0,left:-10
-wraptext=Se for øvring hjemmesiden vår, http://baardarswingclub.no, eller kontakt oss på post@baardarswingclub.no.
+wraptext=Se for √∏vring hjemmesiden v√•r, http://baardarswingclub.no, eller kontakt oss p√• post@baardarswingclub.no.
 
 setColor=255,0,0
 fontsize=14
@@ -81,10 +81,10 @@ fontsize=10
 reltext=32, -50,Periode: 
 relrectangle= 80 -50, 8, 8
 
-reltext=90, -50,Vår
+reltext=90, -50,V√•r
 relrectangle= 112, -50, 8, 8
 
-reltext=122, -50,Høst
+reltext=122, -50,H√∏st
 reltext=152, -50, 20____
 
 reltext=32, -65,Ungdomsrabatt:
@@ -102,7 +102,7 @@ reltext=32, -100,Bet. mottatt av: ____________
 ezSetY=185
 fontsize=11
 wrapopts=right:20,left:275
-wraptext=Bårdar Swing Club
+wraptext=B√•rdar Swing Club
 wraptext=Kristian Augusts gt. 15
 wraptext=0164 Oslo
 fontsize=10
@@ -126,7 +126,7 @@ starttable=fontSize:10,showHeadings:0,showLines:2,xPos:left,xOrientation:right,s
 row=Navn: |#firstname #lastname
 row=Adresse: |#address
 row=E-post: |#email
-row=Fødselsdato: |#birthdate
+row=F√∏dselsdato: |#birthdate
 endtable
 
 #This is the Betal av fields
@@ -152,4 +152,3 @@ fontsize=10
 
 
 #and as it ends here, it will loop for each user.
-

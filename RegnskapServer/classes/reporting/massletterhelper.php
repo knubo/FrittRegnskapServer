@@ -42,7 +42,7 @@ class MassLetterHelper {
         }
         return file_get_contents("templates/$filename");
     }
-
+    
     function saveTemplate($template, $data) {
         $template = Strings::whitelist($template);
 

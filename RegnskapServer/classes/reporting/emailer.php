@@ -7,12 +7,6 @@
 
 class Emailer {
 
-	private $db;
-
-	function Emailer($db) {
-		$this->db = $db;
-	}
-
 	function sendEmail($subject, $email, $body, $sender, $attachObj, $prefix="") {
       $eol="\r\n";
       $mime_boundary=md5(time());

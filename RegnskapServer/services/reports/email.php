@@ -75,7 +75,7 @@ switch ($action) {
 	case "email" :
     case "simulatemail":
         $regnSession->checkReducedWriteAccess();
-		$emailer = new Emailer($db);
+		$emailer = new Emailer();
 		$res = array ();
 
         $subject = urldecode($subject);

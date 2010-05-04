@@ -38,6 +38,9 @@ switch ($action) {
 		$res["result"] = $colsAffected;
 		echo json_encode($res);
 		break;
+	case "info":
+	    echo "Prefix is:".AppConfig::pre();
+	    break;
 	default :
 		die("Unknown action $action");
 }

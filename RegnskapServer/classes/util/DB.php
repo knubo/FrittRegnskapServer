@@ -63,6 +63,18 @@ class DB {
         return $match > 0;
     }
 
+    function has_data($table) {
+        $result = $this->link->query("select count(*) as c from $table");
+
+        if(!$result) {
+            $this->report_error();
+        }
+
+        foreach($result as $one) {
+            return $one["c"];
+        }
+    }
+    
     function report_error() {
         $error = $this->link->error;
         header("HTTP/1.0 512 DB error");

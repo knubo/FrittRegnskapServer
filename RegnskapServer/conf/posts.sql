@@ -1060,3 +1060,4 @@ insert into XXX_post_type
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 
      (8990, 8, null, 'Udekket tap');
+

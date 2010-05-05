@@ -22,6 +22,8 @@ $body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $attachments = array_key_exists("attachments", $_REQUEST) ? $_REQUEST["attachments"] : "";
 
+
+
 $db = new DB();
 $regnSession = new RegnSession($db);
 $currentUser = $regnSession->auth();
@@ -32,51 +34,51 @@ if(!$year) {
 }
 
 switch ($action) {
-	case "list" :
-		$ret = array ();
-		switch ($query) {
-			case "members" :
+    case "list" :
+        $ret = array ();
+        switch ($query) {
+            case "members" :
             case "simulate":
-				$accYearMem = new AccountYearMembership($db);
-				$users = $accYearMem->getReportUsersFull($year);
-				break;
-			case "newsletter" :
-				$accPerson = new AccountPerson($db);
-				$accPerson->setNewsletter(1);
-				$users = $accPerson->search(false);
-				break;
+                $accYearMem = new AccountYearMembership($db);
+                $users = $accYearMem->getReportUsersFull($year);
+                break;
+            case "newsletter" :
+                $accPerson = new AccountPerson($db);
+                $accPerson->setNewsletter(1);
+                $users = $accPerson->search(false);
+                break;
             case "all" :
                 $accPerson = new AccountPerson($db);
                 $users = $accPerson->allWithEmail();
                 echo json_encode($users);
                 die("");
                 break;
-			case "test" :
+            case "test" :
                 if(!$currentUser) {
-                	die("Need current user");
+                    die("Need current user");
                 }
                 $accPerson = new AccountPerson($db);
                 $accPerson->setUser($currentUser);
-				$users = $accPerson->search(false);
-		}
+                $users = $accPerson->search(false);
+        }
 
-		foreach ($users as $one) {
-			if (!array_key_exists("email", $one) || !$one["email"]) {
-				continue;
-			}
-			$u = array ();
-			$u["name"] = $one["lastname"] . ", " . $one["firstname"];
-			$u["email"] = $one["email"];
-			$ret[] = $u;
-		}
+        foreach ($users as $one) {
+            if (!array_key_exists("email", $one) || !$one["email"]) {
+                continue;
+            }
+            $u = array ();
+            $u["name"] = $one["lastname"] . ", " . $one["firstname"];
+            $u["email"] = $one["email"];
+            $ret[] = $u;
+        }
 
-		echo json_encode($ret);
-		break;
-	case "email" :
+        echo json_encode($ret);
+        break;
+    case "email" :
     case "simulatemail":
         $regnSession->checkReducedWriteAccess();
-		$emailer = new Emailer();
-		$res = array ();
+        $emailer = new Emailer();
+        $res = array ();
 
         $subject = urldecode($subject);
         $body = urldecode($body);
@@ -85,20 +87,21 @@ switch ($action) {
         $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
 
         if($action == "email") {
-           $prefix = "";
-           if(AppConfig::USE_QUOTA) {
-               $prefix = $regnSession->getPrefix()."/";
-           }
-            
-		   $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix);
+            $prefix = "";
+            if(AppConfig::USE_QUOTA) {
+                $prefix = $regnSession->getPrefix()."/";
+            }
+
+            $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix);
         } else {
-        	$status = true;
+            $status = true;
         }
 
-		$res["status"] = $status ? 1 : 0;
-		echo json_encode($res);
-		break;
-	default :
-		die("Unknown action $action.");
+        $res["status"] = $status ? 1 : 0;
+        echo json_encode($res);
+        break;
+
+    default :
+        die("Unknown action $action.");
 }
 ?>

@@ -164,7 +164,15 @@ create table if not exists XXX_person (
    birthdate DATE,
    newsletter tinyint,
    hidden tinyint,
-   gender varchar(1)
+   gender varchar(1),
+   secret varchar(40)
+);
+
+CREATE TABLE IF NOT exists XXX_email_content (
+   id INT(5) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name varchar(40) unique NOT NULL,
+   content TEXT,
+   header tinyint
 );
 
 CREATE TABLE IF NOT exists XXX_post_type (

@@ -83,14 +83,19 @@ class DB {
     }
 
     function prepare($query) {
-        
+        if(!$this->link) {
+            die("No database connection available!");
+        }
         if(AppConfig::LOG_DB_STATEMENTS) {
-            $mysqliLog = mysqli_prepare($this->link, "insert into  ".AppConfig::pre() . "log (occured,username,category,action,message)  values (now(),?,?,?,?)");
+            $sql = "insert into  ".AppConfig::pre() . "log (occured,username,category,action,message)  values (now(),?,?,?,?)";
+            $mysqliLog = mysqli_prepare($this->link, $sql);
 
-            $u =  $_SESSION["username"];
-            $d = "dbtrace";
-            mysqli_stmt_bind_param($mysqliLog, "ssss", $u, $d, $d, $query);
-            $mysqliLog->execute();
+            if($mysqliLog) {
+                $u =  $_SESSION["username"];
+                $d = "dbtrace";
+                $mysqliLog->bind_param("ssss", $u, $d, $d, $query);
+                $mysqliLog->execute();
+            }
         }
         
         $mysqli = mysqli_prepare($this->link, $query);

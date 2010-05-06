@@ -24,6 +24,11 @@ switch ($action) {
         $contentHelper = new EmailContent($db);
         echo json_encode($contentHelper->get($id));
         break;
+    case "report_init":
+        $contentHelper = new EmailContent($db);
+        $data = $contentHelper->getAll();
+        echo json_encode($data);
+        break;
     case "setup_init":
         $contentHelper = new EmailContent($db);
         echo json_encode($contentHelper->getAll());

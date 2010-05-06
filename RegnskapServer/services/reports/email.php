@@ -11,6 +11,7 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/reporting/emailer.php");
+include_once ("../../classes/reporting/email_content_class.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 
@@ -21,6 +22,9 @@ $email = array_key_exists("email", $_REQUEST) ? $_REQUEST["email"] : "";
 $body = array_key_exists("body", $_REQUEST) ? $_REQUEST["body"] : "";
 $year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $attachments = array_key_exists("attachments", $_REQUEST) ? $_REQUEST["attachments"] : "";
+$format = array_key_exists("format", $_REQUEST) ? $_REQUEST["format"] : 0;
+$header = array_key_exists("header", $_REQUEST) ? $_REQUEST["header"] : 0;
+$footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
 
 
 
@@ -86,13 +90,19 @@ switch ($action) {
         $attObjs = $attachments ? json_decode($attachments) : null;
         $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
 
+
         if($action == "email") {
             $prefix = "";
             if(AppConfig::USE_QUOTA) {
                 $prefix = $regnSession->getPrefix()."/";
             }
 
-            $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix);
+            $emailContent = new EmailContent($db);
+            $body = $emailContent->attachFooterHeader($body, $footer, $header);
+
+            if($format == "PLAIN") {
+                $status = $emailer->sendPlainTextEmail($subject, $email, $body, $sender, $attObjs, $prefix);
+            }
         } else {
             $status = true;
         }

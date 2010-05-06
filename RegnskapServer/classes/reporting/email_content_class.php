@@ -34,7 +34,7 @@ class EmailContent {
     function getAll() {
         $prep = $this->db->prepare("select id, name, header from " . AppConfig::pre() . "email_content");
         $data = $prep->execute();
-        
+
         $headers = array();
         $footers = array();
 
@@ -48,6 +48,27 @@ class EmailContent {
 
         return array("headers" => $headers, "footers" => $footers);
     }
+
+    function attachFooterHeader($body, $footer, $header) {
+        if($header) {
+            $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
+            $prep->bind_params("i", $header);
+            $res = $prep->execute();
+            
+            $body = $res[0]["content"].$body;
+        }
+
+        if($footer) {
+            $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
+            $prep->bind_params("i", $footer);
+            $res = $prep->execute();
+            
+            $body = $body.$res[0]["content"];
+        }
+
+        return $body;
+    }
+
 }
 
 ?>

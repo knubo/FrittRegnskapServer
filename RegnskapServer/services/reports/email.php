@@ -101,7 +101,7 @@ switch ($action) {
             $body = $emailContent->attachFooterHeader($body, $footer, $header);
 
             if($format == "PLAIN") {
-                $status = $emailer->sendPlainTextEmail($subject, $email, $body, $sender, $attObjs, $prefix);
+                $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, "<html><body><p><strong>Hei verden!</strong></p></body></html>");
             }
         } else {
             $status = true;

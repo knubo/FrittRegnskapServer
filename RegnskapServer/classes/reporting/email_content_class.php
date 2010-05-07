@@ -109,6 +109,10 @@ class EmailContent {
         
         return "<html><body>$res</body></html>";
     }
+    
+    function fillInUnsubscribeURL($body, $secret, $personId) {
+        return preg_replace("/\{unsubscribeurl\}/", AppConfig::ABSOLUTE_URL_TO_SERVICES."newsletter/unsubscribe.php?secret=".$personId.$secret, $body);
+    }
 }
 
 ?>

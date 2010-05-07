@@ -30,16 +30,18 @@ class Emailer {
         $msg.= $eol;
         $msg.= $body.$eol;
 
-        $msg.= "--".$bndp.$eol;
-        $msg.= "Content-Type: multipart/MIXED;".$eol;
-        $msg.= "	boundary=$bndp2".$eol.$eol;
-
         if($html) {
+            $msg.= "--".$bndp.$eol;
+            $msg.= "Content-Type: multipart/MIXED;".$eol;
+            $msg.= "	boundary=$bndp2".$eol.$eol;
+
             $msg.= "--".$bndp2.$eol;
             $msg.= "Content-Type: text/html;".$eol;
             $msg.= "	charset=UTF-8".$eol;
             $msg.= $eol;
             $msg.= $html.$eol.$eol;
+        } else {
+            $bndp2 = $bndp;
         }
 
 

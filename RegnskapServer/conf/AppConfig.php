@@ -24,6 +24,7 @@ function pre() {
     return $_SESSION["prefix"];
 }
 
+const ABSOLUTE_URL_TO_SERVICES = "http://localhost/RegnskapServer/services/";
 
 const LOG_DB_STATEMENTS = false;
 

@@ -25,6 +25,7 @@ $attachments = array_key_exists("attachments", $_REQUEST) ? $_REQUEST["attachmen
 $format = array_key_exists("format", $_REQUEST) ? $_REQUEST["format"] : 0;
 $header = array_key_exists("header", $_REQUEST) ? $_REQUEST["header"] : 0;
 $footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
+$personid = array_key_exists("personid", $_REQUEST) ? $_REQUEST["personid"] : 0;
 
 
 
@@ -91,6 +92,9 @@ switch ($action) {
         $attObjs = $attachments ? json_decode($attachments) : null;
         $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
 
+        $accPerson = new AccountPerson($db);
+        
+        $secret = $accPerson->getSecret($personid);
 
         if($action == "email") {
             $prefix = "";
@@ -101,6 +105,8 @@ switch ($action) {
             $emailContent = new EmailContent($db);
             $body = $emailContent->attachFooterHeader($body, $footer, $header);
 
+            $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personId);
+            
             $html = 0;
             if($format == "HTML") {
                 $html = $body;

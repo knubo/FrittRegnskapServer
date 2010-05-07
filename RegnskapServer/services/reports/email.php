@@ -73,6 +73,7 @@ switch ($action) {
             $u = array ();
             $u["name"] = $one["lastname"] . ", " . $one["firstname"];
             $u["email"] = $one["email"];
+            $u["id"] = $one["id"];
             $ret[] = $u;
         }
 
@@ -100,9 +101,16 @@ switch ($action) {
             $emailContent = new EmailContent($db);
             $body = $emailContent->attachFooterHeader($body, $footer, $header);
 
-            if($format == "PLAIN") {
-                $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, "<html><body><p><strong>Hei verden!</strong></p></body></html>");
+            $html = 0;
+            if($format == "HTML") {
+                $html = $body;
+                $body = $emailContent->makePlainText($html);
+            } else if($format == "WIKI") {
+                $html = $emailContent->makeHTMLFromWiki($body);
+                $body = $emailContent->makePlainText($html);
             }
+            
+            $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
         } else {
             $status = true;
         }

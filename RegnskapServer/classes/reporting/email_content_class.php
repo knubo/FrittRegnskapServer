@@ -69,6 +69,46 @@ class EmailContent {
         return $body;
     }
 
+    function makePlainText($html) {
+        $html = preg_replace("/<h1>(.+?)<\/h1>/", "==========\n $1\n==========\n", $html);
+        $html = preg_replace("/<h2>(.+?)<\/h2>/", " $1\n=====\n", $html);
+        $html = preg_replace("/<h3>(.+?)<\/h3>/", "$1\n-----\n", $html);
+        $html = preg_replace("/<h4>(.+?)<\/h4>/", "_$1_\n\n", $html);
+        $html = preg_replace("/<a href=.(.+?).>(.+?)<\/a>/", "link ($2): $1", $html);
+        $html = preg_replace("/<hr>/", "\n--------------------------------------------------------------------\n", $html);
+        $html = preg_replace("/<p>/", "\n", $html);
+        $html = preg_replace("/<.+?>/", "", $html);
+        return $html;
+    }
+    
+    function makeHTMLFromWiki($body) {
+        $lines = explode("\n", $body);
+        reset($lines);
+        
+        $res = "";
+        foreach($lines as $one) {
+            if(strncasecmp("h1.", $one, 3) == 0) {
+                $res.="<h1>".trim(substr($one, 3))."</h1>\n";
+            } else if(strncasecmp("h2.", $one, 3) == 0) {
+                $res.="<h2>".trim(substr($one, 3))."</h2>\n";
+            } else if(strncasecmp("h3.", $one, 3) == 0) {
+                $res.="<h3>".trim(substr($one, 3))."</h3>\n";
+            } else if(strncasecmp("h4.", $one, 3) == 0) {
+                $res.="<h4>".trim(substr($one, 3))."</h4>\n";
+            } else if(strncasecmp("hr.", $one, 3) == 0) {
+                $res.="<hr>\n";
+            } else if(strlen($one) == 0) {
+                $res.="<p>\n";
+            } else {
+                $one = preg_replace("/\*(.+?)\*/","<strong>$1</strong>", $one);
+                $one = preg_replace("/\_(.+?)\_/","<u>$1</u>", $one);
+                $one = preg_replace("/\|(.+?)\|(.+?)\|/","<a href=\"$1\">$2</a>", $one);
+                $res.="$one\n";
+            }
+        }
+        
+        return "<html><body>$res</body></html>";
+    }
 }
 
 ?>

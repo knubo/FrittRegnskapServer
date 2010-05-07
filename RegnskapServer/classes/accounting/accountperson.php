@@ -235,16 +235,18 @@ class AccountPerson {
                 $secret.= chr(mt_rand(97, 122));
             }
             $prep = $this->db->prepare("update " . AppConfig::pre() . "person set secret = ? where id = ?");
-            $prep->bind_params("si", $secret, $i);
+            $prep->bind_params("si", $secret, $id);
             $prep->execute();
             
-            return $secret;
+            return AppConfig::pre().":".$secret;
         }
-        return $res[0]["secret"];
+        return AppConfig::pre().":".$res[0]["secret"];
     }
     
-    function unsubscribeToNewsletter($secret, $id) {
-         $prep = $this->db->prepare("update " . AppConfig::pre() . "person set newsletter = 0 where secret = ? and id = ?");
+    function unsubscribeToNewsletter($prefix, $secret, $id) {
+         $prefix = Strings::whitelist($prefix);
+        
+         $prep = $this->db->prepare("update " . $prefix . "person set newsletter = 0 where secret = ? and id = ?");
          $prep->bind_params("si", $secret, $id);
          $prep->execute();
          

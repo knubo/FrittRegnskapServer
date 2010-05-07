@@ -105,7 +105,7 @@ switch ($action) {
             $emailContent = new EmailContent($db);
             $body = $emailContent->attachFooterHeader($body, $footer, $header);
 
-            $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personId);
+            $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
             
             $html = 0;
             if($format == "HTML") {

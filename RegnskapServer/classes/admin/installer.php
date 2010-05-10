@@ -38,7 +38,7 @@ class Installer {
         $posts = file_get_contents("../../conf/posts.sql");
 
         $this->execute($posts, $prefix);
-        
+
         $this->db->action("update ".$prefix."_post_type set in_use = 1");
     }
 
@@ -56,10 +56,10 @@ class Installer {
     }
 
     function createUniquePrefix($hostprefix, $retry = 0) {
-        $try = substr($hostprefix, 0, 3).substr($hostprefix, -3)."_";
+        $try = substr($hostprefix, 0, 3).substr($hostprefix, -3);
 
         if($retry > 0) {
-            $try = substr($try, 0, -1)."$retry_";
+            $try = substr($try, 0, -1)."$retry";
             $retry++;
         }
 
@@ -68,7 +68,7 @@ class Installer {
         $res = $prep->execute();
 
         if(count($res) == 0) {
-            return 0;
+            return $try;
         }
 
         return $this->createUniquePrefix($hostprefix, $retry + 1);
@@ -77,21 +77,21 @@ class Installer {
     function sendEmailRequestDomain($wikilogin, $address, $email, $contact, $clubname, $domainname) {
         $subject = urldecode("Domenerequest Fritt Regnskap: $domainname");
         $body = urldecode("Wikilogin: $wikilogin\nAdresse:$address\nEmail:$email\nContact:$contact\nClubname:$clubname\nDomainname:$domainname\n");
-        
+
         $email = "knutbo+fr@ifi.uio.no";
         $emailer = new Emailer();
-        
+
         $status = $emailer->sendEmail($subject, $email, $body, $email, 0);
 
     }
-    
+
     function addStandardData($prefix) {
         $prefix = $prefix."_";
-            
+
         $ezDate = new eZDate();
-        
+
         $year = $ezDate->year();
-        
+
         for($i = 0; $i < 10; $i++) {
             $prep = $this->db->prepare("insert into ".$prefix."semester (description, year, fall) values (?,?,?)");
 
@@ -100,11 +100,11 @@ class Installer {
             if($i > 0 && $i % 2 == 0) {
                 $year++;
             }
-            
+
             $prep->bind_params("sii", $desc, $year, $i % 2);
             $prep->execute();
         }
-        
+
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_SEMESTER','1')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_MONTH','1')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_YEAR','$year')");
@@ -117,33 +117,61 @@ class Installer {
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('FORDRINGER_POSTS','1370,1380,1390,1570')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('REGI_MEMB_POSTS','1920,1905')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_TRPOSTS','1904,1905,1906,1921')");
-        
+
     }
-    
+
     function addAdminUser($admin, $password) {
         $prep = $this->db->prepare("insert into master_person (firstname, lastname) values (?,?)");
         $prep->bind_params("ss", "Admin (edit)", "Admin (edit)");
         $prep->execute();
-        
+
         $user = new User(0);
         $crypted = crypt($password, $user->makesalt());
-        
+
         $prep = $this->db->prepare("insert into master_user (username, pass, person, readonly, reducedwrite, project_required) values (?,?,1,0,0,0)");
         $prep->bind_params("ss", $admin, $crypted);
-        $prep->execute(); 
+        $prep->execute();
     }
-    
+
     function addMasterToInstallations($wikilogin) {
         $prep = $this->db->prepare("select * from installations where dbprefix = 'master'");
         $res = $prep->execute();
-        
+
         if(count($res) == 0) {
             $prep = $this->db->prepare("insert into installations (dbprefix, hostprefix, description, diskquota, wikilogin) values ('master_', 'www','Master',0,?)");
             $prep->bind_params("s", $wikilogin);
             $prep->execute();
-            
+
         }
-        
+
+    }
+
+    function validate($parameters) {
+        $required = array("superuser","password", "domainname", "clubname", "contact", "email", "address", "city", "zipcode");
+
+        $bad = array();
+
+        foreach($required as $one) {
+            if(!array_key_exists($one, $_REQUEST) || strlen(trim($_REQUEST[$one])) == 0) {
+                $bad[] = $one;
+            }
+        }
+
+        $prep = $this->db->prepare("select * from installations where hostprefix = ?");
+        $prep->bind_params("s", $_REQUEST["domainname"]);
+
+        $res = $prep->execute();
+
+        if(count($res)) {
+            $bad[] = "domainname";
+        }
+
+        if(count($bad) > 0) {
+            header("HTTP/1.0 513 Validation Error");
+
+            die(json_encode($bad));
+        }
+
     }
 }
 

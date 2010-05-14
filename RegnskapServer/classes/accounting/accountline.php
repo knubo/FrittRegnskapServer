@@ -14,6 +14,7 @@ class AccountLine {
 	public $PostsArray;
 	public $groupDebetMonth;
 	public $groupKredMonth;
+    public $debetKreditMismatch = 0;
 	public $date;
 	public $sum;
 
@@ -249,7 +250,7 @@ class AccountLine {
 		$lines = $this->getLines($prep->execute());
 
 		if ($fillGrouped) {
-			$groupArray = $this->fill_grouped($lines);
+			$groupArray = $this->fill_grouped(&$lines);
             
             return array("lines"=>$lines, "debetsums"=>$groupArray["debetsums"], "creditsums"=>$groupArray["creditsums"]);
 		}
@@ -263,7 +264,9 @@ class AccountLine {
 	function fill_grouped($lines) {
         $groupDebet = array();
         $groupCredit = array();
-		foreach ($lines as $one) {
+		foreach ($lines as &$one) {
+		    $debbe = 0;
+		    $sumCredit = 0;
 
 			$one->groupDebetMonth = array ();
 			$one->groupKredMonth = array ();
@@ -274,10 +277,12 @@ class AccountLine {
 
 			foreach (array_keys($one->Posts) as $groupid) {
 				$posts = $one->Posts[$groupid];
-
+				
 				foreach ($posts as $post) {
-					if ($post->getDebet() == "1") {
-						if (array_key_exists($groupid, $one->groupDebetMonth)) {
+					if ($post->getDebet() == 1) {
+                       $debbe = $debbe + 0 + $post->getAmount();
+
+                        if (array_key_exists($groupid, $one->groupDebetMonth)) {
 							$one->groupDebetMonth[$groupid] += $post->getAmount();
 						} else {
 							$one->groupDebetMonth[$groupid] = $post->getAmount();
@@ -289,12 +294,14 @@ class AccountLine {
                         }
                         
 					} else {
-						if (array_key_exists($groupid, $one->groupKredMonth)) {
+                        $sumCredit = $sumCredit + 0 + $post->getAmount();
+
+                        if (array_key_exists($groupid, $one->groupKredMonth)) {
 							$one->groupKredMonth[$groupid] += $post->getAmount();
 						} else {
 							$one->groupKredMonth[$groupid] = $post->getAmount();
 						}
-                         if (array_key_exists($groupid, $groupCredit)) {
+                        if (array_key_exists($groupid, $groupCredit)) {
                             $groupCredit[$groupid]+= $post->getAmount();
                         } else {
                             $groupCredit[$groupid] = $post->getAmount();
@@ -302,6 +309,7 @@ class AccountLine {
 					}
 				}
 			}
+		    $one->debetKreditMismatch = ($debbe != $sumCredit) ? "1" : "0"; 
 			$one->PostsArray = null;
 		}
         return array("creditsums" => $groupCredit, "debetsums" => $groupDebet);

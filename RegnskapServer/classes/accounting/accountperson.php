@@ -19,7 +19,7 @@ class AccountPerson {
 
     /* Populated from outside */
     public $Memberships;
-
+    public $BirthdateRequired;
 
     /* Only for querying - not in result set */
     private $User;
@@ -155,11 +155,14 @@ class AccountPerson {
 
     function save() {
 
-        $bdSave = new eZDate();
-        $bdSave->setDate($this->Birthdate);
-
-        $mysqlDate = $bdSave->mySQLDate();
-
+        $mysqlDate = NULL;
+        
+        if($this->Birthdate) {
+            $bdSave = new eZDate();
+            $bdSave->setDate($this->Birthdate);
+    
+            $mysqlDate = $bdSave->mySQLDate();
+        }
         if ($this->Id) {
             $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=? where id = ?");
             $prep->bind_params("sssssssssssiisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Id);

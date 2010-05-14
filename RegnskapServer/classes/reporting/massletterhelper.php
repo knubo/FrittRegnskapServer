@@ -40,13 +40,13 @@ class MassLetterHelper {
         if(!file_exists("templates/$filename")) {
             return "";
         }
-        return file_get_contents("templates/$filename");
+        return utf8_encode(file_get_contents("templates/$filename"));
     }
     
     function saveTemplate($template, $data) {
         $template = Strings::whitelist($template);
 
-        file_put_contents("templates/$template", $data);
+        file_put_contents("templates/$template", utf8_decode($data));
 
         return "1";
 
@@ -162,6 +162,7 @@ class MassLetterHelper {
         $text = str_replace("#firstname", $this->str($this->currentUser["firstname"]), $text);
         $text = str_replace("#lastname", $this->str($this->currentUser["lastname"]), $text);
         $text = str_replace("#address", $this->str($this->currentUser["address"]), $text);
+        $text = str_replace("#memberid", $this->str($this->currentUser["id"]), $text);
         $text = str_replace("#zip", $this->str($this->currentUser["postnmb"]), $text);
         $text = str_replace("#city", $this->str($this->currentUser["city"]), $text);
         $text = str_replace("#year", $this->str($this->year), $text);

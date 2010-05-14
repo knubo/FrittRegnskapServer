@@ -46,8 +46,12 @@ switch ($action) {
 		echo json_encode($columnList);
 		break;
 	case "get" :
+	    $accStd = new AccountStandard($db);
+	    
 		$accPers = new AccountPerson($db);
 		$accPers->load($id);
+		
+		
         $accSemesterMembership = new AccountSemesterMembership($db);
         $accYearMembership = new AccountyearMembership($db);
         $accYouthMembership = new AccountSemesterMembership($db);
@@ -57,6 +61,9 @@ switch ($action) {
         $memberships["year"] = $accYearMembership->getUserMemberships($id, "train");
         $memberships["youth"] = $accYouthMembership->getUserMemberships($id, "youth");
         $accPers->Memberships = $memberships;
+        
+        $accPers->BirthdateRequired = $accStd->getOneValue(AccountStandard::CONST_BIRTHDATE_REQUIRED);
+        
 		echo json_encode($accPers);
 		break;
 	case "search" :

@@ -138,7 +138,7 @@ class Installer {
         $res = $prep->execute();
 
         if(count($res) == 0) {
-            $prep = $this->db->prepare("insert into installations (dbprefix, hostprefix, description, diskquota, wikilogin) values ('master_', 'www','Master',0,?)");
+            $prep = $this->db->prepare("insert into installations (dbprefix, hostprefix, description, diskquota, wikilogin) values ('master_', 'master','Master',0,?)");
             $prep->bind_params("s", $wikilogin);
             $prep->execute();
 

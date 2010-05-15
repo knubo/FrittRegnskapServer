@@ -3,6 +3,22 @@
 
 class AppConfig {
 
+function db() {
+    $host = $_SERVER["SERVER_NAME"];
+        
+    $split = explode(".",$host);
+
+    if($split[0] == 'localhost') {
+        return array("localhost","root","","bsc_kopi");
+    }
+    if($split[0] == 'bsc') {
+        return array("","","","");
+    } 
+    
+    return array("","","","");
+    
+}
+    
 const DB_HOST_NAME="localhost";
 const DB_USER="root";
 const DB_PASSWORD="";

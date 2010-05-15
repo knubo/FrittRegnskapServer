@@ -42,13 +42,16 @@ class BackupDB {
     }
 
 	function backup($table) {
-        $cmd = AppConfig::MYSQLDUMP." -cnt -u" . AppConfig :: DB_USER . " -h " . AppConfig :: DB_HOST_NAME;
+	    
+	    $dbinfo = AppConfig::db();
+	    
+        $cmd = AppConfig::MYSQLDUMP." -cnt -u" . $dbinfo[1] . " -h " . $dbinfo[0];
 
-        if(AppConfig :: DB_PASSWORD && strlen(AppConfig::DB_PASSWORD) > 0) {
-        	$cmd.= " -p" . AppConfig :: DB_PASSWORD;
+        if($dbinfo[2] && strlen($dbinfo[2]) > 0) {
+        	$cmd.= " -p" . $dbinfo[2];
         }
 
-        $cmd.= " " . AppConfig :: DB_NAME . " $table";
+        $cmd.= " " . $dbinfo[3] . " $table";
         $data = array();
 		$res = exec($cmd, &$data);
 

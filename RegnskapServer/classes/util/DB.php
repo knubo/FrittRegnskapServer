@@ -30,8 +30,9 @@ class DB {
     function __construct($keeplatin1 = 0) {
         error_reporting(0); 
         
-        $this->link = mysqli_connect(AppConfig::DB_HOST_NAME,
-        AppConfig::DB_USER, AppConfig::DB_PASSWORD, AppConfig::DB_NAME);
+        $dbinfo = AppConfig::db();
+        
+        $this->link = mysqli_connect($dbinfo[0], $dbinfo[1], $dbinfo[2], $dbinfo[3]);
 
         if (mysqli_connect_errno()) {
             header("HTTP/1.0 515 DB error");

@@ -7,16 +7,24 @@ class AccountPostType {
 	public $Description;
 	public $DetailPost;
 	public $InUse;
+	public $Earning;
+	public $Cost;
+	public $Capital;
+	
 	private $AllEntries;
 	private $db;
+	
 
-	function AccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0) {
+	function AccountPostType($db, $a = 0, $b = 0, $c = 0, $d = 0, $f = 0, $isEarning = 0, $isCost = 0, $isCapital = 0) {
 		$this->db = $db;
 		$this->PostType = & $a;
 		$this->CollPost = & $b;
 		$this->Description = & $c;
 		$this->DetailPost = & $d;
 		$this->InUse = & $f;
+		$this->Earning = $isEarning;
+		$this->Cost = $isCost;
+		$this->Capital = $isCapital;
 	}
 
 	function getInUse() {
@@ -82,7 +90,7 @@ class AccountPostType {
 			for ($i = 0; $i < count($group_array); $i++) {
 
 				$pt = $group_array[$i]["post_type"];
-
+				
 				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"]);
 				$return_array[$i] = $one;
 			}
@@ -117,7 +125,11 @@ class AccountPostType {
 
 				$pt = $group_array[$i]["post_type"];
 
-				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"]);
+				$isEarning = (($pt >= 3000 && $pt < 4000) || $pt == 8400 || $pt ==8040); 
+				$isCost = $pt > 4000 && $pt <= 8500 && $pt <> 8040; 
+				$isCapital = $pt >= 1900 && $pt < 2000;
+				
+				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"], $isEarning, $isCost, $isCapital);
 				$return_array[$i] = $one;
 				$this->AllEntries[$pt] = $one;
 			}

@@ -4,10 +4,16 @@
 class AppConfig {
 
 function db() {
+
+    if(1) {
+        return array("localhost","root","","bsc_kopi");
+    }
+    
     $host = $_SERVER["SERVER_NAME"];
         
     $split = explode(".",$host);
 
+    
     if($split[0] == 'localhost') {
         return array("localhost","root","","bsc_kopi");
     }
@@ -40,7 +46,7 @@ function pre() {
     return $_SESSION["prefix"];
 }
 
-const ABSOLUTE_URL_TO_SERVICES = "http://localhost/RegnskapServer/services/";
+const ABSOLUTE_URL_TO_SERVICES = "/RegnskapServer/services/";
 
 const LOG_DB_STATEMENTS = false;
 

@@ -18,6 +18,9 @@ class AccountLine {
 	public $date;
 	public $sum;
 
+	/*! Used in edit */
+	public $disableDelete;
+	
 	function AccountLine($db, $postnmb = 0, $attachment = 0, $description = 0, $day = 0, $id = 0, $occured = 0, $editedByPerson = 0) {
 		$this->db = $db;
 		$this->Postnmb = $postnmb;
@@ -80,7 +83,7 @@ class AccountLine {
     }
 
 	function read($id) {
-		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description, edited_by_person from " . AppConfig::pre() . "line where id = ?");
+		$prep = $this->db->prepare("select id, attachnmb, occured, postnmb, description, edited_by_person, (select max(id) from " . AppConfig::pre() . "line) as maxid  from " . AppConfig::pre() . "line where id = ?");
 		$prep->bind_params("i", $id);
 		$line_query = $prep->execute($prep);
 
@@ -93,7 +96,10 @@ class AccountLine {
 			$this->Postnmb = $one["postnmb"];
 			$this->Description = $one["description"];
 			$this->EditedByPerson = $one["edited_by_person"];
+		    $this->disableDelete = $one["id"] != $one["maxid"];
 		}
+
+	
 	}
 
 	function sumOneLinePosts($lineId, $debkred) {

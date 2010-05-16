@@ -111,7 +111,9 @@ class EmailContent {
     }
     
     function fillInUnsubscribeURL($body, $secret, $personId) {
-        return preg_replace("/\{unsubscribeurl\}/", AppConfig::ABSOLUTE_URL_TO_SERVICES."newsletter/unsubscribe.php?secret=".$personId.$secret, $body);
+        $protocol = $_SERVER["https"] ? "https://" : "http://"; 
+        $url = $protocol.$_SERVER["SERVER_NAME"].AppConfig::ABSOLUTE_URL_TO_SERVICES."newsletter/unsubscribe.php?secret=".$personId.$secret;
+        return preg_replace("/\{unsubscribeurl\}/", $url, $body);
     }
 }
 

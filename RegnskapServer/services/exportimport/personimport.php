@@ -9,6 +9,7 @@ include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $delimiter = array_key_exists("delimiter", $_REQUEST) ? $_REQUEST["delimiter"] : "";
+$exclude = array_key_exists("exclude", $_REQUEST) ? $_REQUEST["exclude"] : "";
 $db = new DB();
 $logger = new Logger($db);
 $regnSession = new RegnSession($db);
@@ -27,7 +28,6 @@ switch($action) {
         $i = 0;
         $headers = 0;
         foreach($lines as $one) {
-
 
             if(!$headers) {
                 $colCount = preg_match_all("/(\Q".$delimiter."\E)(?=(?:[^\"]|\"[^\"]*\")*$)/", $one, $matches);
@@ -49,9 +49,39 @@ switch($action) {
             echo "</td></tr>\n";
 
             $i++;
+            
         }
         echo "</table>\n";
          
+        break;
+    case "insert":
+        $content = file_get_contents($_FILES['uploadFormElement']['tmp_name']);
+
+        $lines = explode("\n", $content);
+
+        $excludeList = explode(",", $exclude);
+        
+        $row = 0;
+        foreach($lines as $one) {
+            $matches = array();
+            $colCount = preg_match_all("/(\Q".$delimiter."\E)(?=(?:[^\"]|\"[^\"]*\")*$)/", $one, &$matches);
+
+            if(!(array_search($row, $excludeList) === FALSE)) {
+                continue;
+            }
+            
+            $data = array();
+            
+            for($i = 0; $i < $colCount; $i++) {
+                if(!array_key_exists("col$i", $_REQUEST)) {
+                    continue;
+                }
+                $data[$_REQUEST["col$i"]] = $matches[$i];    
+            }
+            
+            $row++;
+        }
+        
         break;
 }
 

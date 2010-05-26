@@ -6,6 +6,7 @@ include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/import/personimportclass.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $delimiter = array_key_exists("delimiter", $_REQUEST) ? $_REQUEST["delimiter"] : "";
@@ -49,39 +50,18 @@ switch($action) {
             echo "</td></tr>\n";
 
             $i++;
-            
+
         }
         echo "</table>\n";
          
         break;
+    case "preview":
+        $pic = new PersonImportClass();
+        $pic->parseContents($exclude, $delimiter);
+        break;
     case "insert":
-        $content = file_get_contents($_FILES['uploadFormElement']['tmp_name']);
 
-        $lines = explode("\n", $content);
 
-        $excludeList = explode(",", $exclude);
-        
-        $row = 0;
-        foreach($lines as $one) {
-            $matches = array();
-            $colCount = preg_match_all("/(\Q".$delimiter."\E)(?=(?:[^\"]|\"[^\"]*\")*$)/", $one, &$matches);
-
-            if(!(array_search($row, $excludeList) === FALSE)) {
-                continue;
-            }
-            
-            $data = array();
-            
-            for($i = 0; $i < $colCount; $i++) {
-                if(!array_key_exists("col$i", $_REQUEST)) {
-                    continue;
-                }
-                $data[$_REQUEST["col$i"]] = $matches[$i];    
-            }
-            
-            $row++;
-        }
-        
         break;
 }
 

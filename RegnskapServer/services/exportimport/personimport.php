@@ -2,11 +2,13 @@
 
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/import/personimportclass.php");
+include_once ("../../classes/import/personimportpersisterclass.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $delimiter = array_key_exists("delimiter", $_REQUEST) ? $_REQUEST["delimiter"] : "";
@@ -60,8 +62,8 @@ switch($action) {
         $pic->parseContents($exclude, $delimiter);
         break;
     case "insert":
-
-
+        $pic = new PersonImportPersisterClass($db);
+        $pic->parseContents($exclude, $delimiter);
         break;
 }
 

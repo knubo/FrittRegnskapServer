@@ -21,21 +21,22 @@ class Installer {
         }
     }
 
+   
     function createTables($prefix) {
-        $dbschema = file_get_contents("../../conf/dbschema.sql");
+        $dbschema = Strings::file_get_contents_utf8("../../conf/dbschema.sql");
 
         $this->execute($dbschema, $prefix);
     }
 
     function createIndexes($prefix) {
-        $indexes = file_get_contents("../../conf/indexes.sql");
+        $indexes = Strings::file_get_contents_utf8("../../conf/indexes.sql");
 
         $this->execute($indexes, $prefix);
 
     }
 
     function addAccountPlan($prefix) {
-        $posts = file_get_contents("../../conf/posts.sql");
+        $posts = Strings::file_get_contents_utf8("../../conf/posts.sql");
 
         $this->execute($posts, $prefix);
 

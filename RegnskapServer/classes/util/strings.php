@@ -1,6 +1,12 @@
 <?php
 class Strings {
 
+    function file_get_contents_utf8($fn) {
+        $content = file_get_contents($fn);
+        return mb_convert_encoding($content, 'UTF-8',
+        mb_detect_encoding($content, 'UTF-8, ISO-8859-1', true));
+    }
+
     function whitelist($dirty_data) {
 
         $dirty_array = str_split($dirty_data);

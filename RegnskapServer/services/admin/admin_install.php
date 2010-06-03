@@ -3,6 +3,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/reporting/emailer.php");

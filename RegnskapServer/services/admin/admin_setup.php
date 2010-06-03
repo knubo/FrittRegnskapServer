@@ -3,6 +3,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/User.php");
 
@@ -20,7 +21,7 @@ $installer = new Installer($db);
 $dbprefix = "master";
 
 /* Careful with this one, double security both commented out and not set to run. */
-if(1) {$installer->dropTables($dbprefix); }
+//if(0) {$installer->dropTables($dbprefix); }
 
 if(!$db->table_exists("master_person")) {
     $installer->createTables($dbprefix);

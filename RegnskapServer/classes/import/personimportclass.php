@@ -52,7 +52,7 @@ class PersonImportClass {
     }
 
     function parseContents($exclude, $delimiter) {
-        $content = file_get_contents($_FILES['uploadFormElement']['tmp_name']);
+        $content = Strings::file_get_contents_utf8($_FILES['uploadFormElement']['tmp_name']);
 
         $lines = explode("\n", $content);
 

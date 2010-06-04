@@ -28,7 +28,8 @@ create table if not exists XXX_user(
   person INT(11) unsigned,
   readonly tinyint,
   reducedwrite tinyint,
-  project_required tinyint
+  project_required tinyint,
+  lastlogin TIMESTAMP
 );
 
 CREATE TABLE IF NOT exists XXX_grouping_head (

@@ -20,7 +20,7 @@ switch ($action) {
             die("Must supply user and password.");
         }
 
-        $db = new DB();
+        $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);
         $masterRecord = $master->get_master_record();
         
@@ -31,9 +31,10 @@ switch ($action) {
 				echo json_encode($arr);
             break;
         }
-        $sess = new RegnSession($db, $masterRecord["dbprefix"]);
+        $dbu = new DB();
+        $sess = new RegnSession($dbu, $masterRecord["dbprefix"]);
         
-        $auth = new User($db);
+        $auth = new User($dbu);
 
         if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == User :: AUTH_OK) {
             session_start();
@@ -60,7 +61,7 @@ switch ($action) {
         echo json_encode($arr);
         break;
     case "installations":
-        $db = new DB();
+        $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);
         echo json_encode($master->getAllInstallations());
         break;

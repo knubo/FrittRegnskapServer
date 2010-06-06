@@ -8,7 +8,7 @@ include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/reporting/emailer.php");
 
-$db = new DB();
+$db = new DB(DB::MASTER_DB);
 $installer = new Installer($db);
 
 $secret = array_key_exists("secret", $_REQUEST) ? trim($_REQUEST["secret"]) : "";
@@ -40,6 +40,11 @@ if(!$dbprefix) {
     die("Failed to calculate DB-prefix");
 }
 
+/* The installer should from this point on work on the database hashed by the host name. */
+$dbUser = new DB();
+$installer = new Installer($dbUser);
+
+
 $installer->createTables($dbprefix);
 $installer->createIndexes($dbprefix);
 $installer->addAccountPlan($dbprefix);
@@ -56,13 +61,13 @@ try {
     $prep->bind_params("sssssss", "Klubb:$clubname", $contact, $email, $address, $zipcode, $city, $phone);
     $prep->execute();
 
-    $prep = $db->prepare("insert into ".$dbprefix."_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
+    $prep = $dbUser->prepare("insert into ".$dbprefix."_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
     $prep->bind_params("sssssss", "Superbruker", $contact, $email, $address, $zipcode, $city, $phone);
     $prep->execute();
 
     $user = new User(0);
     $crypted = crypt($password, $user->makesalt());
-    $prep = $db->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required) values (?,?,1,0,0,0)");
+    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required) values (?,?,1,0,0,0)");
     $prep->bind_params("ss", $superuser, $crypted);
     $prep->execute();
 

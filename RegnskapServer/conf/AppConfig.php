@@ -3,86 +3,97 @@
 
 class AppConfig {
 
-function db() {
+    function db($dbselect = 0) {
 
-    if(1) {
-        return array("localhost","root","","bsc_kopi");
-    }
-    
-    $host = $_SERVER["SERVER_NAME"];
-        
-    $split = explode(".",$host);
+        if(1) {
+            return array("localhost","root","","bsc_kopi");
+        }
 
-    
-    if($split[0] == 'localhost') {
-        return array("localhost","root","","bsc_kopi");
-    }
-    if($split[0] == 'bsc') {
+        $host = $_SERVER["SERVER_NAME"];
+
+        $split = explode(".",$host);
+
+
+        if($split[0] == 'localhost') {
+            return array("localhost","root","","bsc_kopi");
+        }
+        if($split[0] == 'bsc') {
+            return array("","","","");
+        }
+
         return array("","","","");
-    } 
-    
-    return array("","","","");
-    
-}
-    
-const DB_HOST_NAME="localhost";
-const DB_USER="root";
-const DB_PASSWORD="";
-const DB_NAME="bsc_kopi";
 
-#Set to 1 if you want authentication.
-const USE_AUTHENTICATION=1;
+    }
 
-const USE_QUOTA=1;
 
-const TIMEZONE="Europe/Oslo";
+    function hash($string) {
+        $len = count($string);
 
-#Set to 1 if you want to validate email using checkdnsrr - some systems might not support it.
-const VALIDATE_EMAIL_USING_CHECKDNSRR=0;
+        for ($i = 0; $i < $len; $i++) {
+            $h = 31*$h + ord(mb_substr($string, $i, 1));
+        }
+        return $h;
 
-const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
+    }
 
-function pre() {
-    return $_SESSION["prefix"];
-}
+    const DB_HOST_NAME="localhost";
+    const DB_USER="root";
+    const DB_PASSWORD="";
+    const DB_NAME="bsc_kopi";
 
-const ABSOLUTE_URL_TO_SERVICES = "/RegnskapServer/services/";
+    #Set to 1 if you want authentication.
+    const USE_AUTHENTICATION=1;
 
-const LOG_DB_STATEMENTS = false;
+    const USE_QUOTA=1;
 
-#Values for count. Must match CountCoulumns.
-function CountValues() {
-	return array(1000,500,200,100,50,20,10,5,1,0.5);
-}
+    const TIMEZONE="Europe/Oslo";
 
-#Columns in database for count
-function CountColumns() {
-  return array('a1000','a500','a200','a100','a50','a20','a10','a5','a1','a_5');
-}
+    #Set to 1 if you want to validate email using checkdnsrr - some systems might not support it.
+    const VALIDATE_EMAIL_USING_CHECKDNSRR=0;
 
-#Fordring posts
-function FordringPosts() {
-	return array(1370,1380,1390,1500,1570);
-}
-#Posts that are to be transfered to next month.
-function EndPosts() {
-	return array(1904,1905,1906, 1920,1921);
-}
+    const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 
-#Posts available in select when registering a membership.
-function RegisterMembershipPosts() {
-	return array(1920,1905, 2910, 2990);
-}
+    function pre() {
+        return $_SESSION["prefix"];
+    }
 
-#Fond - club account post
-const ClubAccountPost=1920;
-#
-const BBC_FondDebetPost=7795;
-#
-const BBC_FondKreditPost=3995;
-#
-const TSO_FondKreditPost=3397;
-#
+    const ABSOLUTE_URL_TO_SERVICES = "/RegnskapServer/services/";
+
+    const LOG_DB_STATEMENTS = false;
+
+    #Values for count. Must match CountCoulumns.
+    function CountValues() {
+        return array(1000,500,200,100,50,20,10,5,1,0.5);
+    }
+
+    #Columns in database for count
+    function CountColumns() {
+        return array('a1000','a500','a200','a100','a50','a20','a10','a5','a1','a_5');
+    }
+
+    #Fordring posts
+    function FordringPosts() {
+        return array(1370,1380,1390,1500,1570);
+    }
+    #Posts that are to be transfered to next month.
+    function EndPosts() {
+        return array(1904,1905,1906, 1920,1921);
+    }
+
+    #Posts available in select when registering a membership.
+    function RegisterMembershipPosts() {
+        return array(1920,1905, 2910, 2990);
+    }
+
+    #Fond - club account post
+    const ClubAccountPost=1920;
+    #
+    const BBC_FondDebetPost=7795;
+    #
+    const BBC_FondKreditPost=3995;
+    #
+    const TSO_FondKreditPost=3397;
+    #
 }
 
 /* Disable magic quotes */

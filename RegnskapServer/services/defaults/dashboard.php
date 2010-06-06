@@ -14,13 +14,7 @@ $db = new DB();
 $regnSession = new RegnSession($db);
 $user = $regnSession->auth();
 
-
 $pre = AppConfig::pre();
-
-$prep = $db->prepare("update ".$pre."user set lastlogin=now() where username = ?");
-$prep->bind_params("s", $user);
-$prep->execute();
-
 
 $date = new eZDate();
 $year = $date->year();
@@ -36,8 +30,8 @@ $fields .= ", SM.value as active_month";
 $prePart .= ", ".$pre."standard SM";
 $wherePart .= " and SM.id = '".AccountStandard::CONST_MONTH."'";
 
-// Person name
-$fields .= ", P.firstname as firstname, P.lastname as lastname";
+// Person name and last login
+$fields .= ", P.firstname as firstname, P.lastname as lastname, U.lastlogin as lastlogin";
 $prePart .= ", ".$pre."user U, ".$pre."person P ";
 $wherePart .= " and U.username = ? and U.person = P.id";
 
@@ -61,13 +55,29 @@ $leftJoinPart .= " left join ".$pre."youth_price cy ON (cy.semester = (S.semeste
 $fields .= ", ca.amount as next_year_price, ca.amountyouth as next_year_youth_price";
 $leftJoinPart .= " left join ".$pre."year_price ca ON (ca.year = ($year + 1))";
 
+//Current semester course price
+$fields .= ", cpc.amount as current_semester_course_price";
+$leftJoinPart .= " left join ".$pre."course_price cpc ON (cpc.semester = S.semester)";
+
+//Current semester train price
+$fields .= ", ctc.amount as current_semester_train_price";
+$leftJoinPart .= " left join ".$pre."train_price ctc ON (ctc.semester = S.semester)";
+
+//Current semester youth price
+$fields .= ", cyc.amount as current_semester_youth_price";
+$leftJoinPart .= " left join ".$pre."youth_price cyc ON (cyc.semester = S.semester)";
+
+//Current year prices
+$fields .= ", cac.amount as current_year_price, cac.amountyouth as next_year_youth_price";
+$leftJoinPart .= " left join ".$pre."year_price cac ON (cac.year = $year)";
+
 //Last registered post
 $fields .= ", RL.occured as last_when, RL.description as last_desc";
-$prePart .= ", ".$pre."line RL";
-$wherePart .= " and RL.id = (select max(id) from ".$pre."line)"; 
+$leftJoinPart .= "left join ".$pre."line RL ON (RL.id = (select max(id) from ".$pre."line))";
 
 //Last registered by
 $fields .=", (select concat(firstname, ' ', lastname) from ".$pre."person LP where LP.id = RL.edited_by_person) as last_by";
+
 
 $query .= "select $fields from ($prePart) $leftJoinPart where $wherePart";
 
@@ -88,10 +98,23 @@ $accountstatus = $prep->execute();
 
 $arr = array();
 $arr["serverversion"] = Version::SERVER_VERSION;
-$arr["info"] = $info;
+$arr["info"] = array_shift($info);
 $arr["accountstatus"] = $accountstatus;
 //$arr["query"] = $query;
 
 echo json_encode($arr);
+
+
+$prep = $db->prepare("update ".$pre."user set lastlogin=now() where username = ?");
+$prep->bind_params("s", $user);
+$prep->execute();
+
+$a = array("hei","master","beta","bsc", "klubben", "fineklubben","kkkk");
+
+foreach($a as $one) {
+    echo "<br>Hash: $one ".DB::dbhash($one);
+}
+
+
 
 ?>

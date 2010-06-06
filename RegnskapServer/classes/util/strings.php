@@ -30,5 +30,6 @@ class Strings {
 
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
+
 }
 ?>

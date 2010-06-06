@@ -7,6 +7,8 @@
  */
 class DB {
 
+    const MASTER_DB = 1;
+    
     private $link;
 
     function link() {
@@ -27,11 +29,30 @@ class DB {
         }
     }
 
-    function __construct($keeplatin1 = 0) {
-        error_reporting(0); 
+
+    function dbhash($string) {
+        if($string == "master" || $string == "beta") {
+            return 1;
+        }
         
-        $dbinfo = AppConfig::db();
-        
+        $len = count($string);
+        for ($i = 0; $i < $len; $i++) {
+            $h = 31 * $h + ord(mb_substr($string, $i, 1));
+            $h = $h & $h;
+        }
+        return ($h % 2) + 1;
+    }
+
+    /**
+     * 
+     * @param $keeplatin1 If the database strings should be saved as latin-1 strings.
+     * @param $dbselect Selects which database shoudl be used. 1 is the location of the master database. 
+     */
+    function __construct($keeplatin1 = 0, $dbselect = 0) {
+        error_reporting(0);
+
+        $dbinfo = AppConfig::db($dbselect);
+
         $this->link = mysqli_connect($dbinfo[0], $dbinfo[1], $dbinfo[2], $dbinfo[3]);
 
         if (mysqli_connect_errno()) {
@@ -42,8 +63,8 @@ class DB {
         if(!$keeplatin1) {
             mysqli_query($this->link, "SET NAMES 'utf8'");
         }
-        error_reporting(E_ALL  & ~E_NOTICE); 
-        
+        error_reporting(E_ALL  & ~E_NOTICE);
+
     }
 
     function insert_id() {
@@ -75,7 +96,7 @@ class DB {
             return $one["c"];
         }
     }
-    
+
     function report_error() {
         $error = $this->link->error;
         header("HTTP/1.0 512 DB error");
@@ -98,7 +119,7 @@ class DB {
                 $mysqliLog->execute();
             }
         }
-        
+
         $mysqli = mysqli_prepare($this->link, $query);
 
         if (!$mysqli) {

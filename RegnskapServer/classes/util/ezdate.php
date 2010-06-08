@@ -480,12 +480,14 @@ class eZDate
     {
         $ret = false;
 
-        if ( get_class( $date ) == "ezdate" )
+        if ( get_class( $date ) == "eZDate" )
         {
-            if ( $date->year() < $this->Year )
+            if ( $date->year() < $this->Year ) {
                 $ret = false;
-            else if ( $date->year() > $this->Year )
+            }
+            else if ( $date->year() > $this->Year ) {
                 $ret = true;
+            }
             else
             {
                 if ( $date->month() < $this->Month )

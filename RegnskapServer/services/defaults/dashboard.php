@@ -16,8 +16,6 @@ $user = $regnSession->auth();
 
 $pre = AppConfig::pre();
 
-$date = new eZDate();
-$year = $date->year();
 
 $leftJoinPart = "";
 // Semester
@@ -51,9 +49,15 @@ $leftJoinPart .= " left join ".$pre."train_price ct ON (ct.semester = (S.semeste
 $fields .= ", cy.amount as next_semester_youth_price";
 $leftJoinPart .= " left join ".$pre."youth_price cy ON (cy.semester = (S.semester + 1))";
 
+// Current YEAR for accounting
+$fields .= ", YEAR.value as year";
+$prePart .= ", ".$pre."standard YEAR";
+$wherePart .=" and YEAR.id = '".AccountStandard::CONST_YEAR."'";
+
+
 //Next year prices
 $fields .= ", ca.amount as next_year_price, ca.amountyouth as next_year_youth_price";
-$leftJoinPart .= " left join ".$pre."year_price ca ON (ca.year = ($year + 1))";
+$leftJoinPart .= " left join ".$pre."year_price ca ON (ca.year = (YEAR.value + 1))";
 
 //Current semester course price
 $fields .= ", cpc.amount as current_semester_course_price";
@@ -69,7 +73,7 @@ $leftJoinPart .= " left join ".$pre."youth_price cyc ON (cyc.semester = S.semest
 
 //Current year prices
 $fields .= ", cac.amount as current_year_price, cac.amountyouth as next_year_youth_price";
-$leftJoinPart .= " left join ".$pre."year_price cac ON (cac.year = $year)";
+$leftJoinPart .= " left join ".$pre."year_price cac ON (cac.year = YEAR.value)";
 
 //Last registered post
 $fields .= ", RL.occured as last_when, RL.description as last_desc";
@@ -100,20 +104,40 @@ $arr = array();
 $arr["serverversion"] = Version::SERVER_VERSION;
 $arr["info"] = array_shift($info);
 $arr["accountstatus"] = $accountstatus;
-//$arr["query"] = $query;
+
+$now = new eZDate();
+
+
+if($arr["info"]["last_when"]) {
+    $lastAdd = new eZDate();
+    $lastAdd->setMySQLDate($arr["info"]["last_when"]);
+
+    $lastAdd->move(0, 2, 0);
+
+    if($lastAdd->isGreater($now)) {
+        $arr["info"]["long_size_last_warning"] = 1;
+    }
+    $lastAdd->move(0, 2, 0);
+
+    if($lastAdd->isGreater($now)) {
+        $arr["info"]["long_size_last_error"] = 1;
+    }
+}
+
+if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
+    $arr["info"]["mabye_change_semester"] = 1;    
+}
+
 
 echo json_encode($arr);
 
 
-$prep = $db->prepare("update ".$pre."user set lastlogin=now() where username = ?");
-$prep->bind_params("s", $user);
-$prep->execute();
-
-$a = array("hei","master","beta","bsc", "klubben", "fineklubben","kkkk");
-
-foreach($a as $one) {
-    echo "<br>Hash: $one ".DB::dbhash($one);
+if(intval(substr($arr["info"]["lastlogin"], 8,2)) != $now->day()) {
+    $prep = $db->prepare("update ".$pre."user set lastlogin=now() where username = ?");
+    $prep->bind_params("s", $user);
+    $prep->execute();
 }
+
 
 
 

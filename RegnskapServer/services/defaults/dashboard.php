@@ -83,7 +83,7 @@ $leftJoinPart .= "left join ".$pre."line RL ON (RL.id = (select max(id) from ".$
 $fields .=", (select concat(firstname, ' ', lastname) from ".$pre."person LP where LP.id = RL.edited_by_person) as last_by";
 
 
-$query .= "select $fields from ($prePart) $leftJoinPart where $wherePart";
+$query .= "select $fields from ($prePart) $leftJoinPart where $wherePart group by SM.value";
 
 $prep = $db->prepare($query);
 $prep->bind_params("s", $user);

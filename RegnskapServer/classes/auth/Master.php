@@ -16,7 +16,7 @@
     function get_master_record() {
         /* Do not understand this bug, why is this needed?... */
         if(!$this->db) {
-            $this->db = new DB();
+            $this->db = new DB(0, DB::MASTER_DB);
         }
         $prep = $this->db->prepare("select * from installations where hostprefix = ?");
 

@@ -140,5 +140,4 @@ if(intval(substr($arr["info"]["lastlogin"], 8,2)) != $now->day()) {
 
 
 
-
 ?>

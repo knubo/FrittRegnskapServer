@@ -8,7 +8,7 @@ include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/reporting/emailer.php");
 
-$db = new DB(DB::MASTER_DB);
+$db = new DB(0, DB::MASTER_DB);
 $installer = new Installer($db);
 
 $secret = array_key_exists("secret", $_REQUEST) ? trim($_REQUEST["secret"]) : "";
@@ -52,7 +52,8 @@ $installer->addStandardData($dbprefix);
 
 try {
     $db->begin();
-
+    $dbUser->begin();
+    
     $prep = $db->prepare("insert into installations (wikilogin, diskquota, description, hostprefix, dbprefix) values (?,?,?,?,?)");
     $prep->bind_params("sisss", $wikilogin, 5, $clubname, $domainname, $dbprefix."_");
     $prep->execute();
@@ -77,10 +78,12 @@ try {
     $prep->bind_params("ss", $secret, $wikilogin);
     $prep->execute();
 
+    $dbUser->commit();
     $db->commit();
 } catch(Exception $e) {
     $db->rollback();
-
+    $dbUser->rollback();
+    
     $prep = $db->prepare("delete from to_install where secret = ? and wikilogin = ?");
     $prep->bind_params("ss", $secret, $wikilogin);
     $prep->execute();

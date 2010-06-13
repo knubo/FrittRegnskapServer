@@ -95,7 +95,8 @@ class RegnSession {
 
 		
 		if(!$prefix) {
-		    $master = new Master($db);
+		    $masterDB = new DB(0, DB::MASTER_DB);
+		    $master = new Master($masterDB);
 		    $masterRecord = $master->get_master_record();
 		    $prefix = $masterRecord["dbprefix"];
 		}

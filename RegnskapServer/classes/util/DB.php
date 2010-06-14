@@ -49,6 +49,12 @@ class DB {
      * @param $dbselect Selects which database shoudl be used. 1 is the location of the master database. 
      */
     function __construct($keeplatin1 = 0, $dbselect = 0) {
+        if(file_exists("../../conf/closed")) {
+            header("HTTP/1.0 516 Site Closed");
+            die(file_get_contents("../../conf/closed"));
+            
+        }
+        
         error_reporting(0);
 
         $dbinfo = AppConfig::db($dbselect);

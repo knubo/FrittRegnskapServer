@@ -93,7 +93,6 @@ class RegnSession {
 	function RegnSession($db, $prefix = 0) {
 		$this->db = $db;
 
-		
 		if(!$prefix) {
 		    $masterDB = new DB(0, DB::MASTER_DB);
 		    $master = new Master($masterDB);

@@ -5,7 +5,9 @@ create table if not exists installations (
     hostprefix varchar(40) not null unique,
     description varchar(80) not null,
     diskquota INTEGER(9),
-	wikilogin varchar(40) not null
+	wikilogin varchar(40) not null,
+    secret varchar(40),
+    beta tinyint
 );
 
 create table if not exists to_install (

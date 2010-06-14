@@ -31,5 +31,14 @@ class Strings {
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
+    function createSecret() {
+        $secret = "";
+        for ($i=0; $i<40; $i++) {
+            $secret.= chr(mt_rand(97, 122));
+        }
+
+        return $secret;
+    }
+
 }
 ?>

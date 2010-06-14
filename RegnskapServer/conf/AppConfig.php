@@ -25,17 +25,6 @@ class AppConfig {
 
     }
 
-
-    function hash($string) {
-        $len = count($string);
-
-        for ($i = 0; $i < $len; $i++) {
-            $h = 31*$h + ord(mb_substr($string, $i, 1));
-        }
-        return $h;
-
-    }
-
     const DB_HOST_NAME="localhost";
     const DB_USER="root";
     const DB_PASSWORD="";

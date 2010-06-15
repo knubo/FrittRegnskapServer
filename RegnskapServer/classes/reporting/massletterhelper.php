@@ -24,8 +24,9 @@ class MassLetterHelper {
     private $date;
     private $tableopts;
     private $tablerows;
+    private $prefix;
 
-    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate) {
+    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix) {
         $this->db = $db;
         $this->year = $year;
         $this->date = new eZDate();
@@ -33,20 +34,23 @@ class MassLetterHelper {
         $this->courseprice = $courseprice;
         $this->trainprice = $trainprice;
         $this->dueDate = $dueDate;
+        $this->prefix = $prefix;
     }
 
     function readTemplate($filename) {
         $filename = Strings::whitelist($filename);
-        if(!file_exists("templates/$filename")) {
+        $prefix = $this->prefix;
+        if(!file_exists("templates/$prefix/$filename")) {
             return "";
         }
-        return utf8_encode(file_get_contents("templates/$filename"));
+        return utf8_encode(file_get_contents("templates/$prefix/$filename"));
     }
     
     function saveTemplate($template, $data) {
         $template = Strings::whitelist($template);
+        $prefix = $this->prefix;
 
-        file_put_contents("templates/$template", utf8_decode($data));
+        file_put_contents("templates/$prefix/$template", utf8_decode($data));
 
         return "1";
 
@@ -55,10 +59,15 @@ class MassLetterHelper {
 
     function listTemplates() {
         $filenames = array();
-        $d = dir("templates/");
+        $prefix = $this->prefix;
+        
+        if(!file_exists("templates/$prefix")) {
+            mkdir("templates/$prefix");
+        }
+        $d = dir("templates/$prefix/");
 
         while (false !== ($entry = $d->read())) {
-            if(substr_compare($entry,".",0,1) != 0 && $entry != "images") {
+            if(substr_compare($entry,".",0,1) != 0 ) {
                 $filenames[] = $entry;
             }
         }
@@ -255,7 +264,8 @@ class MassLetterHelper {
         $width = $opts["width"];
         $resize = '';
         $just= $opts["just"];
-        $img = $opts["file"];
+        $prefix = $this->prefix;
+        $img = "../../storage/$prefix/".Strings::whitelist($opts["file"]);
         $pad = $opts["padding"];
         $this->pdf->ezImage($img, $pad, $width, $resize, $just,0);
     }
@@ -285,7 +295,9 @@ class MassLetterHelper {
         $this->fonts = array ();
         $this->wrapopts = array ();
 
-        $lines = file("templates/$template");
+        $prefix = $this->prefix;
+        
+        $lines = file("templates/$prefix/$template");
 
         if(!$lines) {
             die("Failed to open $template");

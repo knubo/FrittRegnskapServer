@@ -45,11 +45,11 @@ fontsize=10
 
 #Big image to the top right
 ezSetY=860
-image=file:templates/images/logo_farger_medium.png,padding:85,width:200,just:right
+image=file:logo_farger_medium.png,padding:85,width:200,just:right
 
 #small image to the right to hit membership card
 ezSetY=528
-image=file:templates/images/logo_farger_medium.png,padding:80,width:80,just:right
+image=file:logo_farger_medium.png,padding:80,width:80,just:right
 
 
 ezSetY=485

@@ -25,6 +25,8 @@ $db = new DB(1);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
+$prefix = $regnSession->getPrefix();
+
 $standard = new AccountStandard($db);
 
 if (!$year) {
@@ -42,7 +44,7 @@ $dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 error_reporting(E_ALL);
 set_time_limit(1800);
 
-$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate);
+$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix);
 switch ($action) {
 	case "pdf" :
 		$massLetterHelper->useTemplate($template);

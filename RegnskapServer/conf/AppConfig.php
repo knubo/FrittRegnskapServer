@@ -74,6 +74,8 @@ class AppConfig {
         return array(1920,1905, 2910, 2990);
     }
 
+    const RELATIVE_PATH_MAIN_SERVICES = "../../../RegnskapServer";
+    
     #Fond - club account post
     const ClubAccountPost=1920;
     #

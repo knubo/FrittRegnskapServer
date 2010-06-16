@@ -5,6 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
+include_once ("../../classes/util/system.php");
 include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
@@ -52,6 +53,16 @@ switch($action) {
         break;
     case "save":
         echo json_encode(array());
+        break;
+    case "distribute":
+        echo "<pre>";
+        echo "Distributing";
+        if(!file_exists("../../../../../kopierFraBeta.sh")) {
+            die("Script not found");
+        }
+        system("../../../../../kopierFraBeta.sh");
+        echo "</pre>";
+        echo "<p id=\"focus\"><strong>Complete</strong></p>";
         break;
 }
 

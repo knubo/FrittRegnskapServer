@@ -1,0 +1,88 @@
+<?php
+
+class SQLS {
+    private $db;
+
+    function SQLS($db) {
+        $this->db = $db;
+    }
+
+    function getAll() {
+        $prep = $this->db->prepare("select * from sqllist");
+        return $prep->execute();
+    }
+    
+    function getOneSQL($id) {
+        $prep = $this->db->prepare("select * from sqllist where id = ?");
+        $prep->bind_params("i", $id);
+        return array_shift($prep->execute());
+
+    }
+
+    function addSQL($sql) {
+        $this->db->begin();
+        $prep = $this->db->prepare("insert into sqllist (sqltorun, added, verified, secret, runinbeta, runinother) values (?, now(), 0, ?, 0, 0)");
+
+        $secret = Strings::createSecret();
+
+        $prep->bind_params("ss", $sql, $secret);
+        $prep->execute();
+
+        $id = $this->db->insert_id();
+
+
+        $this->db->commit();
+
+        $subject = "New SQL for Fritt Regnskap ";
+        $body="A new SQL has been queued for verification:\n$sql\nConfirm by using link: ".
+                "http://master.frittregnskap.no/RegnskapServer/services/admin/admin_sql.php?action=verify&id=$id&secret=$secret";
+
+        $emailer = new Emailer();
+        $emailer->sendEmail($subject, "admin@frittregnskap.no",$body,"admin@frittregnskap.no", null);
+    }
+
+    function updateSecret($id) {
+        $secret = Strings::createSecret();
+
+        $prep = $this->db->prepare("update sqllist set secret = ? where id = ?");
+        $prep->bind_params("si", $secret, $id);
+        $prep->execute();
+
+        return $secret;
+    }
+
+    function confirmVerify($id, $secret) {
+        $data = $this->getOneSQL($id);
+
+        if($data["secret"] != $secret) {
+            die("Secret mismatch!");
+        }
+
+        $prep = $this->db->prepare("update sqllist set verified = 1 where id = ?");
+        $prep->bind_params("i", $id);
+        $prep->execute();
+        echo "Verified!";
+    }
+
+
+    function verifyForm($id, $secret) {
+        $data = $this->getOneSQL($id);
+
+        if($data["secret"] != $secret) {
+            die("Secret mismatch!");
+        }
+
+        $newSecret = $this->updateSecret($id);
+
+        echo "<html><body><form action=\"admin_sql.php\">".
+            "Verify SQL id:$id, sql=".$data["sqltorun"]."?<br/>".
+            "<input type=\"hidden\" name=\"action\" value=\"confirmVerify\"/>".
+            "<input type=\"hidden\" name=\"secret\" value=\"$newSecret\"/>".
+            "<input type=\"hidden\" name=\"id\" value=\"$id\"/>".
+            "<input type=\"submit\" value=\"Verify SQL\"/>".
+            "</form></body></html>";
+    }
+
+}
+
+?>

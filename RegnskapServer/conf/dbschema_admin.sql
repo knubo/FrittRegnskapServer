@@ -7,7 +7,8 @@ create table if not exists installations (
     diskquota INTEGER(9),
 	wikilogin varchar(40) not null,
     secret varchar(40),
-    beta tinyint
+    beta tinyint,
+    INTEGER(6) unsigned sqlIdToRun
 );
 
 create table if not exists sqllist (
@@ -19,7 +20,7 @@ create table if not exists sqllist (
     runinbeta tinyint,
 	runbetawhen timestamp,
 	runinother tinyint,
-	runotherwhen timestamp
+	runotherwhen timestamp,
 );
 
 create table if not exists to_install (

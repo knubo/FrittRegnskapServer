@@ -31,6 +31,20 @@ switch($action) {
         $sqls->addSQL($sql);
         echo json_encode(array());
         break;
+    case "get":
+        
+        $data = array();
+        $data["sql"] = $sqls->getOneSQL($id);
+        
+        $master = new Master($db);
+        $installs = $master->getAllInstallations(" order by beta desc, hostprefix");
+        foreach($installs as &$one) {
+            $dbinfo = AppConfig::db(DB::dbhash($one["hostprefix"]));
+            $one["db"] = $dbinfo[3];
+        }
+        $data["installs"] = $installs;        
+        echo json_encode($data);
+        break;
     case "verify":
         $sqls->verifyForm($id, $secret);
         break;
@@ -40,6 +54,9 @@ switch($action) {
     case "list":
         echo json_encode($sqls->getAll());
         break;
+    case "list_installs":
+        break;
+        
     default:
         die("Did not get leagal action $action");
         

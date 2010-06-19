@@ -12,8 +12,8 @@
         return array_shift($prep->execute());
     }
 
-    function getAllInstallations() {
-        $prep = $this->db->prepare("select * from installations");
+    function getAllInstallations($sort = "") {
+        $prep = $this->db->prepare("select * from installations $sort");
 
         return $prep->execute();
     }

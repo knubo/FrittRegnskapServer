@@ -11,12 +11,30 @@ class SQLS {
         $prep = $this->db->prepare("select * from sqllist");
         return $prep->execute();
     }
-    
+
     function getOneSQL($id) {
         $prep = $this->db->prepare("select * from sqllist where id = ?");
         $prep->bind_params("i", $id);
         return array_shift($prep->execute());
 
+    }
+
+    function betaComplete($id) {
+        $prep = $this->db->prepare("update sqllist set runinbeta = 1 where id = ?");
+        $prep->bind_params("i", $id);
+        $prep->execute();
+    }
+
+    function otherComplete($id) {
+        $prep = $this->db->prepare("update sqllist set runinother = 1 where id = ?");
+        $prep->bind_params("i", $id);
+        $prep->execute();
+    }
+
+    function delete($id) {
+        $prep = $this->db->prepare("delete from sqllist where id = ?");
+        $prep->bind_params("i", $id);
+        $prep->execute();
     }
 
     function addSQL($sql) {
@@ -83,6 +101,32 @@ class SQLS {
             "</form></body></html>";
     }
 
+    function run($id, $install) {
+        $sql = $this->getOneSQL($id);
+        if(!$sql["verified"]) {
+            header("HTTP/1.0 515 DB error");
+            die("The given sql id is not verified!");
+        }
+
+        $dbprefix = $install["dbprefix"];
+        $hostprefix = $install["hostprefix"];
+
+        $targetDB = new DB(0, DB::dbhash($hostprefix));
+
+        $replaced_sql = preg_replace("/XXX\_?/", $dbprefix, $sql["sqltorun"]);
+
+        $prep = $targetDB->prepare($replaced_sql);
+
+        $res = array();
+        $res["data"] = $prep->execute();
+        $res["rows"] = $targetDB->affected_rows();
+
+        $iPrep = $this->db->prepare("update installations set sqlIdToRun = null where id = ?");
+        $iPrep->bind_params("i", $install["id"]);
+        $iPrep->execute();
+
+        return $res;
+    }
 }
 
 ?>

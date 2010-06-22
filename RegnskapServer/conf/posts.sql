@@ -649,6 +649,10 @@ insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 
      (3926, 3, 390, 'Treningsavgift (trening)');
 
+     insert into XXX_post_type
+     (post_type, coll_post, detail_post, description) values 
+     (3927, 3, 390, 'Treningsavgift (ungdom)');
+
 
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 
@@ -1052,6 +1056,10 @@ insert into XXX_post_type
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 
      (8800, 9, null, 'Årsresultat');
+
+insert into XXX_post_type
+     (post_type, coll_post, detail_post, description) values 
+     (8800, 9, null, 'Overføringer');
 
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 

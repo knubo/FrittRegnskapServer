@@ -116,8 +116,8 @@ class Installer {
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_POST','9000')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_YEAR_POST','8800')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('FORDRINGER_POSTS','1370,1380,1390,1570')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('REGI_MEMB_POSTS','1920,1905')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_TRPOSTS','1904,1905,1906,1921')");
+        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('REGI_MEMB_POSTS','1920,1900')");
+        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_TRPOSTS','1900,1920')");
 
     }
 

@@ -126,7 +126,7 @@ class AccountPostType {
 				$pt = $group_array[$i]["post_type"];
 
 				$isEarning = (($pt >= 3000 && $pt < 4000) || $pt == 8400 || $pt ==8040); 
-				$isCost = $pt > 4000 && $pt <= 8500 && $pt <> 8040; 
+				$isCost = $pt > 4000 && $pt <= 8500 && $pt <> 8040 && $pt <> 8400; 
 				$isCapital = $pt >= 1900 && $pt < 2000;
 				
 				$one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"], $isEarning, $isCost, $isCapital);

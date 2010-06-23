@@ -20,7 +20,6 @@ class ExportAccounts {
         ->setLastModifiedBy("Fritt Regnskap")
         ->setTitle("Regnskap for $year")
         ->setSubject("Regnskap for $year")
-        ->setDescription("Regnskap for $year, komplett med alle posteringer.")
         ->setKeywords("regnskap $year")
         ->setCategory("regnskap");
 
@@ -29,6 +28,8 @@ class ExportAccounts {
 
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $objPHPExcel->setActiveSheetIndex(0);
+        
+        $objPHPExcel->getProperties()->setDescription("Regnskap for $year, komplett med alle posteringer. Minne benyttet:".(memory_get_peak_usage(true) / 1024 / 1024) . " MB)");
     }
 
     function addRowColors($maxrow, $maxcol) {
@@ -40,8 +41,8 @@ class ExportAccounts {
         $sharedStyle1 = new PHPExcel_Style();
         $sharedStyle2 = new PHPExcel_Style();
 
-        $sharedStyle1->applyFromArray(array('fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
-        $sharedStyle2->applyFromArray(array('fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
+        $sharedStyle1->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
+        $sharedStyle2->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
 
 
         for($row = $maxrow; $row >= 3; $row--) {
@@ -95,6 +96,7 @@ class ExportAccounts {
         $sheet->setCellValueByColumnAndRow($colToUse, 1, $data["post_type"]."\n".$data["accountdesc"]);
         $sheet->mergeCellsByColumnAndRow($colToUse, 1, $colToUse+1, 1);
         $style = $sheet->getStyleByColumnAndRow($colToUse, 1);
+        $style->getFont()->setSize(8);
         $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('CDCDCD');
 
 

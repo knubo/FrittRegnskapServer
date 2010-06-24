@@ -28,8 +28,29 @@ class ExportAccounts {
 
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $objPHPExcel->setActiveSheetIndex(0);
-        
+
         $objPHPExcel->getProperties()->setDescription("Regnskap for $year, komplett med alle posteringer. Minne benyttet:".(memory_get_peak_usage(true) / 1024 / 1024) . " MB)");
+    }
+
+    function addSumRow($lastrow, $maxcol) {
+        $sheet = $this->objPHPExcel->getActiveSheet();
+
+        for($col = 3; $col < $maxcol; $col++) {
+            $lettercol = PHPExcel_Cell::stringFromColumnIndex($col);
+
+            $sheet->setCellValueByColumnAndRow($col, $lastrow+1, '=SUM('.$lettercol.'3:'.$lettercol.$lastrow.')');
+        }
+
+        $colInLetters = PHPExcel_Cell::stringFromColumnIndex($maxcol);
+
+        $sheet->setCellValueByColumnAndRow(2, $lastrow+1, "SUM");
+        
+        $sumstyle = new PHPExcel_Style();
+        $sumstyle->applyFromArray( array('numberformat' => array('code' => '#,##0.00_-') , 
+                                         'borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN), 'bottom' => array('style' => PHPExcel_Style_Border::BORDER_DOUBLE) )
+                                 ));
+        $sheet->setSharedStyle($sumstyle, "A".($lastrow+1).":".$colInLetters.($lastrow+1));
+
     }
 
     function addRowColors($maxrow, $maxcol) {
@@ -37,7 +58,7 @@ class ExportAccounts {
 
         /* one less */
         $maxcol --;
-        
+
         $sharedStyle1 = new PHPExcel_Style();
         $sharedStyle2 = new PHPExcel_Style();
 
@@ -45,9 +66,9 @@ class ExportAccounts {
         $sharedStyle2->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
 
 
+        $colInLetters = PHPExcel_Cell::stringFromColumnIndex($maxcol);
         for($row = $maxrow; $row >= 3; $row--) {
 
-            $colInLetters = PHPExcel_Cell::stringFromColumnIndex($maxcol);
 
             if( (($row + 3) % 6) < 3 ) {
                 $sheet->setSharedStyle($sharedStyle1, "A".$row.":".$colInLetters.$row);
@@ -119,6 +140,7 @@ class ExportAccounts {
 
                 if($currentMonth > 0) {
                     $this->addRowColors($row, $nextFreeCol);
+                    $this->addSumRow($row, $nextFreeCol);
                 }
 
                 $this->objPHPExcel->setActiveSheetIndex($one["month"]);
@@ -155,7 +177,7 @@ class ExportAccounts {
             $sheet->setCellValueByColumnAndRow($headers[$one["post_type"]] + $debIndex, $row, $one["amount"]);
         }
         $this->addRowColors($row, $nextFreeCol);
-
+        $this->addSumRow($row, $nextFreeCol);
     }
 
     function getYearPosts() {

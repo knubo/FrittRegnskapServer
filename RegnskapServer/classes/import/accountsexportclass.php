@@ -4,10 +4,20 @@ class ExportAccounts {
     public $objPHPExcel;
     private $db;
     private $year;
+    private $summaryRow;
+    private $sharedStyle1;
+    private $sharedStyle2;
 
     function ExportAccounts($db, $year) {
         $this->db = $db;
         $this->year = $year;
+
+
+        $this->sharedStyle1 = new PHPExcel_Style();
+        $this->sharedStyle2 = new PHPExcel_Style();
+
+        $this->sharedStyle1->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
+        $this->sharedStyle2->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
 
 
         // Create new PHPExcel object
@@ -26,10 +36,98 @@ class ExportAccounts {
 
         $this->addData();
 
+        $this->createSummaryPage();
+
         // Set active sheet index to the first sheet, so Excel opens this as the first sheet
         $objPHPExcel->setActiveSheetIndex(0);
 
         $objPHPExcel->getProperties()->setDescription("Regnskap for $year, komplett med alle posteringer. Minne benyttet:".(memory_get_peak_usage(true) / 1024 / 1024) . " MB)");
+    }
+
+    function displayData($header, $sheet, $data, $descfield, $displaySum = 0) {
+        $sheet->setCellValueByColumnAndRow(0, $this->summaryRow, $header);
+        $sheet->mergeCellsByColumnAndRow(0, $this->summaryRow, 2, $this->summaryRow);
+
+        $style = $sheet->getStyleByColumnAndRow(0, $this->summaryRow);
+        $style->getFont()->setBold(true)->setSize(13);
+        $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('CDCDCD');
+
+        $this->summaryRow++;
+
+        $sum = 0;
+
+        $stylerow = 0;
+        foreach(array_keys($data) as $post_type) {
+            if($data[$post_type]["value"] == 0) {
+                continue;
+            }
+            $sum+=$data[$post_type]["value"];
+
+            $sheet->setCellValueByColumnAndRow(0, $this->summaryRow, $post_type);
+            $sheet->setCellValueByColumnAndRow(1, $this->summaryRow, $data[$post_type][$descfield]);
+            $sheet->setCellValueByColumnAndRow(2, $this->summaryRow, $data[$post_type]["value"]);
+
+            if( (($stylerow + 3) % 6) < 3 ) {
+                $sheet->setSharedStyle($this->sharedStyle1, "A".$this->summaryRow.":C".$this->summaryRow);
+            } else {
+                $sheet->setSharedStyle($this->sharedStyle2, "A".$this->summaryRow.":C".$this->summaryRow);
+            }
+
+            $stylerow++;
+            $this->summaryRow++;
+        }
+
+        if($displaySum) {
+            $sheet->setCellValueByColumnAndRow(1, $this->summaryRow, "Sum");
+            $sheet->setCellValueByColumnAndRow(2, $this->summaryRow, $sum);
+
+            $sumstyle = new PHPExcel_Style();
+            $sumstyle->applyFromArray( array('numberformat' => array('code' => '#,##0.00_-') ,
+                                         'borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN), 'bottom' => array('style' => PHPExcel_Style_Border::BORDER_DOUBLE) )
+            ));
+            $sheet->setSharedStyle($sumstyle, "A".($this->summaryRow).":C".($this->summaryRow));
+
+            $this->summaryRow += 2;
+
+        } else {
+            $this->summaryRow++;
+        }
+        
+        return $sum;
+    }
+
+    function createSummaryPage() {
+        $sheet = $this->objPHPExcel->setActiveSheetIndex(0);
+
+        $rep = new ReportYear($this->db);
+
+        $sheet->setCellValue("A1", $this->year);
+        $style = $sheet->getStyle("A1");
+        $style->getFont()->setBold(true)->setSize(15);
+
+        $month = 12;
+        $this->summaryRow = 3;
+
+        
+        $data = $rep->list_sums_earnings($this->year, $month);
+        $sumIncome = $this->displayData('Inntekter', $sheet, $data, "description", 1);
+
+        $data = $rep->list_sums_cost($this->year, $month);
+        $sumCost = $this->displayData('Utgifter', $sheet, $data, "description", 1);
+
+        $data = array(" " => array("description" => "Inntekter", "value" => $sumIncome),
+                      "  " => array("description" => "Utgifter", "value" => 0 - $sumCost));
+        $this->displayData('Resultat', $sheet, $data, "description", 1);
+
+        $data = $rep->list_sums_ownings($this->year, $month);
+        $this->displayData('EK og forpliktelser', $sheet, $data, "description",1);
+
+        $data = $rep->list_sums_2000($this->year, $month);
+        $this->displayData('Eiendeler', $sheet, $data, "desc", 1);
+
+        $sheet->getColumnDimensionByColumn(1)->setAutoSize(true);
+        $sheet->getColumnDimensionByColumn(2)->setAutoSize(true);
+
     }
 
     function addSumRow($lastrow, $maxcol) {
@@ -44,11 +142,11 @@ class ExportAccounts {
         $colInLetters = PHPExcel_Cell::stringFromColumnIndex($maxcol);
 
         $sheet->setCellValueByColumnAndRow(2, $lastrow+1, "SUM");
-        
+
         $sumstyle = new PHPExcel_Style();
-        $sumstyle->applyFromArray( array('numberformat' => array('code' => '#,##0.00_-') , 
+        $sumstyle->applyFromArray( array('numberformat' => array('code' => '#,##0.00_-') ,
                                          'borders' => array('top' => array('style' => PHPExcel_Style_Border::BORDER_THIN), 'bottom' => array('style' => PHPExcel_Style_Border::BORDER_DOUBLE) )
-                                 ));
+        ));
         $sheet->setSharedStyle($sumstyle, "A".($lastrow+1).":".$colInLetters.($lastrow+1));
 
     }
@@ -59,21 +157,15 @@ class ExportAccounts {
         /* one less */
         $maxcol --;
 
-        $sharedStyle1 = new PHPExcel_Style();
-        $sharedStyle2 = new PHPExcel_Style();
-
-        $sharedStyle1->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
-        $sharedStyle2->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
-
 
         $colInLetters = PHPExcel_Cell::stringFromColumnIndex($maxcol);
         for($row = $maxrow; $row >= 3; $row--) {
 
 
             if( (($row + 3) % 6) < 3 ) {
-                $sheet->setSharedStyle($sharedStyle1, "A".$row.":".$colInLetters.$row);
+                $sheet->setSharedStyle($this->sharedStyle1, "A".$row.":".$colInLetters.$row);
             } else {
-                $sheet->setSharedStyle($sharedStyle2, "A".$row.":".$colInLetters.$row);
+                $sheet->setSharedStyle($this->sharedStyle2, "A".$row.":".$colInLetters.$row);
             }
         }
     }

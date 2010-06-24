@@ -7,6 +7,8 @@ class ExportAccounts {
     private $summaryRow;
     private $sharedStyle1;
     private $sharedStyle2;
+    private $sharedStyle1NoMoney;
+    private $sharedStyle2NoMoney;
 
     function ExportAccounts($db, $year) {
         $this->db = $db;
@@ -18,6 +20,12 @@ class ExportAccounts {
 
         $this->sharedStyle1->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
         $this->sharedStyle2->applyFromArray(array('numberformat' => array('code' => '#,##0.00_-'), 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
+
+        $this->sharedStyle1NoMoney = new PHPExcel_Style();
+        $this->sharedStyle2NoMoney = new PHPExcel_Style();
+
+        $this->sharedStyle1NoMoney->applyFromArray(array( 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'ECF1F3'))));
+        $this->sharedStyle2NoMoney->applyFromArray(array( 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'D7E2E6'))));
 
 
         // Create new PHPExcel object
@@ -68,9 +76,11 @@ class ExportAccounts {
             $sheet->setCellValueByColumnAndRow(2, $this->summaryRow, $data[$post_type]["value"]);
 
             if( (($stylerow + 3) % 6) < 3 ) {
-                $sheet->setSharedStyle($this->sharedStyle1, "A".$this->summaryRow.":C".$this->summaryRow);
+                $sheet->setSharedStyle($this->sharedStyle1NoMoney, "A".$this->summaryRow.":A".$this->summaryRow);
+                $sheet->setSharedStyle($this->sharedStyle1, "B".$this->summaryRow.":C".$this->summaryRow);
             } else {
-                $sheet->setSharedStyle($this->sharedStyle2, "A".$this->summaryRow.":C".$this->summaryRow);
+                $sheet->setSharedStyle($this->sharedStyle2NoMoney, "A".$this->summaryRow.":A".$this->summaryRow);
+                $sheet->setSharedStyle($this->sharedStyle2, "B".$this->summaryRow.":C".$this->summaryRow);
             }
 
             $stylerow++;

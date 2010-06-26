@@ -146,7 +146,7 @@ class ExportAccounts {
     function addSumRow($lastrow, $maxcol) {
         $sheet = $this->objPHPExcel->getActiveSheet();
 
-        for($col = 3; $col < $maxcol; $col++) {
+        for($col = 4; $col < $maxcol; $col++) {
             $lettercol = PHPExcel_Cell::stringFromColumnIndex($col);
 
             $sheet->setCellValueByColumnAndRow($col, $lastrow+1, '=SUM('.$lettercol.'3:'.$lettercol.$lastrow.')');

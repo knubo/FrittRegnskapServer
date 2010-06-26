@@ -14,7 +14,9 @@ class ExportAccounts {
         $this->db = $db;
         $this->year = $year;
 
+    }
 
+    function export() {
         $this->sharedStyle1 = new PHPExcel_Style();
         $this->sharedStyle2 = new PHPExcel_Style();
 
@@ -50,6 +52,7 @@ class ExportAccounts {
         $objPHPExcel->setActiveSheetIndex(0);
 
         $objPHPExcel->getProperties()->setDescription("Regnskap for $year, komplett med alle posteringer. Minne benyttet:".(memory_get_peak_usage(true) / 1024 / 1024) . " MB)");
+
     }
 
     function displayData($header, $sheet, $data, $descfield, $displaySum = 0) {
@@ -102,7 +105,7 @@ class ExportAccounts {
         } else {
             $this->summaryRow++;
         }
-        
+
         return $sum;
     }
 
@@ -118,7 +121,7 @@ class ExportAccounts {
         $month = 12;
         $this->summaryRow = 3;
 
-        
+
         $data = $rep->list_sums_earnings($this->year, $month);
         $sumIncome = $this->displayData('Inntekter', $sheet, $data, "description", 1);
 
@@ -186,19 +189,19 @@ class ExportAccounts {
 
         $months = array("Januar","Februar","Mars","April","Mai","Juni","Juli","August","September","Oktober","November","Desember");
 
+        $sharedFillStyle = new PHPExcel_Style();
+        $sharedFillStyle ->applyFromArray(array( 'fill' => array('type'=> PHPExcel_Style_Fill::FILL_SOLID, 'color' => array('rgb' => 'CDCDCD'))));
+        
+
         for($i = 0; $i < count($months); $i++) {
             $objWorksheet = $this->objPHPExcel->createSheet();
             $objWorksheet->setTitle($months[$i]);
             $objWorksheet->setCellValueByColumnAndRow(0,2,"Bilag");
             $objWorksheet->setCellValueByColumnAndRow(1,2,"Dato");
             $objWorksheet->setCellValueByColumnAndRow(2,2,"Beskrivelse");
+            $objWorksheet->setCellValueByColumnAndRow(3,2,"Prosjekt");
 
-            for($row = 1; $row < 3; $row++) {
-                for($col = 0; $col < 3; $col++) {
-                    $style = $objWorksheet->getStyleByColumnAndRow($col, $row);
-                    $style->getFill()->setFillType(PHPExcel_Style_Fill::FILL_SOLID)->getStartColor()->setRGB('CDCDCD');
-                }
-            }
+            $objWorksheet->setSharedStyle($sharedFillStyle, "A1:D2");
         }
 
     }
@@ -249,7 +252,7 @@ class ExportAccounts {
                 $row = 2;
                 $currentMonth = $month;
                 $headers = array();
-                $nextFreeCol = 3;
+                $nextFreeCol = 4;
                 $currentLineId = $one["id"];
             }
 
@@ -263,11 +266,13 @@ class ExportAccounts {
             $sheet->setCellValueByColumnAndRow(0, $row, $one["attachnmb"]);
             $sheet->setCellValueByColumnAndRow(1, $row, $one["occured"]);
             $sheet->setCellValueByColumnAndRow(2, $row, $one["description"]);
+            $sheet->setCellValueByColumnAndRow(3, $row, $one["projectdesc"]);
 
             $sheet->getColumnDimensionByColumn(0)->setAutoSize(true);
             $sheet->getColumnDimensionByColumn(1)->setAutoSize(true);
             $sheet->getColumnDimensionByColumn(2)->setAutoSize(true);
-
+            $sheet->getColumnDimensionByColumn(3)->setAutoSize(true);
+            
 
             if(!array_key_exists($one["post_type"], $headers)) {
                 $this->setHeaders($sheet, $one, $nextFreeCol);

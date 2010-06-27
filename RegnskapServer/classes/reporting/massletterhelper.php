@@ -25,6 +25,7 @@ class MassLetterHelper {
     private $tableopts;
     private $tablerows;
     private $prefix;
+    private $preview;
 
     function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix) {
         $this->db = $db;
@@ -45,7 +46,7 @@ class MassLetterHelper {
         }
         return utf8_encode(file_get_contents("templates/$prefix/$filename"));
     }
-    
+
     function saveTemplate($template, $data) {
         $template = Strings::whitelist($template);
         $prefix = $this->prefix;
@@ -60,7 +61,7 @@ class MassLetterHelper {
     function listTemplates() {
         $filenames = array();
         $prefix = $this->prefix;
-        
+
         if(!file_exists("templates/$prefix")) {
             mkdir("templates/$prefix");
         }
@@ -271,7 +272,11 @@ class MassLetterHelper {
     }
 
     function query($args) {
-        if($args == "memberships") {
+
+        if($this->preview) {
+            $accPerson = new AccountPerson($this->db);
+            $this->users = $accPerson->getFirst();
+        } else if($args == "memberships") {
             $accYearMem = new AccountYearMembership($this->db);
 
             $this->users = $accYearMem->getReportUsersFull($this->year);
@@ -285,8 +290,9 @@ class MassLetterHelper {
         $this->pdf->addObject($this->all, 'all');
     }
 
-    function useTemplate($template) {
+    function useTemplate($template, $preview = 0) {
         $arr = $this->listtemplates();
+        $this->preview = $preview;
 
         if(!in_array($template, $arr)) {
             die("Unknown template $template - valid templates are:".implode(',', $arr).".");
@@ -296,7 +302,7 @@ class MassLetterHelper {
         $this->wrapopts = array ();
 
         $prefix = $this->prefix;
-        
+
         $lines = file("templates/$prefix/$template");
 
         if(!$lines) {
@@ -323,16 +329,24 @@ class MassLetterHelper {
             die("Query not set up.");
         }
 
+        $notFirst = 0;
         foreach($this->users as $user) {
+            if($notFirst) {
+                $this->pdf->newPage();
+            }
             $this->currentUser = $user;
 
             foreach($toLoop as $one) {
                 $this->handleOne($one);
             }
-            $this->pdf->newPage();
+            $notFirst = 1;
         }
 
-        $this->pdf->ezStream();
+        if($this->preview) {
+            file_put_contents("../../storage/".$this->prefix."/massletter_preview.pdf", $this->pdf->output());
+        } else {
+            $this->pdf->ezStream();
+        }
 
     }
 

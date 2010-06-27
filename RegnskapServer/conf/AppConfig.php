@@ -42,6 +42,8 @@ class AppConfig {
 
     const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 
+    const CONVERT = "export PATH=\$PATH:/opt/local/bin;convert";
+    
     function pre() {
         return $_SESSION["prefix"];
     }

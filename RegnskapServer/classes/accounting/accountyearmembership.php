@@ -110,8 +110,14 @@ class AccountyearMembership {
 		return $arr;
 	}
 
-    function getReportUsersFull($year) {
-        $prep = $this->db->prepare("select distinct * from " . AppConfig::pre() . "year_membership, " . AppConfig::pre() . "person where memberid=id and year=? order by lastname,firstname");
+    function getReportUsersFull($year, $limit = 0) {
+        $sql = "select distinct * from " . AppConfig::pre() . "year_membership, " . AppConfig::pre() . "person where memberid=id and year=? order by lastname,firstname";
+
+        if($limit) {
+            $sql .= " limit 1";
+        }
+        
+        $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $year);
         $res = $prep->execute();
 

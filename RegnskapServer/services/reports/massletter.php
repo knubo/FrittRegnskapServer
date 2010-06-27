@@ -10,6 +10,7 @@ include_once ("../../classes/util/strings.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountmemberprice.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/reporting/massletterhelper.php");
 include_once ("../../pdf/class.ezpdf.php");
@@ -49,6 +50,12 @@ switch ($action) {
 	case "pdf" :
 		$massLetterHelper->useTemplate($template);
 		break;
+	case "preview":
+	    $massLetterHelper->useTemplate($template, 1);
+	    system(AppConfig::CONVERT." ../../storage/$prefix/massletter_preview.pdf ../../storage/$prefix/massletter_preview.png");
+	    header("Content-Type: image/png");
+	    readfile("../../storage/$prefix/massletter_preview.png");
+	    break;
 	case "list" :
         echo json_encode($massLetterHelper->listTemplates());
         break;

@@ -256,5 +256,10 @@ class AccountPerson {
          return $this->db->affected_rows();
          
     }
- 
+
+    function getFirst() {
+        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person limit 1");
+        return $prep->execute();
+    }
+    
 }

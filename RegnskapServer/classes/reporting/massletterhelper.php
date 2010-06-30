@@ -41,17 +41,17 @@ class MassLetterHelper {
     function readTemplate($filename) {
         $filename = Strings::whitelist($filename);
         $prefix = $this->prefix;
-        if(!file_exists("templates/$prefix/$filename")) {
+        if(!file_exists("../../storage/$prefix/templates/$filename")) {
             return "";
         }
-        return utf8_encode(file_get_contents("templates/$prefix/$filename"));
+        return utf8_encode(file_get_contents("../../storage/$prefix/templates/$filename"));
     }
 
     function saveTemplate($template, $data) {
         $template = Strings::whitelist($template);
         $prefix = $this->prefix;
 
-        file_put_contents("templates/$prefix/$template", utf8_decode($data));
+        file_put_contents("../../storage/$prefix/templates/$template", utf8_decode($data));
 
         return "1";
 
@@ -62,10 +62,13 @@ class MassLetterHelper {
         $filenames = array();
         $prefix = $this->prefix;
 
-        if(!file_exists("templates/$prefix")) {
-            mkdir("templates/$prefix");
+        if(!file_exists("../../storage/$prefix")) {
+            mkdir("../../storage/$prefix");
         }
-        $d = dir("templates/$prefix/");
+        if(!file_exists("../../storage/$prefix/templates")) {
+            mkdir("../../storage/$prefix/templates");
+        }
+        $d = dir("../../storage/$prefix/templates/");
 
         while (false !== ($entry = $d->read())) {
             if(substr_compare($entry,".",0,1) != 0 ) {

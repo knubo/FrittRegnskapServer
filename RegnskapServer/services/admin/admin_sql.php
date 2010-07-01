@@ -5,7 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
-include_once ("../../classes/admin/SQLS.php");
+include_once ("../../classes/admin/sqls.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/reporting/emailer.php");

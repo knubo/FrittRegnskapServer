@@ -115,10 +115,15 @@ class SQLS {
 
         $replaced_sql = preg_replace("/XXX\_?/", $dbprefix, $sql["sqltorun"]);
 
-        $prep = $targetDB->prepare($replaced_sql);
-
         $res = array();
-        $res["data"] = $prep->execute();
+        /* The bsc database runs on an old mysql instance, hence the "fix". */
+        if($dbprefix == "regn_") {
+            $targetDB->action($replaced_sql);
+        } else {
+            $prep = $targetDB->prepare($replaced_sql);
+            $res["data"] = $prep->execute();
+        }
+
         $res["rows"] = $targetDB->affected_rows();
 
         $iPrep = $this->db->prepare("update installations set sqlIdToRun = null where id = ?");

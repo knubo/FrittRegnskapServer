@@ -29,7 +29,8 @@ create table if not exists XXX_user(
   readonly tinyint,
   reducedwrite tinyint,
   project_required tinyint,
-  lastlogin TIMESTAMP
+  lastlogin TIMESTAMP,
+  see_secret tinyint
 );
 
 CREATE TABLE IF NOT exists XXX_grouping_head (
@@ -158,7 +159,7 @@ create table if not exists XXX_person (
    address varchar(80),
    postnmb varchar(4),
    city varchar(20),
-   country varchar(2),
+   	country varchar(2),
    phone varchar(13),
    cellphone varchar(13),
    employee tinyint,
@@ -166,7 +167,9 @@ create table if not exists XXX_person (
    newsletter tinyint,
    hidden tinyint,
    gender varchar(1),
-   secret varchar(40)
+   secret varchar(40),
+   comment TEXT,
+   secretaddress tinyint
 );
 
 CREATE TABLE IF NOT exists XXX_email_content (

@@ -35,6 +35,10 @@ class DB {
             return 1;
         }
         
+        if($string == "bsc") {
+            return -1;
+        }
+        
         $len = count($string);
         for ($i = 0; $i < $len; $i++) {
             $h = 31 * $h + ord(mb_substr($string, $i, 1));

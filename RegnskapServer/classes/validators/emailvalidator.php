@@ -9,6 +9,18 @@
 class EmailValidator {
     
 	function check_email_address($email) {
+        $emails = preg_split("/,/", $email);
+        if(count($emails) > 1) {
+            $status = 0;
+            foreach($emails as $one) {
+                $status = EmailValidator::check_email_address($one);
+                if(!$status) {
+                    return $status;
+                }
+            }
+            return $status;
+        }	    
+	    
 		// First, we check that there's one @ symbol, and that the lengths are right
 		if (!preg_match("/^[^@]{1,64}@[^@]{1,255}$/", $email)) {
 			// Email invalid because wrong number of characters in one section, or wrong number of @ symbols.

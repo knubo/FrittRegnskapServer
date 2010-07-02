@@ -66,19 +66,19 @@ class User {
     }
 
     function hasOnlyReadAccess() {
-        return $this->read_only;
+        return $this->read_only ? 1 : 0;
     }
 
     function hasReducedWrite() {
-        return $this->reduced_write;
+        return $this->reduced_write ? 1 : 0;
     }
 
     function canSeeSecret() {
-        return $this->can_see_secret;
+        return $this->can_see_secret ? 1 : 0;
     }
 
     function hasProjectRequired() {
-        return $this->project_required;
+        return $this->project_required ? 1 : 0;
     }
 
     function getPersonId() {
@@ -87,8 +87,8 @@ class User {
 
 
     function getAll() {
-        $bind = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly,reducedwrite,project_required, see_secret from ". AppConfig::pre() ."user, ".AppConfig::pre()."person where id=person");
-        return $bind->execute();
+        $prep = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly,reducedwrite,project_required, see_secret from ". AppConfig::pre() ."user, ".AppConfig::pre()."person where id=person");
+        return $prep->execute();
     }
 
     function isOnlyOneUserWithSecretAccess() {

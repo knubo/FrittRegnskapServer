@@ -1,9 +1,4 @@
 <?php
-
-/*
- * Created on Jul 16, 2007
- *
- */
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/auth/User.php");
@@ -23,57 +18,57 @@ $see_secret = array_key_exists("see_secret", $_REQUEST) ? $_REQUEST["see_secret"
 $db = new DB();
 $regnSession = new RegnSession($db);
 $loggedInUser = $regnSession->auth();
- 
-switch ($action) {
-	case "all" :
-		$accUsers = new User($db);
-		$columnList = $accUsers->getAll();
-		echo json_encode($columnList);
-		break;
-	case "save" :
-		$res = array ();
 
-		if($see_secret && !$regnSession->canSeeSecret()) {
-		    header("HTTP/1.0 513 Validation Error");
+switch ($action) {
+    case "all" :
+        $accUsers = new User($db);
+        $columnList = $accUsers->getAll();
+        echo json_encode($columnList);
+        break;
+    case "save" :
+        $res = array ();
+
+        if($see_secret && !$regnSession->canSeeSecret()) {
+            header("HTTP/1.0 513 Validation Error");
             die(json_encode(array("MISSING_ACCESS")));
-		}
+        }
 
         $accUsers = new User($db);
 
         if(($user == $loggedInUser) && $regnSession->canSeeSecret() && (!$see_secret) && $accUsers->isOnlyOneUserWithSecretAccess()) {
-		    header("HTTP/1.0 513 Validation Error");
+            header("HTTP/1.0 513 Validation Error");
             die(json_encode(array("LAST_USER")));
         }
-        
+
         $userToChange = $accUsers->getOne($user);
 
         if(!$userToChange) {
             die("Bad data sent in . $user");
         }
-        
+
         if($userToChange["see_secret"] != $see_secret && !$regnSession->canSeeSecret()) {
-             header("HTTP/1.0 513 Validation Error");
+            header("HTTP/1.0 513 Validation Error");
             die(json_encode(array("MISSING_ACCESS")));
         }
-		
+
         if($loggedInUser == $user && $regnSession->hasReducedWriteAccess()) {
             $rowsAffected = $accUsers->updatePassword($user, $password);
             $res["result"] = $rowsAffected;
         } else {
             $regnSession->checkWriteAccess();
-    		$rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite, $project_required, $see_secret);        	
-    		$res["result"] = $rowsAffected;
+            $rowsAffected = $accUsers->save($user, $password, $person,$readonly, $reducedwrite, $project_required, $see_secret);
+            $res["result"] = $rowsAffected;
         }
-    
-		echo json_encode($res);
-        break;  
-	case "delete" :
+
+        echo json_encode($res);
+        break;
+    case "delete" :
         $regnSession->checkWriteAccess();
         $accUsers = new User($db);
         $rowsAffected = $accUsers->delete($user);
         $res = array ();
         $res["result"] = $rowsAffected;
         echo json_encode($res);
-
-		}
+        break;
+}
 ?>

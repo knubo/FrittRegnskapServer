@@ -37,7 +37,9 @@ switch ($action) {
         $auth = new User($dbu);
 
         if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == User :: AUTH_OK) {
-            session_start();
+            if(!session_start()) {
+                die("Failed to start session");
+            }
             	
             $_SESSION["prefix"] = $masterRecord["dbprefix"];
             $_SESSION["diskquota"] = $masterRecord["diskquota"];

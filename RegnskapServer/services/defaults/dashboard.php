@@ -129,6 +129,8 @@ if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
 }
 
 
+$arr["see_secret"] = $regnSession->canSeeSecret();
+
 echo json_encode($arr);
 
 

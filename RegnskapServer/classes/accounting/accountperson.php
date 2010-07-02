@@ -16,7 +16,10 @@ class AccountPerson {
     public $Newsletter;
     public $Hidden;
     public $Gender;
-
+    public $Secretaddress;
+    public $Comment;
+    
+    
     /* Populated from outside */
     public $Memberships;
     public $BirthdateRequired;
@@ -87,6 +90,12 @@ class AccountPerson {
     function setGender($gender) {
         $this->Gender = $gender;
     }
+    function setSecretaddress($secretaddress) {
+        $this->Secretaddress = $secretaddress;
+    }
+    function setComment($comment) {
+        $this->Comment = $comment;
+    }
 
     function name() {
         return $this->FirstName . " " . $this->LastName;
@@ -136,6 +145,9 @@ class AccountPerson {
         $this->setCellphone($fields["cellphone"]);
         $this->setAddress($fields["address"]);
         $this->setNewsletter($fields["newsletter"]);
+        $this->Secretaddress = $fields["secretaddress"];
+        $this->Comment = $fields["comment"];
+        
         if($fields["birthdate"]) {
             $tmpdate = new eZDate();
             $tmpdate->setMySQLDate($fields["birthdate"]);
@@ -146,7 +158,7 @@ class AccountPerson {
     }
 
     function getAll($isEmpoyee = 0) {
-        $sql = "select * from " . AppConfig::pre() . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
+        $sql = "select id, firstname,lastname,email from " . AppConfig::pre() . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
         $prep = $this->db->prepare($sql);
         $res = $prep->execute();
 
@@ -164,14 +176,14 @@ class AccountPerson {
             $mysqlDate = $bdSave->mySQLDate();
         }
         if ($this->Id) {
-            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=? where id = ?");
-            $prep->bind_params("sssssssssssiisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Id);
+            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=? where id = ?");
+            $prep->bind_params("sssssssssssiisisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Secretaddress, $this->Comment, $this->Id);
             $prep->execute();
             return $this->db->affected_rows();
         }
 
-        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?");
-        $prep->bind_params("sssssssssssiis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender);
+        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?");
+        $prep->bind_params("sssssssssssiisis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender,$this->Secretaddress, $this->Comment);
         $prep->execute();
 
         $this->id = $this->db->insert_id();
@@ -219,7 +231,17 @@ class AccountPerson {
         }
         $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig::pre() . "user where person=id and username=?)");
 
-        return $searchWrap->execute();
+        $res = $searchWrap->execute();
+        
+        foreach($res as &$one) {
+            if($one["secretaddress"]) {
+                $one["address"] = "#SECRET#";
+                $one["phone"] = "#SECRET#";
+                $one["cellphone"] = "#SECRET#";
+            }
+        }
+        
+        return $res;
     }
 
     function allWithEmail() {

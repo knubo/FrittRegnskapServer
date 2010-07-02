@@ -68,7 +68,7 @@ try {
 
     $user = new User(0);
     $crypted = crypt($password, $user->makesalt());
-    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required) values (?,?,1,0,0,0)");
+    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required, see_secret) values (?,?,1,0,0,0, 1)");
     $prep->bind_params("ss", $superuser, $crypted);
     $prep->execute();
 

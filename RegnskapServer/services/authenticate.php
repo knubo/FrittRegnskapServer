@@ -46,6 +46,7 @@ switch ($action) {
             $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
             $_SESSION["project_required"] = $auth->hasProjectRequired();
             $_SESSION["person_id"] = $auth->getPersonId();
+            $_SESSION["can_see_secret"] = $auth->canSeeSecret();
             $arr = array (
 				'result' => 'ok', 
             );

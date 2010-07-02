@@ -32,6 +32,8 @@ $queryMembership = array_key_exists("getmemb", $_REQUEST) ? trim($_REQUEST["getm
 $newsletter = array_key_exists("newsletter", $_REQUEST) ? trim($_REQUEST["newsletter"]) : 0;
 $hidden = array_key_exists("hidden", $_REQUEST) ? trim($_REQUEST["hidden"]) : 0;
 $gender = array_key_exists("gender", $_REQUEST) ? trim($_REQUEST["gender"]) : '';
+$secretaddress = array_key_exists("secretaddress", $_REQUEST) ? trim($_REQUEST["secretaddress"]) : '';
+$comment = array_key_exists("comment", $_REQUEST) ? trim($_REQUEST["comment"]) : '';
 
 
 $db = new DB();
@@ -107,6 +109,8 @@ switch ($action) {
         $accPers->setNewsletter($newsletter);
         $accPers->setHidden($hidden);
         $accPers->setGender($gender);
+        $accPers->setSecretaddress($secretaddress);
+        $accPers->setComment($comment);
 
         $res = array();
         $res["result"] = $accPers->save();

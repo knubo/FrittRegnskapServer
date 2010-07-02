@@ -53,6 +53,15 @@ class RegnSession {
         return $_SESSION["prefix"];
     }
     
+
+    function canSeeSecret() {
+        if(!AppConfig::USE_AUTHENTICATION) {
+            return 1;
+        }
+
+    	return $_SESSION["can_see_secret"];
+        
+    }
     
     function hasReducedWriteAccess() {
         if(!AppConfig::USE_AUTHENTICATION) {

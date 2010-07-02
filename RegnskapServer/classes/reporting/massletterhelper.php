@@ -26,8 +26,9 @@ class MassLetterHelper {
     private $tablerows;
     private $prefix;
     private $preview;
+    private $regnSession;
 
-    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix) {
+    function MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix,$regnSession) {
         $this->db = $db;
         $this->year = $year;
         $this->date = new eZDate();
@@ -36,6 +37,7 @@ class MassLetterHelper {
         $this->trainprice = $trainprice;
         $this->dueDate = $dueDate;
         $this->prefix = $prefix;
+        $this->regnSession = $regnSession;
     }
 
     function readTemplate($filename) {
@@ -286,6 +288,17 @@ class MassLetterHelper {
         } else {
             die("Unknown query '$args'");
         }
+
+        if(!$this->regnSession->canSeeSecret()) {
+            foreach($this->users as &$one) {
+                if($one["secretaddress"]) {
+                    $one["address"] = "INGEN TILGANG TIL ADRESSE";
+                    $one["phone"] = "INGEN TILGANG TIL TELEFON";
+                    $one["cellphone"] = "INGEN TILGANG TIL MOBIL";
+                }
+            }
+        }
+
         $this->pdf->restoreState();
         $this->pdf->closeObject();
         // note that object can be told to appear on just odd or even pages by changing 'all' to 'odd'
@@ -306,7 +319,7 @@ class MassLetterHelper {
 
         $prefix = $this->prefix;
 
-        $lines = file("templates/$prefix/$template");
+        $lines = file("../../storage/$prefix/templates/$template");
 
         if(!$lines) {
             die("Failed to open $template");

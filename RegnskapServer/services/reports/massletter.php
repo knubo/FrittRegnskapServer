@@ -45,7 +45,7 @@ $dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 error_reporting(E_ALL);
 set_time_limit(1800);
 
-$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix);
+$massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix, $regnSession);
 switch ($action) {
 	case "pdf" :
 		$massLetterHelper->useTemplate($template);

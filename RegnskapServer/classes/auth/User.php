@@ -92,7 +92,7 @@ class User {
     }
 
     function isOnlyOneUserWithSecretAccess() {
-        $prep = $this->db->prepare("select count(*) as c from ". AppConfig::pre() ."user where see_secret = 1");
+        $prep = $this->db->prepare("select count(*) as c from ". AppConfig::pre() ."user where see_secret = 1 and readonly <> 1");
         $res = $prep->execute();
         
         return $res[0]["c"] < 2;

@@ -79,6 +79,16 @@ $leftJoinPart .= " left join ".$pre."year_price cac ON (cac.year = YEAR.value)";
 $fields .= ", RL.occured as last_when, RL.description as last_desc";
 $leftJoinPart .= "left join ".$pre."line RL ON (RL.id = (select max(id) from ".$pre."line))";
 
+//Last backup time
+$fields .= ", BB.value as backup_by";
+$leftJoinPart .= "left join ".$pre."standard BB ON (BB.id = 'BACKUP_BY')";
+
+//Last backup done by
+$fields .= ", BU.value as backup_time";
+$leftJoinPart .= "left join ".$pre."standard BU ON (BU.id = 'BACKUP_TIME')";
+
+
+
 //Last registered by
 $fields .=", (select concat(firstname, ' ', lastname) from ".$pre."person LP where LP.id = RL.edited_by_person) as last_by";
 
@@ -107,7 +117,6 @@ $arr["accountstatus"] = $accountstatus;
 
 $now = new eZDate();
 
-
 if($arr["info"]["last_when"]) {
     $lastAdd = new eZDate();
     $lastAdd->setMySQLDate($arr["info"]["last_when"]);
@@ -115,17 +124,29 @@ if($arr["info"]["last_when"]) {
     $lastAdd->move(0, 2, 0);
 
     if($lastAdd->isGreater($now)) {
-        $arr["info"]["long_size_last_warning"] = 1;
+        $arr["info"]["long_since_last_warning"] = 1;
     }
     $lastAdd->move(0, 2, 0);
 
     if($lastAdd->isGreater($now)) {
-        $arr["info"]["long_size_last_error"] = 1;
+        $arr["info"]["long_since_last_error"] = 1;
     }
+
+    if($arr["info"]["backup_time"]) {
+        $lastBackup = new eZDate();
+        $lastBackup->setDate($arr["info"]["backup_time"]);
+        $lastBackup->move(0, 2, 0);
+
+        if($lastBackup->isGreater($now)) {
+            $arr["info"]["long_since_backup_error"] = 1;
+        }
+
+    }
+
 }
 
 if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
-    $arr["info"]["mabye_change_semester"] = 1;    
+    $arr["info"]["mabye_change_semester"] = 1;
 }
 
 

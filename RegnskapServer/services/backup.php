@@ -13,7 +13,7 @@ $table = array_key_exists("table", $_REQUEST) ? $_REQUEST["table"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
-$regnSession->auth();
+$loggedInUser = $regnSession->auth();
 $acStandard = new AccountStandard($db);
 
 $prefix = $regnSession->getPrefix();
@@ -22,8 +22,9 @@ $backup = new BackupDB($db, $prefix);
 
 date_default_timezone_set(AppConfig::TIMEZONE);
 
-if($regnSession->canSeeSecret()) {
-    die("Backup cannot be performed without access to secret addresses.");
+if(!$regnSession->canSeeSecret()) {
+    header("HTTP/1.0 513 Validation Error");
+    die(json_encode(array("NO_ACCESS_SECRET_ADDRESSES")));
 }
 
 switch ($action) {
@@ -35,8 +36,9 @@ switch ($action) {
         if(!file_exists("../backup/$prefix")) {
             mkdir("../backup/$prefix");
         }
-        
-        $acStandard->setValue("BACKUP_TIME", date("m.d.Y H:i"));
+
+        $acStandard->setValue("BACKUP_TIME", date("d.m.Y H:i"));
+        $acStandard->setValue("BACKUP_BY", $loggedInUser);
         /* Fallthrough */
     case "delete" :
         $path = "../backup/$prefix/";
@@ -57,7 +59,7 @@ switch ($action) {
         if($prefix != "master_" && strncmp($prefix, $table, strlen($prefix)) <> 0) {
             die("No access to table $table as prefix is $prefix");
         }
-        
+
         $res["result"] = json_encode($backup->backup($table)) ? 1 : 0;
         $res["info"] = json_encode($backup->info);
         echo json_encode($res);
@@ -65,6 +67,7 @@ switch ($action) {
     case "info" :
         $res = array ();
         $res["last_backup"] = $acStandard->getOneValue("BACKUP_TIME");
+        $res["last_backup_by"] = $acStandard->getOneValue("BACKUP_BY");
         if(file_exists("../backup/$prefix/backup.zip")) {
             $res["backup_file"] = date("m.d.Y H:i", filemtime("../backup/$prefix/backup.zip"));
         }

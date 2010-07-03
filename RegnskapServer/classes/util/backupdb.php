@@ -3,9 +3,12 @@ class BackupDB {
 
 	private $db;
     private $logger;
-
-	function BackupDB($db) {
+    private $prefix;
+    public $info;
+    
+	function BackupDB($db,$prefix) {
 		$this->db = $db;
+		$this->prefix = $prefix;
         $this->logger = new Logger($db);
 	}
 
@@ -17,19 +20,32 @@ class BackupDB {
 	}
 
 	function tables() {
-		$prep = $this->db->prepare("show tables like '" . AppConfig::pre() . "%'");
-		$res = $prep->execute();
-
 		$tables = array ();
-		foreach ($res as $value) {
-			$tables = array_merge($tables, array_values($value));
-		}
 
+		$this->addTables(AppConfig::pre(), &$tables);
+
+		if($this->prefix == "master_") {
+		    $this->addTables("wikka_", &$tables);
+            $tables[] = "sqllist";
+            $tables[] = "to_install";
+            $tables[] = "installations";
+		}
+		
 		return $tables;
 	}
 
+	function addTables($prefix, $tables) {
+		$prep = $this->db->prepare("show tables like '$prefix%'");
+		$res = $prep->execute();
+
+		foreach ($res as $value) {
+			$tables = array_merge($tables, array_values($value));
+		}
+	    
+	}
+	
     function zip() {
-        $cmd = "/usr/bin/zip ../backup/backup.zip ../backup/*.sql";
+        $cmd = "/usr/bin/zip ../backup/".$this->prefix."/backup.zip ../backup/".$this->prefix."/*.sql";
 
         $data = array();
         $res = exec($cmd, &$data);
@@ -44,8 +60,8 @@ class BackupDB {
 	function backup($table) {
 	    
 	    $dbinfo = AppConfig::db();
-	    
-        $cmd = AppConfig::MYSQLDUMP." -cnt -u" . $dbinfo[1] . " -h " . $dbinfo[0];
+
+        $cmd = AppConfig::MYSQLDUMP." -cnt -u " . $dbinfo[1] . " -h " . $dbinfo[0];
 
         if($dbinfo[2] && strlen($dbinfo[2]) > 0) {
         	$cmd.= " -p" . $dbinfo[2];
@@ -57,10 +73,13 @@ class BackupDB {
 
         if(count($data) == 0) {
             $this->logger->log("error","exec", "Failed to run command $cmd");
-        	return false;
+        	return 0;
         }
-
-        return file_put_contents("../backup/$table.sql", implode("\n",$data)) > 0;
+	    
+        $this->info = array(count($data));
+	    
+        
+        return file_put_contents("../backup/".$this->prefix."/$table.sql", implode("\n",$data)) > 0;
 	}
 }
 ?>

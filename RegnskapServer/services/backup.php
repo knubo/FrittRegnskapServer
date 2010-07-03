@@ -13,11 +13,18 @@ $table = array_key_exists("table", $_REQUEST) ? $_REQUEST["table"] : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
-$backup = new BackupDB($db);
 $regnSession->auth();
 $acStandard = new AccountStandard($db);
 
+$prefix = $regnSession->getPrefix();
+
+$backup = new BackupDB($db, $prefix);
+
 date_default_timezone_set(AppConfig::TIMEZONE);
+
+if($regnSession->canSeeSecret()) {
+    die("Backup cannot be performed without access to secret addresses.");
+}
 
 switch ($action) {
     case "tables" :
@@ -25,10 +32,14 @@ switch ($action) {
         break;
 
     case "init" :
+        if(!file_exists("../backup/$prefix")) {
+            mkdir("../backup/$prefix");
+        }
+        
         $acStandard->setValue("BACKUP_TIME", date("m.d.Y H:i"));
         /* Fallthrough */
     case "delete" :
-        $path = "../backup/";
+        $path = "../backup/$prefix/";
         $handle = opendir($path);
         for (; false !== ($file = readdir($handle));) {
             if (strncasecmp($file, ".", 1) != 0) {
@@ -43,27 +54,32 @@ switch ($action) {
         break;
     case "backup" :
         $res = array ();
+        if($prefix != "master_" && strncmp($prefix, $table, strlen($prefix)) <> 0) {
+            die("No access to table $table as prefix is $prefix");
+        }
+        
         $res["result"] = json_encode($backup->backup($table)) ? 1 : 0;
+        $res["info"] = json_encode($backup->info);
         echo json_encode($res);
         break;
     case "info" :
         $res = array ();
         $res["last_backup"] = $acStandard->getOneValue("BACKUP_TIME");
-        if(file_exists("../backup/backup.zip")) {
-            $res["backup_file"] = date("m.d.Y H:i", filemtime("../backup/backup.zip"));
+        if(file_exists("../backup/$prefix/backup.zip")) {
+            $res["backup_file"] = date("m.d.Y H:i", filemtime("../backup/$prefix/backup.zip"));
         }
         echo json_encode($res);
         break;
     case "zip" :
         $res = array ();
-        $res["result"] = json_encode($backup->zip($table)) ? 1 : 0;
+        $res["result"] = json_encode($backup->zip()) ? 1 : 0;
         echo json_encode($res);
         break;
     case "get" :
         $backupFileName = "backupAccounting".date("m-d-Y").".zip";
         header('Content-type: octet-stream');
         header('Content-Disposition: attachment; filename="'.$backupFileName);
-        readfile("../backup/backup.zip");
+        readfile("../backup/$prefix/backup.zip");
         break;
 }
 ?>

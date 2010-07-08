@@ -69,7 +69,7 @@ switch ($action) {
         $res["last_backup"] = $acStandard->getOneValue("BACKUP_TIME");
         $res["last_backup_by"] = $acStandard->getOneValue("BACKUP_BY");
         if(file_exists("../backup/$prefix/backup.zip")) {
-            $res["backup_file"] = date("m.d.Y H:i", filemtime("../backup/$prefix/backup.zip"));
+            $res["backup_file"] = date("d.m.Y H:i", filemtime("../backup/$prefix/backup.zip"));
         }
         echo json_encode($res);
         break;
@@ -79,7 +79,7 @@ switch ($action) {
         echo json_encode($res);
         break;
     case "get" :
-        $backupFileName = "backupAccounting".date("m-d-Y").".zip";
+        $backupFileName = "backupAccounting".date("d-m-Y").".zip";
         header('Content-type: octet-stream');
         header('Content-Disposition: attachment; filename="'.$backupFileName);
         readfile("../backup/$prefix/backup.zip");

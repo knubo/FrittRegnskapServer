@@ -21,8 +21,9 @@ $regnSession->auth();
 
 if (!$month || !$year) {
 	$standard = new AccountStandard($db);
-	$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
-	$month = $standard->getOneValue(AccountStandard::CONST_MONTH);
+	$values = $standard->getValues(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH);
+	$year = $values[AccountStandard::CONST_YEAR];
+	$month = $values[AccountStandard::CONST_MONTH];
 }
 
 $accLines = new AccountLine($db);

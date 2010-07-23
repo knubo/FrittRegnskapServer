@@ -27,105 +27,104 @@ $header = array_key_exists("header", $_REQUEST) ? $_REQUEST["header"] : 0;
 $footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
 $personid = array_key_exists("personid", $_REQUEST) ? $_REQUEST["personid"] : 0;
 
-
-
 $db = new DB();
 $regnSession = new RegnSession($db);
 $currentUser = $regnSession->auth();
 
 $standard = new AccountStandard($db);
-if(!$year) {
-    $year = $standard->getOneValue(AccountStandard::CONST_YEAR);
-}
 
 switch ($action) {
-    case "list" :
-        $ret = array ();
-        switch ($query) {
-            case "members" :
-            case "simulate":
-                $accYearMem = new AccountYearMembership($db);
-                $users = $accYearMem->getReportUsersFull($year);
-                break;
-            case "newsletter" :
-                $accPerson = new AccountPerson($db);
-                $accPerson->setNewsletter(1);
-                $users = $accPerson->search(false);
-                break;
-            case "all" :
-                $accPerson = new AccountPerson($db);
-                $users = $accPerson->allWithEmail();
-                echo json_encode($users);
-                die("");
-                break;
-            case "test" :
-                if(!$currentUser) {
-                    die("Need current user");
-                }
-                $accPerson = new AccountPerson($db);
-                $accPerson->setUser($currentUser);
-                $users = $accPerson->search(false);
-        }
+	case "list" :
+		$ret = array ();
+		switch ($query) {
+			case "members" :
+			case "simulate" :
+				if (!$year) {
+					$year = $standard->getOneValue(AccountStandard :: CONST_YEAR);
+				}
+				$accYearMem = new AccountYearMembership($db);
+				$users = $accYearMem->getReportUsersFull($year);
+				break;
+			case "newsletter" :
+				$accPerson = new AccountPerson($db);
+				$accPerson->setNewsletter(1);
+				$users = $accPerson->search(false);
+				break;
+			case "all" :
+				$accPerson = new AccountPerson($db);
+				$users = $accPerson->allWithEmail();
+				echo json_encode($users);
+				die("");
+				break;
+			case "test" :
+				if (!$currentUser) {
+					die("Need current user");
+				}
+				$accPerson = new AccountPerson($db);
+				$accPerson->setUser($currentUser);
+				$users = $accPerson->search(false);
+		}
 
-        foreach ($users as $one) {
-            if (!array_key_exists("email", $one) || !$one["email"]) {
-                continue;
-            }
-            $u = array ();
-            $u["name"] = $one["lastname"] . ", " . $one["firstname"];
-            $u["email"] = $one["email"];
-            $u["id"] = $one["id"];
-            $ret[] = $u;
-        }
+		foreach ($users as $one) {
+			if (!array_key_exists("email", $one) || !$one["email"]) {
+				continue;
+			}
+			$u = array ();
+			$u["name"] = $one["lastname"] . ", " . $one["firstname"];
+			$u["email"] = $one["email"];
+			$u["id"] = $one["id"];
+			$ret[] = $u;
+		}
 
-        echo json_encode($ret);
-        break;
-    case "email" :
-    case "simulatemail":
-        $regnSession->checkReducedWriteAccess();
-        $emailer = new Emailer();
-        $res = array ();
+		echo json_encode($ret);
+		break;
+	case "email" :
+	case "simulatemail" :
+		$regnSession->checkReducedWriteAccess();
+		$emailer = new Emailer();
+		$res = array ();
 
-        $subject = urldecode($subject);
-        $body = urldecode($body);
-        $attachments = urldecode($attachments);
-        $attObjs = $attachments ? json_decode($attachments) : null;
-        $sender = $standard->getOneValue(AccountStandard::CONST_EMAIL_SENDER);
+		$subject = urldecode($subject);
+		$body = urldecode($body);
+		$attachments = urldecode($attachments);
+		$attObjs = $attachments ? json_decode($attachments) : null;
+		$sender = $standard->getOneValue(AccountStandard :: CONST_EMAIL_SENDER);
 
-        $accPerson = new AccountPerson($db);
-        
-        $secret = $accPerson->getSecret($personid);
+		$accPerson = new AccountPerson($db);
 
-        if($action == "email") {
-            $prefix = "";
-            if(AppConfig::USE_QUOTA) {
-                $prefix = $regnSession->getPrefix()."/";
-            }
+		$secret = $accPerson->getSecret($personid);
 
-            $emailContent = new EmailContent($db);
-            $body = $emailContent->attachFooterHeader($body, $footer, $header);
+		if ($action == "email") {
+			$prefix = "";
+			if (AppConfig :: USE_QUOTA) {
+				$prefix = $regnSession->getPrefix() . "/";
+			}
 
-            $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
-            
-            $html = 0;
-            if($format == "HTML") {
-                $html = $body;
-                $body = $emailContent->makePlainText($html);
-            } else if($format == "WIKI") {
-                $html = $emailContent->makeHTMLFromWiki($body);
-                $body = $emailContent->makePlainText($html);
-            }
-            
-            $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
-        } else {
-            $status = true;
-        }
+			$emailContent = new EmailContent($db);
+			$body = $emailContent->attachFooterHeader($body, $footer, $header);
 
-        $res["status"] = $status ? 1 : 0;
-        echo json_encode($res);
-        break;
+			$body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
 
-    default :
-        die("Unknown action $action.");
+			$html = 0;
+			if ($format == "HTML") {
+				$html = $body;
+				$body = $emailContent->makePlainText($html);
+			} else
+				if ($format == "WIKI") {
+					$html = $emailContent->makeHTMLFromWiki($body);
+					$body = $emailContent->makePlainText($html);
+				}
+
+			$status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
+		} else {
+			$status = true;
+		}
+
+		$res["status"] = $status ? 1 : 0;
+		echo json_encode($res);
+		break;
+
+	default :
+		die("Unknown action $action.");
 }
 ?>

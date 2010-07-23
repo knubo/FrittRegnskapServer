@@ -29,9 +29,16 @@ $regnSession->auth();
 $prefix = $regnSession->getPrefix();
 
 $standard = new AccountStandard($db);
+$dueDate = 0;
 
 if (!$year) {
-    $year = $standard->getOneValue(AccountStandard::CONST_YEAR);
+	$values = $standard->getValues(AccountStandard::CONST_YEAR, "MASSLETTER_DUE_DATE");
+
+	$dueDate = $values["MASSLETTER_DUE_DATE"];
+	$year = $values[AccountStandard::CONST_YEAR];
+
+} else {
+	$dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 }
 
 $accPrices = new AccountMemberPrice($db);
@@ -40,7 +47,6 @@ $prices = $accPrices->getCurrentPrices();
 $yearprice = round($prices["year"]);
 $courseprice = round($prices["course"]);
 $trainprice = round($prices["train"]);
-$dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 
 error_reporting(E_ALL);
 set_time_limit(1800);

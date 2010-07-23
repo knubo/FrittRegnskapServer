@@ -5,6 +5,7 @@ class EndYearHelper {
     private $result;
     private $year;
     private $reportYear;
+    private $endYearPost;
 
     function EndYearHelper($db) {
         $this->db = $db;
@@ -14,6 +15,8 @@ class EndYearHelper {
         $acStandard = new AccountStandard($this->db);
 		$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
 		$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
+
+		$this->endYearPost = $acStandard->getOneValue(AccountStandard::CONST_END_YEAR_POST);
 
 	    $endYearData = $this->getEndYearData($active_year);
 		
@@ -119,11 +122,13 @@ class EndYearHelper {
                 $this->result[] = $add;
             }
         }
+        
+        $endPost = $this->endYearPost;
 
         if($total > 0) {
-            $this->result[] = array("post" => 2050, "DEBET" => 1, "value" => $total);
+            $this->result[] = array("post" => $endPost, "DEBET" => 1, "value" => $total);
         } else if($total < 0) {
-            $this->result[] = array("post" => 2050, "DEBET" => -1, "value" => 0 - $total);
+            $this->result[] = array("post" => $endPost, "DEBET" => -1, "value" => 0 - $total);
         }
 
     }

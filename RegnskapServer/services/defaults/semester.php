@@ -19,7 +19,7 @@ $regnSession->auth();
 $accStandard = new AccountStandard($db);
 $accSemester = new AccountSemester($db);
 
-$values = $accStandard->getValues(AccountStandard::CONST_SEMESTER,AccountStandard::CONST_MONTH,AccountStandard::CONST_YEAR);
+$values = $accStandard->getValues(array(AccountStandard::CONST_SEMESTER,AccountStandard::CONST_MONTH,AccountStandard::CONST_YEAR));
 $active_semester = $values[AccountStandard::CONST_SEMESTER];
 
 $data = array();

@@ -32,7 +32,7 @@ $standard = new AccountStandard($db);
 $dueDate = 0;
 
 if (!$year) {
-	$values = $standard->getValues(AccountStandard::CONST_YEAR, "MASSLETTER_DUE_DATE");
+	$values = $standard->getValues(array(AccountStandard::CONST_YEAR, "MASSLETTER_DUE_DATE"));
 
 	$dueDate = $values["MASSLETTER_DUE_DATE"];
 	$year = $values[AccountStandard::CONST_YEAR];

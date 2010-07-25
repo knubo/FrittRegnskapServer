@@ -21,7 +21,7 @@ $regnSession->auth();
 
 if (!$month || !$year) {
 	$standard = new AccountStandard($db);
-	$values = $standard->getValues(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH);
+	$values = $standard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH));
 	$year = $values[AccountStandard::CONST_YEAR];
 	$month = $values[AccountStandard::CONST_MONTH];
 }

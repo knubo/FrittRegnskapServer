@@ -155,6 +155,7 @@ if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
 /* Updates fist time complete to reflect that wizard has been used */
 if(!$arr["info"]["first_time_complete"] && $arr["info"]["last_desc"]) {
 	$arr["info"]["first_time_complete"] = 1;
+	$standard = new AccountStandard($db);
 	$standard->setValue(AccountStandard::CONST_FIRST_TIME_SETUP, 1);
 }
 

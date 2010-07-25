@@ -63,18 +63,18 @@ class AccountStandard {
 		return $return_array;
 	}
 
-	function question($q) {
+	static function question($q) {
 		return "?";
 	}
-	function i($q) {
+	static function i($q) {
 		return "i";
 	}
 
 	function getValues($ids) {
-		$params = array_map("question", $ids);
-		$vals = array_map("i", $ids);
+		$params = array_map(array("AccountStandard","question"), $ids);
+		$vals = array_map(array("AccountStandard","i"), $ids);
 
-		$prep = $this->db->prepare("select value,id from " . AppConfig :: pre() . "standard where id IN(" . implode(",", params) . ")");
+		$prep = $this->db->prepare("select value,id from " . AppConfig :: pre() . "standard where id IN(" . implode(",", $params) . ")");
 		$prep->bind_array_params(implode("", $vals), $ids);
 
 		$return_array = array ();

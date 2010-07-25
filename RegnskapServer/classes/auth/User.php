@@ -90,14 +90,14 @@ class User {
 		$toMerge = json_decode($toMergeStr);
 		
 		foreach($toMerge as $key => $value) {
-			$profile[$key] = $value;
+			$profile->$key = $value;
 		}
 
 		$this->updateProfile($user, $profile);
 	}
 
 	function updateProfile($user, $profile) {
-		$prep = $this->db->prepare("update". AppConfig::pre() ."user set profile=? where username = ?");
+		$prep = $this->db->prepare("update ". AppConfig::pre() ."user set profile=? where username = ?");
         $prep->bind_params("ss", json_encode($profile), $user);
         $res = $prep->execute();
         
@@ -107,11 +107,11 @@ class User {
 		$prep = $this->db->prepare("select profile from ". AppConfig::pre() ."user where username = ?");
         $prep->bind_params("s", $user);
         $res = $prep->execute();
-        
-        if(!$res["profile"]) {
+
+        if(!$res[0]["profile"]) {
         	return array();
         }
-        return json_decode($res["profile"]);
+        return json_decode($res[0]["profile"]);
 	}
 
 

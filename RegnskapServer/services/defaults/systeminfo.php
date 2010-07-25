@@ -5,6 +5,7 @@ include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/auth/User.php");
 
 $db = new DB();
 $regnSession = new RegnSession($db);

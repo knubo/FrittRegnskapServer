@@ -5,6 +5,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/reporting/email_content_class.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/auth/User.php");
 
 
 

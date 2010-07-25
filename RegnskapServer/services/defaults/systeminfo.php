@@ -8,7 +8,7 @@ include_once ("../../classes/auth/Master.php");
 
 $db = new DB();
 $regnSession = new RegnSession($db);
-$regnSession->auth();
+$currentUser = $regnSession->auth();
 
 ?>
 
@@ -32,6 +32,15 @@ foreach(array_keys($_SESSION) as $one) {
   echo "<tr><td colspan='2'>INGEN SESJON/NO SESSION</td></tr>";
 }
 ?>
-
-
 </table>
+
+RŒprofildata/Raw profile data 
+<pre>
+<?php
+	$accUser = new User($db);
+	
+	$profile = $accUser->getProfile($currentUser);
+	
+	echo json_encode($profile);
+?>	
+</pre>

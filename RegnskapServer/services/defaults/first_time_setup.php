@@ -24,23 +24,18 @@ $regnSession->auth();
 switch ($action) {
 	case "info" :
 		$standard = new AccountStandard($db);
-		$accSemester = new AccountSemester($db);
 
 		$ret = $standard->getValues(array (
 			AccountStandard :: CONST_YEAR,
 			AccountStandard :: CONST_MONTH,
-			AccountStandard :: CONST_SEMESTER
 		));
 
 		$year = $ret[AccountStandard :: CONST_YEAR];
 		$month = $ret[AccountStandard :: CONST_MONTH];
-		$semester = $ret[AccountStandard :: CONST_SEMESTER];
 
 		$res = array (
 			"year" => $year,
 			"month" => $month,
-			"semester" => $semester,
-			"semesters" => $accSemester->getAll()
 		);
 
 		echo json_encode($res);
@@ -50,9 +45,11 @@ switch ($action) {
 		$standard = new AccountStandard($db);
 		$year = $data["year"];
 		$monht = $data["month"];
+		
+		$semesterIsFall = $data["semester"];
 		$standard->setValue(AccountStandard :: CONST_YEAR, $year);
 		$standard->setValue(AccountStandard :: CONST_MONTH, $month);
-		$standard->setValue(AccountStandard :: CONST_SEMESTER, $data["semester"]);
+		$standard->setValue(AccountStandard :: CONST_FIRST_TIME_SETUP, 1);
 		$ib = $data["ib"];
 
 		if (count($ib) > 0) {
@@ -68,7 +65,30 @@ switch ($action) {
 
 		}
 
+		for ($i = 0; $i < 10; $i++) {
+			$prep = $this->db->prepare("insert into " . $prefix . "semester (description, year, fall) values (?,?,?)");
+
+			$desc = $i % 2 == 0 ? "VŒr $year" : "H¿st $year";
+
+
+			if ($i > 0 && $i % 2 == 0) {
+				$year++;
+			}
+
+			$prep->bind_params("sii", $desc, $year, $i % 2);
+			$prep->execute();
+
+			if(!$semesterId && ($i % 2) == $semesterIsFall) {
+				$semesterId = $this->db->insert_id();
+			}
+
+		}
+
+		$standard->setValue(AccountStandard :: CONST_SEMESTER, $semesterId);
+
+
 		$db->commit();
+		echo json_encode(array("result" => 1));
 		break;
 }
 ?>

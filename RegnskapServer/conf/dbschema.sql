@@ -30,7 +30,8 @@ create table if not exists XXX_user(
   reducedwrite tinyint,
   project_required tinyint,
   lastlogin TIMESTAMP,
-  see_secret tinyint
+  see_secret tinyint,
+  profile TEXT
 );
 
 CREATE TABLE IF NOT exists XXX_grouping_head (

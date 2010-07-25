@@ -18,13 +18,13 @@ $regnSession->auth();
 $accLine = new AccountLine($db);
 $standard = new AccountStandard($db);
 
-$ret = $standard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::FIRST_TIME, AccountStandard::CONST_SEMESTER));
+$ret = $standard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::CONST_SEMESTER));
 
 $year = $ret[AccountStandard::CONST_YEAR];
 $month = $ret[AccountStandard::CONST_MONTH];
 $semester = $ret[AccountStandard::CONST_SEMESTER];
-$first_time = $ret[AccountStandard::FIRST_TIME];
 $attachment = $accLine->getNextAttachmentNmb($year);
+
 $postnmb = $accLine->getNextPostnmb($year, $month);
 
 $res = array("year"=>$year, "month"=>$month, "attachment"=>$attachment, "postnmb"=>$postnmb, "first_time_complete" => $first_time, "semester" => $semester);

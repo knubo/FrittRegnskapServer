@@ -85,6 +85,35 @@ class User {
         return $this->personId;
     }
 
+	function mergeProfile($user, $toMergeStr) {
+		$profile = $this->getProfile($user);
+		$toMerge = json_decode($toMergeStr);
+		
+		foreach($toMerge as $key => $value) {
+			$profile[$key] = $value;
+		}
+
+		$this->updateProfile($user, $profile);
+	}
+
+	function updateProfile($user, $profile) {
+		$prep = $this->db->prepare("update". AppConfig::pre() ."user set profile=? where username = ?");
+        $prep->bind_params("ss", json_encode($profile), $user);
+        $res = $prep->execute();
+        
+	}
+
+	function getProfile($user) {
+		$prep = $this->db->prepare("select profile from ". AppConfig::pre() ."user where username = ?");
+        $prep->bind_params("s", $user);
+        $res = $prep->execute();
+        
+        if(!$res["profile"]) {
+        	return array();
+        }
+        return json_decode($res["profile"]);
+	}
+
 
     function getAll() {
         $prep = $this->db->prepare("select username, person, concat_ws(' ',firstname, lastname) as name, readonly,reducedwrite,project_required, see_secret from ". AppConfig::pre() ."user, ".AppConfig::pre()."person where id=person");

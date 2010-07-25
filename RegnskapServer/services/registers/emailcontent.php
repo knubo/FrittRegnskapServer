@@ -26,7 +26,10 @@ switch ($action) {
         break;
     case "report_init":
         $contentHelper = new EmailContent($db);
+        $accUser = new User($db);
         $data = $contentHelper->getAll();
+        $data["profile"] = $accUser->getProfile($currentUser);
+        
         echo json_encode($data);
         break;
     case "setup_init":

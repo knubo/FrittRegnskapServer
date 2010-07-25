@@ -87,6 +87,9 @@ $leftJoinPart .= "left join ".$pre."standard BB ON (BB.id = 'BACKUP_BY')";
 $fields .= ", BU.value as backup_time";
 $leftJoinPart .= "left join ".$pre."standard BU ON (BU.id = 'BACKUP_TIME')";
 
+//First time setup
+$fields .= ", FT.value as first_time_complete";
+$leftJoinPart .= "left join ".$pre."standard FT ON (FT.id = '".AccountStandard::CONST_FIRST_TIME_SETUP."')";
 
 
 //Last registered by
@@ -149,6 +152,11 @@ if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
     $arr["info"]["mabye_change_semester"] = 1;
 }
 
+/* Updates fist time complete to reflect that wizard has been used */
+if(!$arr["info"]["first_time_complete"] && $arr["info"]["last_desc"]) {
+	$arr["info"]["first_time_complete"] = 1;
+	$standard->setValue(AccountStandard::CONST_FIRST_TIME_SETUP, 1);
+}
 
 $arr["see_secret"] = $regnSession->canSeeSecret();
 

@@ -1,6 +1,5 @@
 <?php
 
-
 /*
  * Created on Aug 9, 2007
  */
@@ -14,6 +13,7 @@ include_once ("../../classes/reporting/emailer.php");
 include_once ("../../classes/reporting/email_content_class.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/auth/User.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $query = array_key_exists("query", $_REQUEST) ? $_REQUEST["query"] : "all";
@@ -26,15 +26,19 @@ $format = array_key_exists("format", $_REQUEST) ? $_REQUEST["format"] : 0;
 $header = array_key_exists("header", $_REQUEST) ? $_REQUEST["header"] : 0;
 $footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
 $personid = array_key_exists("personid", $_REQUEST) ? $_REQUEST["personid"] : 0;
+$emailSettings = array_key_exists("emailSettings", $_REQUEST) ? $_REQUEST["emailSettings"] : 0;
 
 $db = new DB();
 $regnSession = new RegnSession($db);
 $currentUser = $regnSession->auth();
 
-$standard = new AccountStandard($db);
 
 switch ($action) {
 	case "list" :
+		$standard = new AccountStandard($db);
+		$accUser = new User($db);
+		$accUser->mergeProfile($currentUser, $emailSettings);
+		
 		$ret = array ();
 		switch ($query) {
 			case "members" :

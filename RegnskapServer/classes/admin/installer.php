@@ -89,22 +89,6 @@ class Installer {
     function addStandardData($prefix) {
         $prefix = $prefix."_";
 
-        $ezDate = new eZDate();
-
-        $year = $ezDate->year();
-
-        for($i = 0; $i < 10; $i++) {
-            $prep = $this->db->prepare("insert into ".$prefix."semester (description, year, fall) values (?,?,?)");
-
-            $desc = $i % 2 == 0 ? "VŒr $year" : "H¿st $year";
-
-            if($i > 0 && $i % 2 == 0) {
-                $year++;
-            }
-
-            $prep->bind_params("sii", $desc, $year, $i % 2);
-            $prep->execute();
-        }
 
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_SEMESTER','1')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_MONTH','1')");

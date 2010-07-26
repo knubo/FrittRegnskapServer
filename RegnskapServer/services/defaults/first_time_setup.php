@@ -47,6 +47,8 @@ switch ($action) {
         $standard = new AccountStandard($db);
         $year = $data->year;
         $month = $data->month;
+        $spring = $data->spring;
+        $fall = $data->fall;
 
         $semesterIsFall = $data->semester;
         $standard->setValue(AccountStandard :: CONST_YEAR, $year);
@@ -77,7 +79,7 @@ switch ($action) {
             $prefix = $regnSession->getPrefix();
             $prep = $db->prepare("insert into " . $prefix . "semester (description, year, fall) values (?,?,?)");
 
-            $desc = $i % 2 == 0 ? "VŒr $year" : "H¿st $year";
+            $desc = $i % 2 == 0 ? "$spring $year" : "$fall $year";
 
 
             if ($i > 0 && $i % 2 == 0) {

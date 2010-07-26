@@ -118,6 +118,12 @@ $arr["serverversion"] = Version::SERVER_VERSION;
 $arr["info"] = array_shift($info);
 $arr["accountstatus"] = $accountstatus;
 
+/* Spesial case - first time no semesters are registered... */
+if(!$arr["info"]) {
+    $arr["info"] = array("first_time_complete" => 0, "firstname" => "", "lastname" => "", "lastlogin" => "...");    
+}
+
+
 $now = new eZDate();
 
 if($arr["info"]["last_when"]) {

@@ -34,7 +34,7 @@ switch ($action) {
 
         $year = $ret[AccountStandard :: CONST_YEAR];
         $month = $ret[AccountStandard :: CONST_MONTH];
-
+        
         $res = array (
 			"year" => $year,
 			"month" => $month,
@@ -54,12 +54,18 @@ switch ($action) {
         $standard->setValue(AccountStandard :: CONST_FIRST_TIME_SETUP, 1);
         $ib = $data->IB;
 
-        if (count($ib) > 0) {
+        $gotOne = 0;
+        foreach($ib as $post => $amount) {
+            $gotOne = 1;
+        }
+        
+        if ($gotOne) {
             $acAccountLine = new AccountLine($db);
             $acAccountLine->setNewLatest("IB", 1, $year, $month);
             $acAccountLine->store($month, $year);
 
-            $endTransferPost = 8960;
+            $endTransferPost = $standard->getOneValue(AccountStandard::CONST_IB_POST);
+            
             foreach ($ib as $post => $amount) {
                 $acAccountLine->addPostSingleAmount($acAccountLine->getId(), -1, $endTransferPost, $amount);
                 $acAccountLine->addPostSingleAmount($acAccountLine->getId(), 1, $post, $amount);

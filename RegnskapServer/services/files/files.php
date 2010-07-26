@@ -39,15 +39,37 @@ switch($action) {
         }
 
         $percentUsed = 0;
-        
+
         if(AppConfig::USE_QUOTA) {
             $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
         }
-        
-        echo json_encode(array("files" => $res, 
+
+        echo json_encode(array("files" => $res,
         					"totalsize" => Strings::formatBytes($total), 
         					"quota" => $regnSession->getQuota(). " MB", 
         					"used" => $percentUsed));
+
+        break;
+    case "image":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix()."/";
+        }
+
+        if($file[0] == '.') {
+            echo "0";
+        } else {
+            header('Content-Description: File Transfer');
+            header('Content-Type: image');
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize("../../storage/".$prefix."/".$file));
+            ob_clean();
+            flush();
+            readfile("../../storage/".$prefix."/".$file);
+        }
 
         break;
     case "get":
@@ -61,15 +83,15 @@ switch($action) {
         } else {
             header('Content-Description: File Transfer');
             header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename='.basename($file));
+            header('Content-Disposition: attachment; filename='.$file);
             header('Content-Transfer-Encoding: binary');
             header('Expires: 0');
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($file));
+            header('Content-Length: ' . filesize("../../storage/".$prefix."/".$file));
             ob_clean();
             flush();
-            readfile("../../storage/".$prefix.$file);
+            readfile("../../storage/".$prefix."/".$file);
         }
 
         break;
@@ -123,9 +145,9 @@ switch($action) {
             }
 
             $total += filesize($_FILES['uploadFormElement']['tmp_name']);
-            
+
             $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
-            
+
         }
 
         if($total > 100) {

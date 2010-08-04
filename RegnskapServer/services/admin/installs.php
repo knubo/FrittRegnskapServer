@@ -17,6 +17,7 @@ $hostprefix = array_key_exists("hostprefix", $_REQUEST) ? $_REQUEST["hostprefix"
 $beta = array_key_exists("beta", $_REQUEST) ? $_REQUEST["beta"] : "";
 $quota = array_key_exists("quota", $_REQUEST) ? $_REQUEST["quota"] : "";
 $description = array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : "";
+$wikilogin = array_key_exists("wikilogin", $_REQUEST) ? $_REQUEST["wikilogin"] : "";
 
 $db = new DB();
 $logger = new Logger($db);
@@ -38,7 +39,7 @@ switch($action) {
         echo json_encode($one);
         break;
     case "save":
-        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description);
+        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin);
         echo json_encode(array ("result" => $res));
         break;
     case "list":

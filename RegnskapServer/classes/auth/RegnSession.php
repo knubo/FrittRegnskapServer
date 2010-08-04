@@ -19,6 +19,10 @@ class RegnSession {
             header("HTTP/1.0 510 Not Authenticated :".json_encode($_SESSION));
             die("Not authenticated");           
         }
+
+        /* Usage logging */
+        file_put_contents($_SERVER["DOCUMENT_ROOT"]."/RegnskapServer/ACTIVITY.log",gmdate("d.m.Y-H:i:s",$_SERVER["REQUEST_TIME"])." ".$_SERVER["SERVER_NAME"]." ".$_SESSION["username"]." ".basename($_SERVER["SCRIPT_NAME"])." ".$_REQUEST["action"]."\n", FILE_APPEND);
+        
         return $_SESSION["username"];
     }
     

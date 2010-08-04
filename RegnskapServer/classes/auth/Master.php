@@ -18,9 +18,9 @@
         return $prep->execute();
     }
 
-    function updateInstall($id, $hostprefix, $beta, $quota, $description) {
-        $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=? where id = ?");
-        $prep->bind_params("sissi", $hostprefix, $beta, $quota, $description, $id);
+    function updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin) {
+        $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=?,wikilogin=? where id = ?");
+        $prep->bind_params("sisssi", $hostprefix, $beta, $quota, $description, $wikilogin, $id);
         $prep->execute();
 
         return $this->db->affected_rows();

@@ -4,6 +4,7 @@ include_once ("../../classes/util/DB.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/accounting/accountstandard.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "all";
 $user = array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : "";
@@ -64,6 +65,16 @@ switch ($action) {
         break;
     case "delete" :
         $regnSession->checkWriteAccess();
+        
+        $accStandard = new AccountStandard($db);
+
+        $abortDelete = $accStandard->getOneValue(AccountStandard::CONST_NO_DELETE_USERS);
+        
+        if($abortDelete) {
+            header("HTTP/1.0 513 Validation Error");
+            die(json_encode(array("DELETE_DISABLED")));
+        }
+        
         $accUsers = new User($db);
         $rowsAffected = $accUsers->delete($user);
         $res = array ();

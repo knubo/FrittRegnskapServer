@@ -12,6 +12,15 @@ include_once ("../classes/auth/RegnSession.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
 switch ($action) {
+    case "hash":
+        $host = $_SERVER["SERVER_NAME"];
+        $split = explode(".",$host);
+        $dbn = DB::dbhash($split[0]);
+        echo "Hash is: $dbn for ".$split[0];
+        break;
+
+    case "forward":
+        $forward = 1;
     case "login" :
         $user = $_REQUEST["user"];
         $password = $_REQUEST["password"];
@@ -23,24 +32,24 @@ switch ($action) {
         $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);
         $masterRecord = $master->get_master_record();
-        
+
         if(!$masterRecord) {
-             $arr = array (
+            $arr = array (
 				'error' => 'Ikke identifisert database.'
 				);
 				echo json_encode($arr);
-            break;
+				break;
         }
         $dbu = new DB();
         $sess = new RegnSession($dbu, $masterRecord["dbprefix"]);
-        
+
         $auth = new User($dbu);
 
         if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == User :: AUTH_OK) {
             if(!session_start()) {
                 die("Failed to start session");
             }
-            	
+             
             $_SESSION["prefix"] = $masterRecord["dbprefix"];
             $_SESSION["diskquota"] = $masterRecord["diskquota"];
             $_SESSION["username"] = $user;
@@ -52,15 +61,20 @@ switch ($action) {
             $arr = array (
 				'result' => 'ok', 
             );
-            
-            session_write_close(); 
+
+            session_write_close();
 
         } else {
             $arr = array (
 				'error' => 'Ugyldig brukernavn eller passord.',
                 'dbprefix' => $masterRecord["dbprefix"]
-				);
+            );
         }
+
+        if($forward) {
+            header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
+        }
+
         echo json_encode($arr);
         break;
     case "installations":
@@ -68,7 +82,7 @@ switch ($action) {
         $master = new Master($db);
         echo json_encode($master->getAllInstallations());
         break;
-        
+
     case "logout" :
         $db = new DB();
         $sess = new RegnSession($db);

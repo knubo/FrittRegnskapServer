@@ -1059,7 +1059,7 @@ insert into XXX_post_type
 
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 
-     (8800, 9, null, 'Overføringer');
+     (9000, 9, null, 'Overføringer');
 
 insert into XXX_post_type
      (post_type, coll_post, detail_post, description) values 

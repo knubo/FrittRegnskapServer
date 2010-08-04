@@ -41,7 +41,7 @@ if(!$dbprefix) {
 }
 
 /* The installer should from this point on work on the database hashed by the host name. */
-$dbUser = new DB();
+$dbUser = new DB(0, DB::dbhash($domainname));
 $installer = new Installer($dbUser);
 
 

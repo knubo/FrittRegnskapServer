@@ -31,9 +31,10 @@ $birthdate_required = array_key_exists("birthdate_required", $_REQUEST) ? $_REQU
 
 $db = new DB();
 $regnSession = new RegnSession($db);
-$regnSession->auth();
+$loggedInUser = $regnSession->auth();
 
 $accStd = new AccountStandard($db);
+
 
 switch ($action) {
     case "get" :

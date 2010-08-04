@@ -1,6 +1,5 @@
 <?php
 
-
 class AppConfig {
 
     function db($dbselect = 0) {

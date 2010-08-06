@@ -105,12 +105,15 @@ $info = $prep->execute();
 
 // Status for accounts.
 
-$prep = $db->prepare("select A.post, ((select sum(D.amount) from ".$pre."post D where D.post_type = A.post and D.debet = '1') -".
-		      " (select sum(C.amount) from ".$pre."post C where C.post_type = A.post and C.debet = '-1')) as s".
+$prep = $db->prepare("select A.post, (select sum(D.amount) from ".$pre."post D where D.post_type = A.post and D.debet = '1') as d,".
+		      " (select sum(C.amount) from ".$pre."post C where C.post_type = A.post and C.debet = '-1') as c".
 						   " from ".$pre."accounttrack A");
 
-
 $accountstatus = $prep->execute();
+
+foreach($accountstatus as &$one) {
+    $one["s"] = $one["d"] - $one["c"];
+}
 
 
 $arr = array();

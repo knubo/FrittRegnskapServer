@@ -34,7 +34,7 @@ $hidden = array_key_exists("hidden", $_REQUEST) ? trim($_REQUEST["hidden"]) : 0;
 $gender = array_key_exists("gender", $_REQUEST) ? trim($_REQUEST["gender"]) : '';
 $secretaddress = array_key_exists("secretaddress", $_REQUEST) ? trim($_REQUEST["secretaddress"]) : '';
 $comment = array_key_exists("comment", $_REQUEST) ? trim($_REQUEST["comment"]) : '';
-
+$date = array_key_exists("date", $_REQUEST) ? trim($_REQUEST["date"]) : "";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -42,6 +42,10 @@ $regnSession->auth();
 
 
 switch ($action) {
+    case "changes":
+		$accPers = new AccountPerson($db);
+        echo json_encode($accPers->allChangedSince($date));
+        break;   
 	case "all" :
 		$accPers = new AccountPerson($db);
 		$columnList = $accPers->getAll($onlyEmp);

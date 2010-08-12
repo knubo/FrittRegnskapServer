@@ -18,8 +18,8 @@ class AccountPerson {
     public $Gender;
     public $Secretaddress;
     public $Comment;
-    
-    
+
+
     /* Populated from outside */
     public $Memberships;
     public $BirthdateRequired;
@@ -147,7 +147,7 @@ class AccountPerson {
         $this->setNewsletter($fields["newsletter"]);
         $this->Secretaddress = $fields["secretaddress"];
         $this->Comment = $fields["comment"];
-        
+
         if($fields["birthdate"]) {
             $tmpdate = new eZDate();
             $tmpdate->setMySQLDate($fields["birthdate"]);
@@ -168,21 +168,21 @@ class AccountPerson {
     function save() {
 
         $mysqlDate = NULL;
-        
+
         if($this->Birthdate) {
             $bdSave = new eZDate();
             $bdSave->setDate($this->Birthdate);
-    
+
             $mysqlDate = $bdSave->mySQLDate();
         }
         if ($this->Id) {
-            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=? where id = ?");
+            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=?,lastedit=now() where id = ?");
             $prep->bind_params("sssssssssssiisisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Secretaddress, $this->Comment, $this->Id);
             $prep->execute();
             return $this->db->affected_rows();
         }
 
-        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?");
+        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?,lastedit=now()");
         $prep->bind_params("sssssssssssiisis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender,$this->Secretaddress, $this->Comment);
         $prep->execute();
 
@@ -232,7 +232,7 @@ class AccountPerson {
         $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig::pre() . "user where person=id and username=?)");
 
         $res = $searchWrap->execute();
-        
+
         foreach($res as &$one) {
             if($one["secretaddress"]) {
                 $one["address"] = "#SECRET#";
@@ -240,7 +240,7 @@ class AccountPerson {
                 $one["cellphone"] = "#SECRET#";
             }
         }
-        
+
         return $res;
     }
 
@@ -262,20 +262,20 @@ class AccountPerson {
             $prep = $this->db->prepare("update " . AppConfig::pre() . "person set secret = ? where id = ?");
             $prep->bind_params("si", $secret, $id);
             $prep->execute();
-            
+
             return AppConfig::pre().":".$secret;
         }
         return AppConfig::pre().":".$res[0]["secret"];
     }
-    
+
     function unsubscribeToNewsletter($prefix, $secret, $id) {
-         $prefix = Strings::whitelist($prefix);
-        
-         $prep = $this->db->prepare("update " . $prefix . "person set newsletter = 0 where secret = ? and id = ?");
-         $prep->bind_params("si", $secret, $id);
-         $prep->execute();
+        $prefix = Strings::whitelist($prefix);
+
+        $prep = $this->db->prepare("update " . $prefix . "person set newsletter = 0 where secret = ? and id = ?");
+        $prep->bind_params("si", $secret, $id);
+        $prep->execute();
          
-         return $this->db->affected_rows();
+        return $this->db->affected_rows();
          
     }
 
@@ -283,5 +283,31 @@ class AccountPerson {
         $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person limit 1");
         return $prep->execute();
     }
-    
+
+    function allChangedSince($date) {
+        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person where lastedit >= ? and hidden <> 1");
+        $prep->bind_params("s", $date);
+
+        $res =  $prep->execute();
+
+        foreach($res as &$one) {
+            if($one["secretaddress"]) {
+                $one["address"] = "#SECRET#";
+                $one["phone"] = "#SECRET#";
+                $one["cellphone"] = "#SECRET#";
+            } else {
+                $one["secretaddress"] = 0;
+            }
+            unset($one["hidden"]);
+            unset($one["secret"]);
+            
+            foreach($one as $key => $value) {
+                if($value === NULL) {
+                    $one[$key] = "";
+                }
+            }
+        }
+        
+        return $res;
+    }
 }

@@ -292,9 +292,11 @@ class AccountPerson {
 
         foreach($res as &$one) {
             if($one["secretaddress"]) {
-                $one["address"] = "#SECRET#";
-                $one["phone"] = "#SECRET#";
-                $one["cellphone"] = "#SECRET#";
+                $one["address"] = "";
+                $one["phone"] = "";
+                $one["city"] = "";
+                $one["postnmb"] = "";
+                $one["cellphone"] = "";
             } else {
                 $one["secretaddress"] = 0;
             }

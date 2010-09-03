@@ -44,6 +44,9 @@ class AppConfig {
     const CONVERT = "export PATH=\$PATH:/opt/local/bin;convert";
     
     function pre() {
+        if(!$_SESSION) {
+            return "regn_";            
+        }
         return $_SESSION["prefix"];
     }
 

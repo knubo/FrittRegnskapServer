@@ -264,3 +264,20 @@ CREATE TABLE IF NOT exists XXX_fond_action (
    creditpost INTEGER(5)
 );
 
+CREATE TABLE IF NOT exists XXX_portal_user (
+    username varchar(25) PRIMARY KEY,
+    pass varchar(15),
+    person INT(11) unsigned,
+	show_gender bit,
+	show_birthdate bit,
+	show_cellphone bit,
+	show_phone bit,
+	show_country bit,
+	show_city bit,
+	show_postnmb bit,
+	show_address bit,
+	show_email bit,
+	show_lastname bit,
+	show_firstname bit,
+	show_image bit
+);

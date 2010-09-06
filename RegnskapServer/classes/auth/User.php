@@ -85,34 +85,41 @@ class User {
         return $this->personId;
     }
 
-	function mergeProfile($user, $toMergeStr) {
-		$profile = $this->getProfile($user);
-		$toMerge = json_decode($toMergeStr);
-		
-		foreach($toMerge as $key => $value) {
-			$profile->$key = $value;
-		}
+    function mergeProfile($user, $toMergeStr) {
+        $profile = $this->getProfile($user);
+        $toMerge = json_decode($toMergeStr);
 
-		$this->updateProfile($user, $profile);
-	}
+        if(is_array($profile)) {
+            foreach($toMerge as $key => $value) {
+                $profile[$key] = $value;
+            }
+            
+        } else {
+            foreach($toMerge as $key => $value) {
+                $profile->$key = $value;
+            }
+        }
 
-	function updateProfile($user, $profile) {
-		$prep = $this->db->prepare("update ". AppConfig::pre() ."user set profile=? where username = ?");
+        $this->updateProfile($user, $profile);
+    }
+
+    function updateProfile($user, $profile) {
+        $prep = $this->db->prepare("update ". AppConfig::pre() ."user set profile=? where username = ?");
         $prep->bind_params("ss", json_encode($profile), $user);
         $res = $prep->execute();
-        
-	}
 
-	function getProfile($user) {
-		$prep = $this->db->prepare("select profile from ". AppConfig::pre() ."user where username = ?");
+    }
+
+    function getProfile($user) {
+        $prep = $this->db->prepare("select profile from ". AppConfig::pre() ."user where username = ?");
         $prep->bind_params("s", $user);
         $res = $prep->execute();
 
         if(!$res[0]["profile"]) {
-        	return array();
+            return json_decode(json_encode(array()));
         }
         return json_decode($res[0]["profile"]);
-	}
+    }
 
 
     function getAll() {
@@ -123,10 +130,10 @@ class User {
     function isOnlyOneUserWithSecretAccess() {
         $prep = $this->db->prepare("select count(*) as c from ". AppConfig::pre() ."user where see_secret = 1 and readonly <> 1");
         $res = $prep->execute();
-        
+
         return $res[0]["c"] < 2;
     }
-    
+
     function updatePassword($user, $password) {
         $pass = crypt($password, $this->makesalt());
 
@@ -143,7 +150,7 @@ class User {
         $res = $prep->execute();
         return array_shift($res);
     }
-    
+
     function save($user, $password, $person, $readonly, $reducedwrite, $project_required, $see_secret) {
         if(!$password) {
             $bind = $this->db->prepare("update ". AppConfig::pre() ."user set person=?,readonly=?,reducedwrite=?,project_required=?, see_secret=? where username=?");

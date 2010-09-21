@@ -29,7 +29,7 @@ class PersonImportPersisterClass extends PersonImportClass {
         }
 
         if($field == "newsletter") {
-            if($value != "1" && $value != "0") {
+            if($value != 1 && $value != 0) {
                 $this->error++;
                 return NULL;
             }

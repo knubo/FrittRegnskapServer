@@ -13,7 +13,7 @@ include_once ("../../classes/import/personimportpersisterclass.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $delimiter = array_key_exists("delimiter", $_REQUEST) ? $_REQUEST["delimiter"] : "";
 $exclude = array_key_exists("exclude", $_REQUEST) ? $_REQUEST["exclude"] : "";
-$db = new DB();
+$db = new DB(1);
 $logger = new Logger($db);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
@@ -22,7 +22,7 @@ $regnSession->auth();
 
 switch($action) {
     case "findfields":
-        $content = file_get_contents($_FILES['uploadFormElement']['tmp_name']);
+        $content = Strings::file_get_contents_utf8($_FILES['uploadFormElement']['tmp_name']);
 
         $lines = explode("\n", $content);
          

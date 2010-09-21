@@ -43,7 +43,7 @@ class PersonImportClass {
             return "###ERROR###";
         }
         
-        if($field == "newsletter" && $value != "1" && $value != 0) {
+        if($field == "newsletter" && $value != 1 && $value != 0) {
             $this->errorCount++;
             return "###ERROR###";
         }

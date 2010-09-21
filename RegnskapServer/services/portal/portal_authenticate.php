@@ -19,8 +19,16 @@ switch ($action) {
         echo "Hash is: $dbn for ".$split[0];
         break;
 
+    case "sessionvalid":
+        $db = new DB();
+        $regnSession = new RegnSession($db,0, "portal");
+        $regnSession->auth();
+        echo json_encode(array());
+        break;
+        
     case "forward":
-        $forward = 1;
+        header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
+        break;        
     case "login" :
         $user = $_REQUEST["user"];
         $password = $_REQUEST["password"];
@@ -29,6 +37,8 @@ switch ($action) {
             die("Must supply user and password.");
         }
 
+        header("Content-Type: application/json");
+        
         $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);
         $masterRecord = $master->get_master_record();
@@ -66,13 +76,11 @@ switch ($action) {
             );
         }
 
-        if($forward) {
-            header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
-        }
 
         echo json_encode($arr);
         break;
 
+        
     case "logout" :
         $db = new DB();
         $sess = new RegnSession($db,0, "portal");

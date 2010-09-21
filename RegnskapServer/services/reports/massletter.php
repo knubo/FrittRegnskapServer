@@ -32,13 +32,13 @@ $standard = new AccountStandard($db);
 $dueDate = 0;
 
 if (!$year) {
-	$values = $standard->getValues(array(AccountStandard::CONST_YEAR, "MASSLETTER_DUE_DATE"));
+    $values = $standard->getValues(array(AccountStandard::CONST_YEAR, "MASSLETTER_DUE_DATE"));
 
-	$dueDate = $values["MASSLETTER_DUE_DATE"];
-	$year = $values[AccountStandard::CONST_YEAR];
+    $dueDate = $values["MASSLETTER_DUE_DATE"];
+    $year = $values[AccountStandard::CONST_YEAR];
 
 } else {
-	$dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
+    $dueDate = $standard->getOneValue("MASSLETTER_DUE_DATE");
 }
 
 $accPrices = new AccountMemberPrice($db);
@@ -50,6 +50,16 @@ $trainprice = round($prices["train"]);
 
 error_reporting(E_ALL);
 set_time_limit(1800);
+
+function mysort($a, $b) {
+    $al = strtolower($a);
+    $bl = strtolower($b);
+    if ($al == $bl) {
+        return 0;
+    }
+    return ($al > $bl) ? +1 : -1;
+}
+
 
 $massLetterHelper = new MassLetterHelper($db, $year, $yearprice, $courseprice, $trainprice, $dueDate, $prefix, $regnSession);
 switch ($action) {
@@ -64,15 +74,9 @@ switch ($action) {
             }
             $arr[] = substr($one, 0, -4);
         }
-        usort($arr, function($a, $b) {
-            $al = strtolower($a);
-            $bl = strtolower($b);
-            if ($al == $bl) {
-                return 0;
-            }
-            return ($al > $bl) ? +1 : -1;
-        });
-        
+
+        usort($arr, "mysort");
+
         echo json_encode($arr);
         break;
 

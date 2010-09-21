@@ -11,13 +11,21 @@ $secret = array_key_exists("secret", $_REQUEST) ? $_REQUEST["secret"] : "";
 
 $secretAndPrefix = explode(":", substr($secret,1));
 
+$matches = array();
+preg_match("/([0-9]+)(.+):(.*)/",$secret, &$matches);
 
-$id = substr($secret,0,1);
+if(count($matches) != 4) {
+    die("Klarte ikke tolke inputdata.");
+}
+
+$id = $matches[1];
+$prefix = $matches[2];
+$secretKey = $matches[3];
 
 $db = new DB();
 $accPerson = new AccountPerson($db);
 
-$result = $accPerson->unsubscribeToNewsletter($secretAndPrefix[0], $secretAndPrefix[1], $id);
+$result = $accPerson->unsubscribeToNewsletter($prefix, $secretKey, $id);
 
 if($result) {
     echo "Du er n&aring; avmeldt nyhetsbrevet.";

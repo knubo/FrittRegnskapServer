@@ -36,30 +36,43 @@ class PortalUser {
 
     function authenticate($username, $password, $prefix) {
 
-        $toBind = $this->db->prepare("select pass,person from ". $prefix ."portal_user where username = ?");
+        $toBind = $this->db->prepare("select pass,person,email from ". $prefix ."portal_user U, ". $prefix ."person P where U.person = P.id and P.email like ?");
 
-        $toBind->bind_params("s", $username);
+        $toBind->bind_params("s", "%".$username."%");
 
         $result = $toBind->execute($toBind);
 
-        if (!$result && !sizeof($result)) {
+        if (!$result && sizeof($result) != 1) {
             return PortalUser::AUTH_FAILED;
+        }
+
+        $email = $result[0]["email"];
+
+        if($username != $email) {
+            $emails = explode(",", $email);
+            if(count($emails) > 0) {
+                if(array_search($username, $emails) === FALSE) {
+                    return PortalUser::AUTH_FAILED;
+                }
+            } else {
+                return PortalUser::AUTH_FAILED;
+            }
         }
 
         $crypted = $result[0]["pass"];
 
-        $this->personId = $result[0]["person"];
-
-        if (crypt($password, $crypted) == $crypted) {
-            return PortalUser::AUTH_OK;
+        if (crypt($password, $crypted) != $crypted) {
+            return PortalUser::AUTH_FAILED;
         }
-        return PortalUser::AUTH_FAILED;
+
+        $this->personId = $result[0]["person"];
+        return PortalUser::AUTH_OK;
     }
     function getPersonId() {
         return $this->personId;
     }
 
-    
+
     function updatePassword($user, $password) {
         $pass = crypt($password, $this->makesalt());
 
@@ -76,34 +89,34 @@ class PortalUser {
         $res = $prep->execute();
         return array_shift($res);
     }
-    
+
     /*
-    function save($user, $password, $person) {
-        if(!$password) {
-            $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set person=?,readonly=?,reducedwrite=?,project_required=?, see_secret=? where username=?");
-            $bind->bind_params("iiiiis", $person, $user);
-            $bind->execute();
+     function save($user, $password, $person) {
+     if(!$password) {
+     $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set person=?,readonly=?,reducedwrite=?,project_required=?, see_secret=? where username=?");
+     $bind->bind_params("iiiiis", $person, $user);
+     $bind->execute();
 
-            return $this->db->affected_rows();
-        }
+     return $this->db->affected_rows();
+     }
 
-        $bind = $this->db->prepare("insert into ". AppConfig::pre() ."user set pass=?, person=?, username=?,readonly=?,project_required=?,see_secret=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?,see_secret=?");
-        $pass = crypt($password, $this->makesalt());
+     $bind = $this->db->prepare("insert into ". AppConfig::pre() ."user set pass=?, person=?, username=?,readonly=?,project_required=?,see_secret=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?,see_secret=?");
+     $pass = crypt($password, $this->makesalt());
 
-        $bind->bind_params("sisiiisiiiii", $pass, $person, $user, $readonly, $project_required, $see_secret, $pass, $person, $readonly,$reducedwrite, $project_required,$see_secret);
-        $bind->execute();
+     $bind->bind_params("sisiiisiiiii", $pass, $person, $user, $readonly, $project_required, $see_secret, $pass, $person, $readonly,$reducedwrite, $project_required,$see_secret);
+     $bind->execute();
 
-        return $this->db->affected_rows();
-    }
+     return $this->db->affected_rows();
+     }
 
-    function delete($user) {
-        $bind = $this->db->prepare("delete from ". AppConfig::pre() ."user where username=?");
+     function delete($user) {
+     $bind = $this->db->prepare("delete from ". AppConfig::pre() ."user where username=?");
 
-        $bind->bind_params("s", $user);
-        $bind->execute();
+     $bind->bind_params("s", $user);
+     $bind->execute();
 
-        return $this->db->affected_rows();
-    }
-    */
+     return $this->db->affected_rows();
+     }
+     */
 }
 ?>

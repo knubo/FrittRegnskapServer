@@ -37,7 +37,9 @@ switch ($action) {
             die("Must supply user and password.");
         }
 
-        header("Content-Type: application/json");
+        if(!array_key_exists("test",$_REQUEST)) {
+            header("Content-Type: application/json");
+        }
         
         $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);

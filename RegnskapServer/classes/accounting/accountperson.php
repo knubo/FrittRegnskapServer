@@ -118,6 +118,17 @@ class AccountPerson {
         return $res[0]["firstname"]." ".$res[0]["lastname"];
     }
 
+    function getOnePortal($id) {
+        $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
+        		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image ".
+        		"from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where id = ? and id=person";
+        $prep = $this->db->prepare($sql);
+        $prep->bind_params("i", $id);
+        $res = $prep->execute();
+
+        return array_pop($res);
+    }
+
     function getOne($id) {
         $sql = "select * from " . AppConfig::pre() . "person where id = ?";
         $prep = $this->db->prepare($sql);
@@ -163,6 +174,21 @@ class AccountPerson {
         $res = $prep->execute();
 
         return $res;
+    }
+
+    function savePortalUser($id, $data) {
+        $bdSave = new eZDate();
+        $bdSave->setDate($data->birthdate);
+        $mysqlDate = $bdSave->mySQLDate();
+
+
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,birthdate=?,newsletter=?, gender=?, lastedit=now() where id = ?");
+        $prep->bind_params("ssssssssssisi", $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city, $data->country, $data->phone, $data->cellphone, $mysqlDate, $data->newsletter, $data->gender, $id);
+        $prep->execute();
+        
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, show_city=?, show_postnmb=?, show_address=?, show_email=?, show_lastname=?, show_firstname=?, show_image=? where person =? ");
+        $prep->bind_params("iiiiiiiiiiiii", $data->show_gender, $data->show_birthdate, $data->show_cellphone, $data->show_phone, $data->show_country, $data->show_city, $data->show_postnmb, $data->show_address, $data->show_email, $data->show_lastname, $data->show_firstname, $data->show_image, $id);
+        $prep->execute();
     }
 
     function save() {
@@ -285,7 +311,7 @@ class AccountPerson {
     }
 
     function allChangedSince($date) {
-        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person where lastedit >= ? and hidden <> 1");
+        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person where firstname is not null and length(firstname) > 0 and lastedit >= ? and (hidden is null or hidden = 0)");
         $prep->bind_params("s", $date);
 
         $res =  $prep->execute();
@@ -302,14 +328,22 @@ class AccountPerson {
             }
             unset($one["hidden"]);
             unset($one["secret"]);
-            
+
+            if(!$one["employee"] || strlen($one["employee"] == 0)) {
+                $one["employee"] = 0;
+            }
+            if(!$one["newsletter"] || strlen($one["newsletter"] == 0)) {
+                $one["newsletter"] = 0;
+            }
+
+
             foreach($one as $key => $value) {
                 if($value === NULL) {
                     $one[$key] = "";
                 }
             }
         }
-        
+
         return $res;
     }
 }

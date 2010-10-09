@@ -64,7 +64,7 @@ switch ($action) {
             $_SESSION["username"] = $user;
             $_SESSION["person_id"] = $auth->getPersonId();
             $arr = array (
-				'result' => 'ok', 
+				'result' => 'ok', 'person_id' => $auth->getPersonId()
             );
 
             session_write_close();

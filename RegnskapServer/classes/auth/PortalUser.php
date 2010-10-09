@@ -36,7 +36,7 @@ class PortalUser {
 
     function authenticate($username, $password, $prefix) {
 
-        $toBind = $this->db->prepare("select pass from ". $prefix ."portal_user where username = ?");
+        $toBind = $this->db->prepare("select pass,person from ". $prefix ."portal_user where username = ?");
 
         $toBind->bind_params("s", $username);
 

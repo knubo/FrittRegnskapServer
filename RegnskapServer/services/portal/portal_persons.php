@@ -21,14 +21,48 @@ switch($action) {
     case "me":
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);
-        echo json_encode($accPerson->getOnePortal($personId));
+
+        $personData = $accPerson->getOnePortal($personId);
+
+        $file = "profile_images/profile_$personId.jpg";
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+
+        $personData["has_profile_image"] = file_exists("../../storage/".$prefix."/".$file) ? 1 : 0;
+
+
+
+        echo json_encode($personData);
         break;
-        
+
+    case "myimage":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = $regnSession->getPersonId();
+
+        $file = "profile_images/profile_$personId.jpg";
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: image');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize("../../storage/".$prefix."/".$file));
+        ob_clean();
+        flush();
+        readfile("../../storage/".$prefix."/".$file);
+        break;
+
     case "save":
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);
         $accPerson->savePortalUser($personId, json_decode($data));
         echo json_encode(array("result" => "ok"));
         break;
-        
+
 }

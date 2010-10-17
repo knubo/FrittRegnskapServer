@@ -70,8 +70,7 @@ switch($action) {
 
         system(AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." "."../../storage/".$prefix."/".$file);
         
-        echo json_encode($_REQUEST);
-        echo json_encode($_FILES);
+        unlink($_FILES['uploadfile']['tmp_name']);
 
         break;
 

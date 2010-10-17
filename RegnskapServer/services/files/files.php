@@ -158,6 +158,8 @@ switch($action) {
             $result["status"] = copy($_FILES['uploadFormElement']['tmp_name'], "../../storage/".$prefix.$fileName) ? 1 : 0;
         }
 
+        unlink($_FILES['uploadFormElement']['tmp_name']);
+        
         $logger->log("info","files", "Uploaded: $fileName");
 
         echo json_encode($result);

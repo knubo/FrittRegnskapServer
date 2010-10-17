@@ -58,6 +58,22 @@ switch($action) {
         readfile("../../storage/".$prefix."/".$file);
         break;
 
+    case "imageupload":
+
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = $regnSession->getPersonId();
+
+        $file = "profile_images/profile_$personId.jpg";
+
+        echo copy($_FILES['uploadfile']['tmp_name'], "../../storage/".$prefix."/".$file);
+        echo json_encode($_REQUEST);
+        echo json_encode($_FILES);
+
+        break;
+
     case "save":
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);

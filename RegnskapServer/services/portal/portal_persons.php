@@ -68,7 +68,8 @@ switch($action) {
 
         $file = "profile_images/profile_$personId.jpg";
 
-        echo copy($_FILES['uploadfile']['tmp_name'], "../../storage/".$prefix."/".$file);
+        system(AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." "."../../storage/".$prefix."/".$file);
+        
         echo json_encode($_REQUEST);
         echo json_encode($_FILES);
 

@@ -8,6 +8,7 @@ include_once ("../../classes/auth/PortalUser.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/auth/RegnSession.php");
+include_once ("../../classes/accounting/accountperson.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
@@ -25,10 +26,46 @@ switch ($action) {
         $regnSession->auth();
         echo json_encode(array());
         break;
-        
+
     case "forward":
         header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
-        break;        
+        break;
+    case "secret":
+        $secret = $_REQUEST["secret"];
+        $id = $_REQUEST["id"];
+
+        if(!$secret || !$id) {
+            die("");
+        }
+        $db = new DB(0, DB::MASTER_DB);
+        $master = new Master($db);
+        $masterRecord = $master->get_master_record();
+
+        if(!$masterRecord) {
+            die('Ikke identifisert database.');
+        }
+        $dbu = new DB();
+        $sess = new RegnSession($dbu, $masterRecord["dbprefix"], "portal");
+
+        $accPerson = new AccountPerson($dbu);
+
+        if(!$accPerson->requirePortaluserSecretMatchAndUpdateSecret($secret, $id)) {
+            die("Ditt engangspassord er ugyldig.");
+        }
+
+        if(!session_start()) {
+            die("Failed to start session");
+        }
+         
+        $_SESSION["prefix"] = $masterRecord["dbprefix"];
+        $_SESSION["username"] = "secret_id";
+        $_SESSION["person_id"] = $id;
+
+        session_write_close();
+
+        header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
+        break;
+
     case "login" :
         $user = $_REQUEST["user"];
         $password = $_REQUEST["password"];
@@ -40,7 +77,7 @@ switch ($action) {
         if(!array_key_exists("test",$_REQUEST)) {
             header("Content-Type: application/json");
         }
-        
+
         $db = new DB(0, DB::MASTER_DB);
         $master = new Master($db);
         $masterRecord = $master->get_master_record();
@@ -82,7 +119,7 @@ switch ($action) {
         echo json_encode($arr);
         break;
 
-        
+
     case "logout" :
         $db = new DB();
         $sess = new RegnSession($db,0, "portal");

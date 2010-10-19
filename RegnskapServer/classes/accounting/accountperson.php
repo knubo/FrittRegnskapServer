@@ -185,7 +185,7 @@ class AccountPerson {
         $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,birthdate=?,newsletter=?, gender=?, lastedit=now() where id = ?");
         $prep->bind_params("ssssssssssisi", $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city, $data->country, $data->phone, $data->cellphone, $mysqlDate, $data->newsletter, $data->gender, $id);
         $prep->execute();
-        
+
         $prep = $this->db->prepare("update " . AppConfig::pre() . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, show_city=?, show_postnmb=?, show_address=?, show_email=?, show_lastname=?, show_firstname=?, show_image=? where person =? ");
         $prep->bind_params("iiiiiiiiiiiii", $data->show_gender, $data->show_birthdate, $data->show_cellphone, $data->show_phone, $data->show_country, $data->show_city, $data->show_postnmb, $data->show_address, $data->show_email, $data->show_lastname, $data->show_firstname, $data->show_image, $id);
         $prep->execute();
@@ -275,23 +275,44 @@ class AccountPerson {
         return $searchWrap->execute();
     }
 
+    function setSecret($id) {
+        $secret = "";
+        for ($i=0; $i<40; $i++) {
+            $secret.= chr(mt_rand(97, 122));
+        }
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "person set secret = ? where id = ?");
+        $prep->bind_params("si", $secret, $id);
+        $prep->execute();
+
+        return $secret;
+    }
+
     function getSecret($id) {
         $prep = $this->db->prepare("select secret from " . AppConfig::pre() . "person where id=?");
         $prep->bind_params("i", $id);
         $res = $prep->execute();
 
         if(!$res[0]["secret"]) {
-            $secret = "";
-            for ($i=0; $i<40; $i++) {
-                $secret.= chr(mt_rand(97, 122));
-            }
-            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set secret = ? where id = ?");
-            $prep->bind_params("si", $secret, $id);
-            $prep->execute();
+
+            $secret = $this->setSecret($id);
 
             return AppConfig::pre().":".$secret;
         }
         return AppConfig::pre().":".$res[0]["secret"];
+    }
+
+    function requirePortaluserSecretMatchAndUpdateSecret($secret, $id) {
+        $prep = $this->db->prepare("select id from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where secret=? and id =? and id=person");
+        $prep->bind_params("si", $secret, $id);
+        $res = $prep->execute();
+        
+        if(count($res) == 0) {
+            return 0;
+        }
+        
+        $this->setSecret($id);
+        
+        return 1;
     }
 
     function unsubscribeToNewsletter($prefix, $secret, $id) {

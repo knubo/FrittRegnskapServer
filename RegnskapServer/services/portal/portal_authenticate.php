@@ -6,9 +6,13 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/auth/PortalUser.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/auth/User.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/accounting/accountperson.php");
+include_once ("../../classes/reporting/emailer.php");
+include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/validators/emailvalidator.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
@@ -25,6 +29,76 @@ switch ($action) {
         $regnSession = new RegnSession($db,0, "portal");
         $regnSession->auth();
         echo json_encode(array());
+        break;
+    case "connect":
+        $email = $_REQUEST["email"];
+        if(!array_key_exists("test",$_REQUEST)) {
+            header("Content-Type: application/json");
+        }
+
+        if(!$email) {
+            die(json_encode(array("error"=>"Inngi epostadresse.")));
+        }
+        if(!EmailValidator::check_email_address($email)) {
+            die(json_encode(array("error"=>"Ugyldig epostadresse.")));
+        }
+
+
+        $db = new DB(0, DB::MASTER_DB);
+        $master = new Master($db);
+        $masterRecord = $master->get_master_record();
+
+        if(!$masterRecord) {
+            die('Ikke identifisert database.');
+        }
+        $dbu = new DB();
+
+        $accPerson = new AccountPerson($dbu);
+
+        $accPerson->setEmail("%".$email."%");
+        $res = $accPerson->search(0);
+
+        if(count($res) == 0) {
+            echo json_encode(array("error"=>"Du er ikke registrert i regnskapsdatabasen."));
+        } else if(count($res) > 1) {
+            echo json_encode(array("error"=>"Du er registrert ".count($res)." ganger i regnskapsdatabasen. Ta kontakt med styret i din klubb slik at de kan fikse dette."));
+            break;
+        } else {
+            $standard = new AccountStandard($dbu);
+
+            $person = $accPerson->getOne($res[0]["id"]);
+
+            $emailer = new Emailer();
+
+            $body = "Linken under gir direkte innlogging til medlemsportalen til Fritt Regnskap. Etter innlogging kan du endre til et nytt passord.\n\n".
+             "http://".$_SERVER["SERVER_NAME"]."/RegnskapServer/services/portal/portal_authenticate.php?action=secret&email=$email&id=".$person["id"]."&secret=".$person["secret"].
+            "\n\nVenligst hilsen Fritt Regnskap.\n\n".
+            "Om du mottar denne eposten og ikke har bedt om engangslink fra medlemsportalen kan du ignorere denne eposten og ditt passord forblir uendret.";
+            $sender = $standard->getOneValue(AccountStandard :: CONST_EMAIL_SENDER);
+            $emailer->sendEmail("Nytt engangspassord til medlemsportal for frittregnskap.no",$email, $body, $sender,0);
+
+            echo json_encode(array("status"=> "ok"));
+        }
+         
+        break;
+
+    case "password":
+
+        $db = new DB();
+        $regnSession = new RegnSession($db,0, "portal");
+        $regnSession->auth();
+        $personId = $regnSession->getPersonId();
+        $password = $_REQUEST["password"];
+
+        if(!$password) {
+            die("Password required");
+        }
+
+        $accPerson = new AccountPerson($db);
+
+        $accPerson->updatePortalPassword($personId, $password);
+
+        echo json_encode(array("status"=> "ok"));
         break;
 
     case "forward":

@@ -118,6 +118,16 @@ class AccountPerson {
         return $res[0]["firstname"]." ".$res[0]["lastname"];
     }
 
+    function updatePortalPassword($personId, $password) {
+        $pass = crypt($password, User::makesalt());
+
+        $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set pass=? where person=?");
+        $bind->bind_params("si", $pass, $personId);
+        
+        $bind->execute();
+    }
+
+
     function getOnePortal($id) {
         $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image ".
@@ -305,13 +315,13 @@ class AccountPerson {
         $prep = $this->db->prepare("select id from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where secret=? and id =? and id=person");
         $prep->bind_params("si", $secret, $id);
         $res = $prep->execute();
-        
+
         if(count($res) == 0) {
             return 0;
         }
-        
+
         $this->setSecret($id);
-        
+
         return 1;
     }
 

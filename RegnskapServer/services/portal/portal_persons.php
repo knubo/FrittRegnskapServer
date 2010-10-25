@@ -23,13 +23,14 @@ switch($action) {
         $accPerson = new AccountPerson($db);
 
         $personData = $accPerson->getOnePortal($personId);
+        $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
 
-        $file = "profile_images/profile_$personId.jpg";
+        $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
         $prefix = "";
         if(AppConfig::USE_QUOTA) {
             $prefix = $regnSession->getPrefix();
         }
-
+        
         $personData["has_profile_image"] = file_exists("../../storage/".$prefix."/".$file) ? 1 : 0;
 
 
@@ -38,13 +39,17 @@ switch($action) {
         break;
 
     case "myimage":
+
         $prefix = "";
         if(AppConfig::USE_QUOTA) {
             $prefix = $regnSession->getPrefix();
         }
         $personId = $regnSession->getPersonId();
 
-        $file = "profile_images/profile_$personId.jpg";
+        $accPerson = new AccountPerson($db);
+        $personData = $accPerson->getOnePortal($personId);
+        $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
+        $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
 
         header('Content-Description: File Transfer');
         header('Content-Type: image');
@@ -65,11 +70,15 @@ switch($action) {
             $prefix = $regnSession->getPrefix();
         }
         $personId = $regnSession->getPersonId();
+        $accPerson = new AccountPerson($db);
+        $personData = $accPerson->getOnePortal($personId);
 
-        $file = "profile_images/profile_$personId.jpg";
+        $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
+
+        $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
 
         system(AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." "."../../storage/".$prefix."/".$file);
-        
+
         unlink($_FILES['uploadfile']['tmp_name']);
 
         break;
@@ -77,8 +86,54 @@ switch($action) {
     case "save":
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);
-        $accPerson->savePortalUser($personId, json_decode($data));
+
+        $saveData =  json_decode($data);
+        $accPerson->savePortalUser($personId, $saveData);
+
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        
+        $filehidden = "profile_images/hidden_profile_$personId.jpg";
+        $file = "profile_images/profile_$personId.jpg";
+        
+        if($saveData->show_image) {
+            if(file_exists("../../storage/".$prefix."/".$filehidden)) {
+                rename("../../storage/".$prefix."/".$filehidden, "../../storage/".$prefix."/".$file);               
+            }
+        } else {
+            if(file_exists("../../storage/".$prefix."/".$file)) {
+                rename("../../storage/".$prefix."/".$file, "../../storage/".$prefix."/".$filehidden);               
+            }
+        }
+
+
         echo json_encode(array("result" => "ok"));
         break;
 
+    case "share":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+
+        $file = "profile_images/portal_cache.json";
+        $cacheFile = "../../storage/".$prefix."/".$file;
+
+        $statInfo = 0;
+        if(file_exists($cacheFile)) {
+            $statInfo = stat($cacheFile);
+        }
+
+        if($statInfo && $statInfo[9] > (time() - (60 * 60 * 24) )) {
+            readfile($cacheFile);
+        } else {
+            $accPerson = new AccountPerson($db);
+             
+            $data = json_encode($accPerson->getSharedCompactPortalData());
+            file_put_contents($cacheFile, $data);
+            echo $data;
+        }
+        break;
 }

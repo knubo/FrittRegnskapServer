@@ -123,10 +123,40 @@ class AccountPerson {
 
         $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set pass=? where person=?");
         $bind->bind_params("si", $pass, $personId);
-        
+
         $bind->execute();
     }
 
+    function getSharedCompactPortalData() {
+        $prep = $this->db->prepare("select person as p, ".
+        "(if(show_firstname,firstname,'')) as f, (if(show_lastname,lastname,'')) as l, ".
+        "(if(show_phone, phone,'')) as q, (if(show_cellphone,cellphone,'')) as c, ".
+        "(if(show_gender, gender, '')) as g, (if(show_email, email, '')) as e, ".
+        "(if(show_address, address, '')) as z, (if(show_city, city, '')) as x, ".
+        "(if(show_postnmb, postnmb, '')) as v, (if(show_country, country, '')) as b, ".
+        "(if(show_birthdate, birthdate, '')) as n, show_image as m, ".
+        "(select min(year) from regn_year_membership where memberid=person) as y". 
+        " from " . AppConfig::pre() . "portal_user," . AppConfig::pre() . "person where person = id and show_firstname");        
+
+        $arr = $prep->execute();
+
+        $accDate = new ezDate();
+        $year = $accDate->year();
+
+        $prepOther = $this->db->prepare("select id, firstname, lastname,(select min(year) from " . AppConfig::pre() . "year_membership where memberid=id) as yf ".
+        " from " . AppConfig::pre() . "person, ". AppConfig::pre() . "year_membership ".
+        " where not exists(select null from regn_portal_user where person=id) and id=memberid and year IN(?, ?) group by id");
+
+        $prepOther->bind_params("ii", $year, $year-1);
+
+        $arrOther = $prepOther->execute();
+
+        foreach($arrOther as $one) {
+            $arr[] = array("p" => $one["id"], "f" => $one["firstname"], "l" => $one["lastname"], "y" => $one["yf"]);
+        }
+
+        return $arr;
+    }
 
     function getOnePortal($id) {
         $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".

@@ -127,7 +127,19 @@ class AccountPerson {
         $bind->execute();
     }
 
+
+
     function getSharedCompactPortalData() {
+        function sortPerson($one, $two) {
+            $res = strcasecmp($one["f"], $two["f"]);
+
+            if($res) {
+                return $res;
+            }
+
+            return strcasecmp($one["l"], $two["l"]);
+        }
+
         $prep = $this->db->prepare("select person as p, ".
         "(if(show_firstname,firstname,'')) as f, (if(show_lastname,lastname,'')) as l, ".
         "(if(show_phone, phone,'')) as q, (if(show_cellphone,cellphone,'')) as c, ".
@@ -154,6 +166,8 @@ class AccountPerson {
         foreach($arrOther as $one) {
             $arr[] = array("p" => $one["id"], "f" => $one["firstname"], "l" => $one["lastname"], "y" => $one["yf"]);
         }
+
+        usort($arr, "sortPerson");
 
         return $arr;
     }

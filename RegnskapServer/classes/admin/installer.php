@@ -79,7 +79,7 @@ class Installer {
         $subject = urldecode("Domenerequest Fritt Regnskap: $domainname");
         $body = urldecode("Wikilogin: $wikilogin\nAdresse:$address\nEmail:$email\nContact:$contact\nClubname:$clubname\nDomainname:$domainname\n");
 
-        $email = "knutbo+fr@ifi.uio.no";
+        $email = "admin@frittregnskap.no";
         $emailer = new Emailer();
 
         $status = $emailer->sendEmail($subject, $email, $body, $email, 0);

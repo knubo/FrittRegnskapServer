@@ -3,6 +3,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/ezdate.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
@@ -30,7 +31,7 @@ switch($action) {
         if(AppConfig::USE_QUOTA) {
             $prefix = $regnSession->getPrefix();
         }
-        
+
         $personData["has_profile_image"] = file_exists("../../storage/".$prefix."/".$file) ? 1 : 0;
 
 
@@ -51,6 +52,31 @@ switch($action) {
         $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
         $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
 
+        header('Content-Description: File Transfer');
+        header('Content-Type: image');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize("../../storage/".$prefix."/".$file));
+        ob_clean();
+        flush();
+        readfile("../../storage/".$prefix."/".$file);
+        break;
+
+    case "image":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = Strings::whitelist($_REQUEST["personId"]);
+        
+        $file = "profile_images/profile_$personId.jpg";
+
+        if(!file_exists("../../storage/".$prefix."/".$file)) {
+            die("No image");
+        }
+        
         header('Content-Description: File Transfer');
         header('Content-Type: image');
         header('Content-Transfer-Encoding: binary');
@@ -94,17 +120,17 @@ switch($action) {
         if(AppConfig::USE_QUOTA) {
             $prefix = $regnSession->getPrefix();
         }
-        
+
         $filehidden = "profile_images/hidden_profile_$personId.jpg";
         $file = "profile_images/profile_$personId.jpg";
-        
+
         if($saveData->show_image) {
             if(file_exists("../../storage/".$prefix."/".$filehidden)) {
-                rename("../../storage/".$prefix."/".$filehidden, "../../storage/".$prefix."/".$file);               
+                rename("../../storage/".$prefix."/".$filehidden, "../../storage/".$prefix."/".$file);
             }
         } else {
             if(file_exists("../../storage/".$prefix."/".$file)) {
-                rename("../../storage/".$prefix."/".$file, "../../storage/".$prefix."/".$filehidden);               
+                rename("../../storage/".$prefix."/".$file, "../../storage/".$prefix."/".$filehidden);
             }
         }
 

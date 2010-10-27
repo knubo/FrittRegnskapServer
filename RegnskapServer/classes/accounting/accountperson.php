@@ -147,7 +147,8 @@ class AccountPerson {
         "(if(show_address, address, '')) as z, (if(show_city, city, '')) as x, ".
         "(if(show_postnmb, postnmb, '')) as v, (if(show_country, country, '')) as b, ".
         "(if(show_birthdate, birthdate, '')) as n, show_image as m, ".
-        "(select min(year) from regn_year_membership where memberid=person) as y". 
+        "(select min(year) from regn_year_membership where memberid=person) as y, ".
+        "show_image as s". 
         " from " . AppConfig::pre() . "portal_user," . AppConfig::pre() . "person where person = id and show_firstname");        
 
         $arr = $prep->execute();

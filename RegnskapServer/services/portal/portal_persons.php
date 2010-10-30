@@ -7,8 +7,7 @@ include_once ("../../classes/util/strings.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
-
-//header("Content-Type: application/json");
+include_once ("../../classes/reporting/emailer.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $data = array_key_exists("data", $_REQUEST) ? $_REQUEST["data"] : 0;

@@ -69,13 +69,13 @@ switch($action) {
             $prefix = $regnSession->getPrefix();
         }
         $personId = Strings::whitelist($_REQUEST["personId"]);
-        
+
         $file = "profile_images/profile_$personId.jpg";
 
         if(!file_exists("../../storage/".$prefix."/".$file)) {
             die("No image");
         }
-        
+
         header('Content-Description: File Transfer');
         header('Content-Type: image');
         header('Content-Transfer-Encoding: binary');
@@ -86,6 +86,33 @@ switch($action) {
         ob_clean();
         flush();
         readfile("../../storage/".$prefix."/".$file);
+        break;
+    case "imagetest":
+        
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = Strings::whitelist($_REQUEST["personId"]);
+
+        $personId = $personId;
+        
+        $file = "finland$personId.jpg";
+
+        if(!file_exists("/Users/knuterikborgen/Pictures/finland/".$file)) {
+            die("No image");
+        }
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: image');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize("/Users/knuterikborgen/Pictures/finland/".$file));
+        ob_clean();
+        flush();
+        readfile("/Users/knuterikborgen/Pictures/finland/".$file);
         break;
 
     case "imageupload":

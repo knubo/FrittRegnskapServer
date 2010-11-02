@@ -175,7 +175,8 @@ class AccountPerson {
 
     function getOnePortal($id) {
         $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
-        		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image ".
+        		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".
+                "homepage, twitter, facebook, linkedin ".
         		"from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where id = ? and id=person";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
@@ -241,8 +242,10 @@ class AccountPerson {
         $prep->bind_params("ssssssssssisi", $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city, $data->country, $data->phone, $data->cellphone, $mysqlDate, $data->newsletter, $data->gender, $id);
         $prep->execute();
 
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, show_city=?, show_postnmb=?, show_address=?, show_email=?, show_lastname=?, show_firstname=?, show_image=? where person =? ");
-        $prep->bind_params("iiiiiiiiiiiii", $data->show_gender, $data->show_birthdate, $data->show_cellphone, $data->show_phone, $data->show_country, $data->show_city, $data->show_postnmb, $data->show_address, $data->show_email, $data->show_lastname, $data->show_firstname, $data->show_image, $id);
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, ".
+        							"show_city=?, show_postnmb=?, show_address=?, show_email=?, show_lastname=?, ".
+        							"show_firstname=?, show_image=?,twitter=?,homepage=?,linkedin=?,facebook=? where person =? ");
+        $prep->bind_params("iiiiiiiiiiiissssi", $data->show_gender, $data->show_birthdate, $data->show_cellphone, $data->show_phone, $data->show_country, $data->show_city, $data->show_postnmb, $data->show_address, $data->show_email, $data->show_lastname, $data->show_firstname, $data->show_image, $data->twitter, $data->homepage,$data->linkedin,$data->facebook,$id);
         $prep->execute();
     }
 

@@ -279,5 +279,9 @@ CREATE TABLE IF NOT exists XXX_portal_user (
 	show_email bit,
 	show_lastname bit,
 	show_firstname bit,
-	show_image bit
+	show_image bit,
+	homepage varchar(255),
+	twitter varchar(255),
+	linkedin varchar(255),
+	facebook varchar(255)
 );

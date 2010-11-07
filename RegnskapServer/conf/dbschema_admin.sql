@@ -8,7 +8,9 @@ create table if not exists installations (
 	wikilogin varchar(40) not null,
     secret varchar(40),
     beta tinyint,
-    INTEGER(6) unsigned sqlIdToRun
+    INTEGER(6) unsigned sqlIdToRun,
+    portal_status int,
+    portal_title varchar(255)
 );
 
 create table if not exists sqllist (

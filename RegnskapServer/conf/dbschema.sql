@@ -283,5 +283,8 @@ CREATE TABLE IF NOT exists XXX_portal_user (
 	homepage varchar(255),
 	twitter varchar(255),
 	linkedin varchar(255),
-	facebook varchar(255)
+	facebook varchar(255),
+	deactivated bit,
+	lastlogin TIMESTAMP
+
 );

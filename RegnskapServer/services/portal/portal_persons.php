@@ -136,6 +136,11 @@ switch($action) {
         break;
 
     case "save":
+        
+        if(strpos($data, "<") !== FALSE || strpos($data, "<") !== FALSE) {
+            die(json_encode(array("error" =>"Ikke bruk ulovlige tegn som: < eller >")));            
+        }
+        
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);
 

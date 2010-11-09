@@ -17,6 +17,24 @@ include_once ("../../classes/validators/emailvalidator.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
 switch ($action) {
+
+    case "status":
+        $host = $_SERVER["SERVER_NAME"];
+        $split = explode(".",$host);
+        $db = new DB(0, DB::MASTER_DB);
+        
+        $prep = $db->prepare("select portal_status, portal_title from installations where hostprefix = ?");
+        $prep->bind_params("s", $split[0]);
+        
+        $data = array_shift($prep->execute());
+        
+        if(!$data["portal_status"]) {
+            $data["portal_status"] = 0;
+        }
+        
+        echo json_encode($data);
+        break;
+    
     case "hash":
         $host = $_SERVER["SERVER_NAME"];
         $split = explode(".",$host);

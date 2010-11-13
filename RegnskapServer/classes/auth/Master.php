@@ -97,6 +97,25 @@
 
     }
 
+    function update_portal_status($newstatus) {
+        $install = $this->get_master_record();
+
+        $prep = $this->db->prepare("update installations set portal_status=? where id=?");
+        $prep->bind_params("ii", $newstatus, $install["id"]);
+         
+        $prep->execute();
+        
+    }
+
+    function update_portal_info($title) {
+        $install = $this->get_master_record();
+
+        $prep = $this->db->prepare("update installations set portal_title=? where id=?");
+        $prep->bind_params("si", $title, $install["id"]);
+         
+        $prep->execute();
+    }
+
     function get_master_record() {
         /* Do not understand this bug, why is this needed?... */
         if(!$this->db) {

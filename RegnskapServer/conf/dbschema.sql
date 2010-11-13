@@ -174,6 +174,24 @@ create table if not exists XXX_person (
    lastedit TIMESTAMP
 );
 
+create table if not exists XXX_person_backup (
+   id INT(11) unsigned NOT NULL PRIMARY KEY,
+   firstname varchar(50),
+   lastname varchar(50),
+   email varchar(100),
+   address varchar(80),
+   postnmb varchar(4),
+   city varchar(20),
+   country varchar(2),
+   phone varchar(13),
+   cellphone varchar(13),
+   employee tinyint,
+   birthdate DATE,
+   newsletter tinyint,
+   gender varchar(1),
+   lastedit TIMESTAMP
+);
+
 CREATE TABLE IF NOT exists XXX_email_content (
    id INT(5) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
    name varchar(40) unique NOT NULL,

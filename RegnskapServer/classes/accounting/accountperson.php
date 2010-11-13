@@ -237,6 +237,10 @@ class AccountPerson {
         $bdSave->setDate($data->birthdate);
         $mysqlDate = $bdSave->mySQLDate();
 
+        /* Take a backup */
+        $prep = $this->db->prepare("insert ignore into regn_person_backup (id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit) (select id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit from regn_person where id = ?)");
+        $prep->bind_params("i", $id);
+        $prep->execute();
 
         $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,birthdate=?,newsletter=?, gender=?, lastedit=now() where id = ?");
         $prep->bind_params("ssssssssssisi", $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city, $data->country, $data->phone, $data->cellphone, $mysqlDate, $data->newsletter, $data->gender, $id);

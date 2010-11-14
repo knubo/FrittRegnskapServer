@@ -173,6 +173,13 @@ class AccountPerson {
         return $arr;
     }
 
+    function getAllPortal() {
+        $sql = "select firstname, lastname, U.* from ". AppConfig::pre() . "person," . AppConfig::pre() . "portal_user U where id=person order by firstname, lastname";
+        $prep = $this->db->prepare($sql);
+        $res = $prep->execute();
+        return $res;        
+    }
+    
     function getOnePortal($id) {
         $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".

@@ -5,6 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/admin/installer.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
@@ -28,6 +29,11 @@ switch($action) {
         echo json_encode(array("portal_title"=> $info["portal_title"], "portal_status"=> $info["portal_status"] ? $info["portal_status"] : 0));
         break;
 
+    case "all":
+        $accPerson = new AccountPerson($db);
+        echo json_encode($accPerson->getAllPortal());
+        break;
+        
     case "saveinfo":
         $dbPortal = new DB(0, DB::MASTER_DB);
         $master = new Master($dbPortal);

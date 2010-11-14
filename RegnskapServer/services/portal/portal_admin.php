@@ -33,7 +33,31 @@ switch($action) {
         $accPerson = new AccountPerson($db);
         echo json_encode($accPerson->getAllPortal());
         break;
-        
+
+    case "image":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = $_REQUEST["image"];
+        $accPerson = new AccountPerson($db);
+        $personData = $accPerson->getOnePortal($personId);
+        $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
+        $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
+
+        header('Content-Description: File Transfer');
+        header('Content-Type: image');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize("../../storage/".$prefix."/".$file));
+        ob_clean();
+        flush();
+        readfile("../../storage/".$prefix."/".$file);
+        break;
+
+
     case "saveinfo":
         $dbPortal = new DB(0, DB::MASTER_DB);
         $master = new Master($dbPortal);

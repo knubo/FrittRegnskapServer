@@ -186,7 +186,9 @@ switch ($action) {
 
         $auth = new PortalUser($dbu);
 
-        if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == PortalUser :: AUTH_OK) {
+        $status = $auth->authenticate($user, $password, $masterRecord["dbprefix"]);
+        
+        if ($status == PortalUser :: AUTH_OK) {
             if(!session_start()) {
                 die("Failed to start session");
             }
@@ -200,7 +202,14 @@ switch ($action) {
 
             session_write_close();
 
-        } else {
+        } else if($status == PortalUser::AUTH_BLOCKED) {
+            $arr = array (
+				'error' => 'Din bruker er sperret.',
+                'dbprefix' => $masterRecord["dbprefix"]
+            );
+            
+        } else { 
+            
             $arr = array (
 				'error' => 'Ugyldig brukernavn eller passord.',
                 'dbprefix' => $masterRecord["dbprefix"]

@@ -29,9 +29,46 @@ switch($action) {
         echo json_encode(array("portal_title"=> $info["portal_title"], "portal_status"=> $info["portal_status"] ? $info["portal_status"] : 0));
         break;
 
+
+    case "one":
+        $accPerson = new AccountPerson($db);
+        echo json_encode($accPerson->getOnePortal($_REQUEST["id"]));
+        break;
+
+    case "setblocked":
+        $accPerson = new AccountPerson($db);
+        $accPerson->setPortalBlocked($_REQUEST["id"],$_REQUEST["blocked"]);
+        echo json_encode(array("result" => 1));
+        break;
+    
     case "all":
         $accPerson = new AccountPerson($db);
         echo json_encode($accPerson->getAllPortal());
+        break;
+
+    case "delProfileImage":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $personId = $_REQUEST["image"];
+        $accPerson = new AccountPerson($db);
+        $personData = $accPerson->getOnePortal($personId);
+        $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
+        $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
+        unlink("../../storage/".$prefix."/".$file);
+
+        echo json_encode(array("result" => 1));
+        break;
+    case "deltwitter":
+    case "delfacebook":
+    case "delhomepage":
+    case "dellinkedin":
+        $accPerson = new AccountPerson($db);
+
+        $accPerson->removeUrlField(substr($action,3), $_REQUEST["id"]);
+
+        echo json_encode(array("result" => 1));
         break;
 
     case "image":

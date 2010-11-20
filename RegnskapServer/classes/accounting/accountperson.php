@@ -127,6 +127,19 @@ class AccountPerson {
         $bind->execute();
     }
 
+    function setPortalBlocked($personId, $blocked) {
+        $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set deactivated=? where person=?");
+        $bind->bind_params("ii", $blocked, $personId);
+
+        $bind->execute();
+    }
+    
+    function removeUrlField($field, $id) {
+        $prep = $this->db->prepare("update ". AppConfig::pre() ."portal_user set $field = '' where person = ?");
+        $prep->bind_params("i", $id);
+        $prep->execute();
+    }
+
 
 
     function getSharedCompactPortalData() {
@@ -177,11 +190,11 @@ class AccountPerson {
         $sql = "select firstname, lastname, U.* from ". AppConfig::pre() . "person," . AppConfig::pre() . "portal_user U where id=person order by firstname, lastname";
         $prep = $this->db->prepare($sql);
         $res = $prep->execute();
-        return $res;        
+        return $res;
     }
-    
+
     function getOnePortal($id) {
-        $sql = "select firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
+        $sql = "select deactivated, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".
                 "homepage, twitter, facebook, linkedin ".
         		"from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where id = ? and id=person";
@@ -245,7 +258,7 @@ class AccountPerson {
         $mysqlDate = $bdSave->mySQLDate();
 
         /* Take a backup */
-        $prep = $this->db->prepare("insert ignore into regn_person_backup (id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit) (select id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit from regn_person where id = ?)");
+        $prep = $this->db->prepare("insert ignore into " . AppConfig::pre() . "person_backup (id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit) (select id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit from " . AppConfig::pre() . "person where id = ?)");
         $prep->bind_params("i", $id);
         $prep->execute();
 

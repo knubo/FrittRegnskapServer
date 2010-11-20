@@ -8,7 +8,8 @@
 class PortalUser {
     const AUTH_OK = 1;
     const AUTH_FAILED = 0;
-
+    const AUTH_BLOCKED = 2;
+    
     private $db;
     private $personId;
 
@@ -36,7 +37,7 @@ class PortalUser {
 
     function authenticate($username, $password, $prefix) {
 
-        $toBind = $this->db->prepare("select pass,person,email from ". $prefix ."portal_user U, ". $prefix ."person P where U.person = P.id and P.email like ?");
+        $toBind = $this->db->prepare("select pass,person,email,deactivated from ". $prefix ."portal_user U, ". $prefix ."person P where U.person = P.id and P.email like ?");
 
         $toBind->bind_params("s", "%".$username."%");
 
@@ -65,6 +66,10 @@ class PortalUser {
             return PortalUser::AUTH_FAILED;
         }
 
+        if($result[0]["deactivated"]) {
+            return PortalUser::AUTH_BLOCKED;
+        }
+        
         $this->personId = $result[0]["person"];
         return PortalUser::AUTH_OK;
     }

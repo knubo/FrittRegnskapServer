@@ -128,8 +128,13 @@ switch($action) {
         $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
 
         $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
-
-        system(AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." "."../../storage/".$prefix."/".$file);
+        
+        if(!is_dir("../../storage/".$prefix."/profile_images/")) {
+            mkdir("../../storage/".$prefix."/profile_images/",0700, true);
+        }
+        
+        $cmd = AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." ../../storage/".$prefix."/".$file;
+        system($cmd);
 
         unlink($_FILES['uploadfile']['tmp_name']);
 

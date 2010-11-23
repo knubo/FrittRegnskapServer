@@ -73,8 +73,7 @@ switch ($action) {
 
         $accPerson = new AccountPerson($dbu);
 
-        $accPerson->setEmail("%".$email."%");
-        $res = $accPerson->search(0);
+        $res = $accPerson->searchByEmailInDb($email, $masterRecord["dbprefix"]);
 
         if(count($res) == 0) {
             echo json_encode(array("error"=>"Du er ikke registrert i regnskapsdatabasen."));
@@ -82,9 +81,9 @@ switch ($action) {
             echo json_encode(array("error"=>"Du er registrert ".count($res)." ganger i regnskapsdatabasen. Ta kontakt med styret i din klubb slik at de kan fikse dette."));
             break;
         } else {
-            $standard = new AccountStandard($dbu);
+            $standard = new AccountStandard($dbu, $masterRecord["dbprefix"]);
 
-            $person = $accPerson->getOne($res[0]["id"]);
+            $person = $res[0];
 
             $emailer = new Emailer();
 
@@ -137,13 +136,13 @@ switch ($action) {
             die('Ikke identifisert database.');
         }
         $dbu = new DB();
-        $sess = new RegnSession($dbu, $masterRecord["dbprefix"], "portal");
-
         $accPerson = new AccountPerson($dbu);
 
-        if(!$accPerson->requirePortaluserSecretMatchAndUpdateSecret($secret, $id)) {
+        if(!$accPerson->requirePortaluserSecretMatchAndUpdateSecret($secret, $id, $masterRecord["dbprefix"])) {
             die("Ditt engangspassord er ugyldig.");
         }
+
+        $sess = new RegnSession($dbu, $masterRecord["dbprefix"], "portal");
 
         if(!session_start()) {
             die("Failed to start session");

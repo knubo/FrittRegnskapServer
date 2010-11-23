@@ -40,7 +40,28 @@ switch($action) {
         $accPerson->setPortalBlocked($_REQUEST["id"],$_REQUEST["blocked"]);
         echo json_encode(array("result" => 1));
         break;
-    
+
+    case "allimages":
+        $prefix = "";
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix();
+        }
+        $dir = "../../storage/".$prefix."/profile_images/";
+
+        $ids = array();
+
+        if ($handle = opendir($dir)) {
+            /* This is the correct way to loop over the directory. */
+            while (false !== ($file = readdir($handle))) {
+                $matches = array();
+                if(preg_match("/_(\d+).jpg/", $file, &$matches)) {
+                    $ids[] = $matches[1];
+                }
+            }
+        }
+        closedir($handle);
+        echo json_encode($ids);
+        break;
     case "all":
         $accPerson = new AccountPerson($db);
         echo json_encode($accPerson->getAllPortal());

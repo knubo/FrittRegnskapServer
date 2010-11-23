@@ -133,7 +133,7 @@ class AccountPerson {
 
         $bind->execute();
     }
-    
+
     function removeUrlField($field, $id) {
         $prep = $this->db->prepare("update ". AppConfig::pre() ."portal_user set $field = '' where person = ?");
         $prep->bind_params("i", $id);
@@ -160,7 +160,7 @@ class AccountPerson {
         "(if(show_address, address, '')) as z, (if(show_city, city, '')) as x, ".
         "(if(show_postnmb, postnmb, '')) as v, (if(show_country, country, '')) as b, ".
         "(if(show_birthdate, birthdate, '')) as n, show_image as m, ".
-        "(select min(year) from regn_year_membership where memberid=person) as y, ".
+        "(select min(year) from " . AppConfig::pre() . "year_membership where memberid=person) as y, ".
         "show_image as s, twitter as t, homepage as h, facebook as j, linkedin as k". 
         " from " . AppConfig::pre() . "portal_user," . AppConfig::pre() . "person where person = id and show_firstname");        
 
@@ -171,7 +171,7 @@ class AccountPerson {
 
         $prepOther = $this->db->prepare("select id, firstname, lastname,(select min(year) from " . AppConfig::pre() . "year_membership where memberid=id) as yf ".
         " from " . AppConfig::pre() . "person, ". AppConfig::pre() . "year_membership ".
-        " where not exists(select null from regn_portal_user where person=id) and id=memberid and year IN(?, ?) group by id");
+        " where not exists(select null from " . AppConfig::pre() . "portal_user where person=id) and id=memberid and year IN(?, ?) group by id");
 
         $prepOther->bind_params("ii", $year, $year-1);
 
@@ -193,10 +193,20 @@ class AccountPerson {
         return $res;
     }
 
+    function searchByEmailInDb($email, $dbprefix) {
+        $email = "%".$email."%";
+        $sql = "select id, secret from ".$dbprefix."person where email like ?";
+        
+        $prep = $this->db->prepare($sql);
+        $prep->bind_params("s", $email);
+        return $prep->execute();
+        
+    }
+
     function getOnePortal($id) {
-        $sql = "select deactivated, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter, gender,".
+        $sql = "select deactivated, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".
-                "homepage, twitter, facebook, linkedin ".
+                "homepage, twitter, facebook, linkedin, ifnull(newsletter, 0) as newsletter ".
         		"from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where id = ? and id=person";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
@@ -357,12 +367,17 @@ class AccountPerson {
         return $searchWrap->execute();
     }
 
-    function setSecret($id) {
+    function setSecret($id, $prefix = 0) {
         $secret = "";
         for ($i=0; $i<40; $i++) {
             $secret.= chr(mt_rand(97, 122));
         }
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "person set secret = ? where id = ?");
+        
+        if(!$prefix) {
+            $prefix = AppConfig::pre();
+        }
+        
+        $prep = $this->db->prepare("update " . $prefix . "person set secret = ? where id = ?");
         $prep->bind_params("si", $secret, $id);
         $prep->execute();
 
@@ -383,8 +398,12 @@ class AccountPerson {
         return AppConfig::pre().":".$res[0]["secret"];
     }
 
-    function requirePortaluserSecretMatchAndUpdateSecret($secret, $id) {
-        $prep = $this->db->prepare("select id from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where secret=? and id =? and id=person");
+    function requirePortaluserSecretMatchAndUpdateSecret($secret, $id, $prefix) {
+        $prepins = $this->db->prepare("insert ignore into ".$prefix . "portal_user (person, show_firstname, show_lastname) values (?,1,1)");
+        $prepins->bind_params("i", $id);
+        $prepins->execute();
+        
+        $prep = $this->db->prepare("select id from " . $prefix . "person," . $prefix . "portal_user where secret=? and id =? and id=person");
         $prep->bind_params("si", $secret, $id);
         $res = $prep->execute();
 
@@ -392,7 +411,7 @@ class AccountPerson {
             return 0;
         }
 
-        $this->setSecret($id);
+        $this->setSecret($id, $prefix);
 
         return 1;
     }

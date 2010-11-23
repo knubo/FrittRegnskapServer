@@ -283,9 +283,8 @@ CREATE TABLE IF NOT exists XXX_fond_action (
 );
 
 CREATE TABLE IF NOT exists XXX_portal_user (
-    username varchar(80) PRIMARY KEY,
     pass varchar(15),
-    person INT(11) unsigned,
+    person INT(11) unsigned primary key,
 	show_gender bit,
 	show_birthdate bit,
 	show_cellphone bit,

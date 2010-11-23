@@ -22,25 +22,32 @@ class AccountStandard {
 
 	private $db;
 
-	function AccountStandard($db) {
+	function AccountStandard($db, $prefix = 0) {
 		$this->db = $db;
+		
+		if($prefix) {
+		    $this->prefix = $prefix;
+		} else {
+		    $this->prefix = AppConfig :: pre();
+		} 
+		
 	}
 
 
 	function setValue($id, $value) {
 
-		$prep = $this->db->prepare("select * from " . AppConfig :: pre() . "standard where id=?");
+		$prep = $this->db->prepare("select * from " . $this->prefix . "standard where id=?");
 		$prep->bind_params("s", $id);
 		$query_array = $prep->execute();
 
 		if (count($query_array) > 0) {
-			$prep = $this->db->prepare("update " . AppConfig :: pre() . "standard set value=? where id=?");
+			$prep = $this->db->prepare("update " . $this->prefix . "standard set value=? where id=?");
 			$prep->bind_params("ss", $value, $id);
 			$prep->execute();
 
 			return $this->db->affected_rows();
 		} else {
-			$prep = $this->db->prepare("insert into " . AppConfig :: pre() . "standard (id, value) values (?,?)");
+			$prep = $this->db->prepare("insert into " . $this->prefix . "standard (id, value) values (?,?)");
 			$prep->bind_params("ss", $id, $value);
 			$prep->execute();
 
@@ -49,7 +56,7 @@ class AccountStandard {
 	}
 
 	function getValue($id) {
-		$prep = $this->db->prepare("select value from " . AppConfig :: pre() . "standard where id=?");
+		$prep = $this->db->prepare("select value from " . $this->prefix . "standard where id=?");
 		$prep->bind_params("s", $id);
 
 		$return_array = array ();
@@ -61,7 +68,7 @@ class AccountStandard {
 			}
 		}
 
-		return $return_array;
+    	return $return_array;
 	}
 
 	static function question($q) {
@@ -75,7 +82,7 @@ class AccountStandard {
 		$params = array_map(array("AccountStandard","question"), $ids);
 		$vals = array_map(array("AccountStandard","i"), $ids);
 
-		$prep = $this->db->prepare("select value,id from " . AppConfig :: pre() . "standard where id IN(" . implode(",", $params) . ")");
+		$prep = $this->db->prepare("select value,id from " . $this->prefix . "standard where id IN(" . implode(",", $params) . ")");
 		$prep->bind_array_params(implode("", $vals), $ids);
 
 		$return_array = array ();

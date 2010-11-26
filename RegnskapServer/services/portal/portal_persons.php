@@ -156,6 +156,22 @@ switch($action) {
         $accPerson = new AccountPerson($db);
 
         $saveData =  json_decode($data);
+        
+        if(substr($saveData->homepage, 0, 7) == "http://") {
+            $saveData->homepage = substr($saveData->homepage, 7);
+        }
+        if(substr($saveData->twitter, 0, 7) == "http://") {
+            $saveData->twitter = substr($saveData->twitter, 7);
+        }
+        if(substr($saveData->facebook, 0, 7) == "http://") {
+            $saveData->facebook = substr($saveData->facebook, 7);
+        }
+        if(substr($saveData->linkedin, 0, 7) == "http://") {
+            $saveData->linkedin = substr($saveData->linkedin, 7);
+        }
+        
+        
+        
         $accPerson->savePortalUser($personId, $saveData);
 
         $prefix = "";

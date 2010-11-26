@@ -6,6 +6,7 @@ include_once ("../../classes/util/strings.php");
 include_once ("../../classes/util/logger.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/util/fileutil.php");
 
 $db = new DB();
 $logger = new Logger($db);
@@ -32,9 +33,16 @@ switch($action) {
         $total = 0;
         while(false !== ($data = $directory->read())) {
             if($data[0] != '.') {
-                $size = filesize("../../storage/$prefix/$data");
-                $total += $size;
-                $res[] = array("name"=> $data, "size" => Strings::formatBytes($size));
+                if(is_dir("../../storage/$prefix/$data")) {
+                    $size = dirSize("../../storage/$prefix/$data");
+                    $total += $size;
+                    $res[] = array("name"=> $data, "size" => Strings::formatBytes($size), "link" => 0);
+                    
+                } else {
+                    $size = filesize("../../storage/$prefix/$data");
+                    $total += $size;
+                    $res[] = array("name"=> $data, "size" => Strings::formatBytes($size), "link" => 1);
+                }
             }
         }
 
@@ -139,7 +147,11 @@ switch($action) {
             $total = 0;
             while(false !== ($data = $directory->read())) {
                 if($data[0] != '.') {
-                    $size = filesize("../../storage/$prefix/$data");
+                    if(is_dir("../../storage/$prefix/$data")) {
+                        $size = dirSize("../../storage/$prefix/$data");
+                    } else {
+                        $size = filesize("../../storage/$prefix/$data");
+                    }
                     $total += $size;
                 }
             }
@@ -150,7 +162,7 @@ switch($action) {
 
         }
 
-        if($total > 100) {
+        if($percentUsed > 100) {
             $result["status"] = -1;
         } else if($fileName[0] == '.') {
             $result["status"] = 0;

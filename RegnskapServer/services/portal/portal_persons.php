@@ -8,6 +8,7 @@ include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/reporting/emailer.php");
+include_once ("../../classes/util/fileutil.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
 $data = array_key_exists("data", $_REQUEST) ? $_REQUEST["data"] : 0;
@@ -32,8 +33,6 @@ switch($action) {
         }
 
         $personData["has_profile_image"] = file_exists("../../storage/".$prefix."/".$file) ? 1 : 0;
-
-
 
         echo json_encode($personData);
         break;
@@ -87,34 +86,7 @@ switch($action) {
         flush();
         readfile("../../storage/".$prefix."/".$file);
         break;
-    case "imagetest":
-        
-        $prefix = "";
-        if(AppConfig::USE_QUOTA) {
-            $prefix = $regnSession->getPrefix();
-        }
-        $personId = Strings::whitelist($_REQUEST["personId"]);
-
-        $personId = $personId;
-        
-        $file = "finland$personId.jpg";
-
-        if(!file_exists("/Users/knuterikborgen/Pictures/finland/".$file)) {
-            die("No image");
-        }
-
-        header('Content-Description: File Transfer');
-        header('Content-Type: image');
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
-        header('Content-Length: ' . filesize("/Users/knuterikborgen/Pictures/finland/".$file));
-        ob_clean();
-        flush();
-        readfile("/Users/knuterikborgen/Pictures/finland/".$file);
-        break;
-
+         
     case "imageupload":
 
         $prefix = "";
@@ -128,24 +100,58 @@ switch($action) {
         $hiddenPrefx = $personData["show_image"] ? "" : "hidden_";
 
         $file = "profile_images/".$hiddenPrefx."profile_$personId.jpg";
-        
+
         if(!is_dir("../../storage/".$prefix."/profile_images/")) {
             mkdir("../../storage/".$prefix."/profile_images/",0700, true);
         }
-        
+
+        if(AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix()."/";
+
+            if(!is_dir("../../storage/$prefix")) {
+                mkdir("../../storage/$prefix");
+            }
+
+            $directory = dir("../../storage/$prefix");
+
+            $total = 0;
+            while(false !== ($data = $directory->read())) {
+                if($data[0] != '.') {
+                    if(is_dir("../../storage/$prefix/$data")) {
+                        $size = dirSize("../../storage/$prefix/$data");
+                    } else {
+                        $size = filesize("../../storage/$prefix/$data");
+                    }
+                    $total += $size;
+                }
+            }
+
+            $total += filesize($_FILES['uploadFormElement']['tmp_name']);
+
+            $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
+
+        }
+
+        if($percentUsed > 100) {
+            header("HTTP/1.0 513 Quota exceeded");
+            die("Kan ikke laste opp bilde - diskkvoten er oversteget for portalen.");
+        }
+
         $cmd = AppConfig::CONVERT." -adaptive-resize 200x260 ".$_FILES['uploadfile']['tmp_name']." ../../storage/".$prefix."/".$file;
         system($cmd);
 
         unlink($_FILES['uploadfile']['tmp_name']);
 
+        echo "Profilbilde opplastet";
+        
         break;
 
     case "save":
-        
+
         if(strpos($data, "<") !== FALSE || strpos($data, "<") !== FALSE) {
-            die(json_encode(array("error" =>"Ikke bruk ulovlige tegn som: < eller >")));            
+            die(json_encode(array("error" =>"Ikke bruk ulovlige tegn som: < eller >")));
         }
-        
+
         $personId = $regnSession->getPersonId();
         $accPerson = new AccountPerson($db);
 

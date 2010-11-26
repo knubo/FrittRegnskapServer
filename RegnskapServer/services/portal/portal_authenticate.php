@@ -151,7 +151,8 @@ switch ($action) {
         $_SESSION["prefix"] = $masterRecord["dbprefix"];
         $_SESSION["username"] = "secret_id";
         $_SESSION["person_id"] = $id;
-
+        $_SESSION["diskquota"] = $masterRecord["diskquota"];
+        
         session_write_close();
 
         header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
@@ -195,6 +196,8 @@ switch ($action) {
             $_SESSION["prefix"] = $masterRecord["dbprefix"];
             $_SESSION["username"] = $user;
             $_SESSION["person_id"] = $auth->getPersonId();
+            $_SESSION["diskquota"] = $masterRecord["diskquota"];
+            
             $arr = array (
 				'result' => 'ok', 'person_id' => $auth->getPersonId()
             );

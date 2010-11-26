@@ -43,11 +43,10 @@ switch ($action) {
 
         $userToChange = $accUsers->getOne($user);
 
-        if(!$userToChange) {
-            die("Bad data sent in . $user");
-        }
-
-        if($userToChange["see_secret"] != $see_secret && !$regnSession->canSeeSecret()) {
+        $changeUserSecretInvalid = $userToChange && $userToChange["see_secret"] != $see_secret && !$regnSession->canSeeSecret();
+        $newUserSecretInvalid = !$userToChange && $see_secret && !$regnSession->canSeeSecret();
+        
+        if($changeUserSecretInvalid || $newUserSecretInvalid) {
             header("HTTP/1.0 513 Validation Error");
             die(json_encode(array("MISSING_ACCESS")));
         }

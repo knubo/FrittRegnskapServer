@@ -23,6 +23,10 @@ class AppConfig {
         return array("","","","");
 
     }
+    
+    const DOMENESHOP_USER = "knutbo@ifi.uio.no";
+    const DOMENESHOP_PASS = "";
+    
 
     const DB_HOST_NAME="localhost";
     const DB_USER="root";

@@ -18,6 +18,8 @@ $beta = array_key_exists("beta", $_REQUEST) ? $_REQUEST["beta"] : "";
 $quota = array_key_exists("quota", $_REQUEST) ? $_REQUEST["quota"] : "";
 $description = array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : "";
 $wikilogin = array_key_exists("wikilogin", $_REQUEST) ? $_REQUEST["wikilogin"] : "";
+$portal_status = array_key_exists("portal_status", $_REQUEST) ? $_REQUEST["portal_status"] : "";
+$portal_title = array_key_exists("portal_title", $_REQUEST) ? $_REQUEST["portal_title"] : "";
 
 $db = new DB();
 $logger = new Logger($db);
@@ -39,7 +41,7 @@ switch($action) {
         echo json_encode($one);
         break;
     case "save":
-        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin);
+        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title);
         echo json_encode(array ("result" => $res));
         break;
     case "list":

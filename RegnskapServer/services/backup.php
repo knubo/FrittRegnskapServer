@@ -32,6 +32,19 @@ switch ($action) {
         echo json_encode($backup->tables());
         break;
 
+    case "tables_plain":
+        echo preg_replace("/$prefix/","", json_encode($backup->tables()));
+        break;
+
+    case "schema_plain":
+        echo preg_replace("/XXX_/", "", file_get_contents("../conf/dbschema.sql"));
+        echo preg_replace("/XXX_/", "", file_get_contents("../conf/indexes.sql"));
+        break;
+
+    case "dump_plain":
+        echo preg_replace("/$prefix/","", $backup->dump_plain($prefix.$table));
+        break;
+
     case "init" :
         if(!file_exists("../backup/$prefix")) {
             mkdir("../backup/$prefix");

@@ -87,11 +87,17 @@ $opts3 = array('http' =>
 array(
         'method'  => 'POST',
         'content_type' => 'application/x-www-form-urlencoded',
-		'header' => "Content-type: application/x-www-form-urlencoded\r\n".
-					"User-Agent: Fritt Regnskap Knut Erik Borgen\r\n".
-                    "Cookie: sessionid=".$session."\r\n".
+		'header' => "Host: www.domeneshop.no\r\n".
+                    "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n".
+                    "Accept-Language: en-us,en;q=0.5\r\n".
+                    "Accept-Encoding: gzip,deflate\r\n".
+                    "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7\r\n".
+                    "Referer: https://www.domeneshop.no/admin.cgi?id=449465&edit=forwarding\r\n".
+					"Content-type: application/x-www-form-urlencoded\r\n".
+					"User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12\r\n".
+                    "Cookie: language=no; currency=NOK; sessionid=".$session."\r\n".
 					"Content-Length: " . strlen($postdata) . "\r\n",
-    	'user_agent' => 'Fritt Regnskap admin@frittregnskap.no',
+    	'user_agent' => 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2.12) Gecko/20101026 Firefox/3.6.12',
         'content' => $postdata3
 )
 );
@@ -103,6 +109,6 @@ $fp3 = fopen($urlToAddDomain, 'r', false, $context3);
 fpassthru($fp3);
 fclose($fp3);
 
-echo "used: $postdata3";
+echo "used: $postdata3 <br>".json_encode($opts3);
 
 ?>

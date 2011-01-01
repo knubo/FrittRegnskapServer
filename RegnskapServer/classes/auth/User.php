@@ -86,9 +86,11 @@ class User {
     }
 
     function mergeProfile($user, $toMergeStr) {
+
         $profile = $this->getProfile($user);
         $toMerge = json_decode($toMergeStr);
 
+        
         if(is_array($profile)) {
             foreach($toMerge as $key => $value) {
                 $profile[$key] = $value;

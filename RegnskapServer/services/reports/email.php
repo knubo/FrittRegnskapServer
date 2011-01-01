@@ -37,8 +37,11 @@ $standard = new AccountStandard($db);
 switch ($action) {
     case "list" :
         $accUser = new User($db);
-        $accUser->mergeProfile($currentUser, $emailSettings);
 
+        if($emailSettings) {
+            $accUser->mergeProfile($currentUser, $emailSettings);
+        }
+        
         $ret = array ();
         switch ($query) {
             case "members" :

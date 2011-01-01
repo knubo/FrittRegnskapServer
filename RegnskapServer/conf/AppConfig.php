@@ -46,6 +46,8 @@ class AppConfig {
     const MYSQLDUMP="/usr/local/mysql/bin/mysqldump";
 
     const CONVERT = "export PATH=\$PATH:/opt/local/bin;convert";
+
+    const WIKKA_PREFIX = "wikka2_";
     
     function pre() {
         if(!$_SESSION) {

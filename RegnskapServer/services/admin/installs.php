@@ -64,6 +64,9 @@ switch($action) {
     case "doDelete":
         $master->doDelete($id, $secret);
         break;        
+    case "sendWelcomeLetter":
+        $master->sendWelcomeLetter($id);
+        break;
     default:
         die("Unknown action $action");
 }

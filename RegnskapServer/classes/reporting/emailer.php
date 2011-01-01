@@ -7,7 +7,7 @@
 
 class Emailer {
 
-    function sendEmail($subject, $email, $body, $sender, $attachObj, $prefix="", $html = 0) {
+    function sendEmail($subject, $email, $body, $sender, $attachObj, $prefix="", $html = 0, $bcc = 0) {
         $eol="\r\n";
         $bndp = md5(time()).rand(1000,9999);
         $bndp2 = "2$bndp";
@@ -21,8 +21,9 @@ class Emailer {
         $headers .= "Return-Path: ".$sender.$eol;    // these two to set reply address
         $headers .= "Message-ID: <".time()."-".$sender.">".$eol;
         $headers .= "X-Mailer: PHP v".phpversion().$eol;          // These two to help avoid spam-filters
-
-
+        if($bcc) {
+            $headers .= "BCC: $bcc".$eol;
+        }
 
         $msg.= "--".$bndp.$eol;
         $msg.= "Content-Transfer-Encoding: 8bit".$eol;

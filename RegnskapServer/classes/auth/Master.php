@@ -143,6 +143,34 @@
         return array("dbprefix" => "regn_", "default"=>true, "diskquota"=>42);
     }
 
+    
+    function sendWelcomeLetter($id) {
+        $data = $this->getOneInstallation($id);
+        $prep = $this->db->prepare("select email from ".AppConfig::WIKKA_PREFIX."users where name like ?");
+        $prep->bind_params("s", $data["wikilogin"]);
+        
+        $res = $prep->execute();
+        
+        if(count($res) == 0) {
+            die("No email found for "+$id);
+        }
+        
+        $email = $res[0]["email"];
+        
+        if(!$email) {
+            die("No email found in:".json_encode($res));
+        }
+        
+        $subject = "Ditt regnskapssystem hos Fritt Regnskap er klart til bruk";
+        $body="Velkommen til Fritt Regnskap!\n\nRegsnakspsystemet ditt er klart til bruk via denne addressen:\n\nhttp://".$data["hostprefix"].".frittregnskap.no/prg/AccountingGWT.html\n".
+                "\nMvh\nAdministrajon for Fritt Regnskap\n";
+
+        $emailer = new Emailer();
+        $emailer->sendEmail($subject, $email,$body,"admin@frittregnskap.no", null,0,0, "admin@frittregnskap.no");
+        
+        echo json_encode(array("result"=> ok));
+    }
+    
 
 }
 

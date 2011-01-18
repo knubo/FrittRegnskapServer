@@ -23,6 +23,10 @@ $fields = "S.description as semester_description, S.semester as semester_id, S.f
 $prePart = $pre."semester S, ".$pre."standard SS";
 $wherePart = " S.semester = SS.value and SS.id = '".AccountStandard::CONST_SEMESTER."'";
 
+// Next semester
+$fields .= ", NS.semester as NextSemester";
+$leftJoinPart .= " left join ".$pre."semester NS on (NS.year = if(S.fall = 1, S.year+1,S.year) and NS.fall = if(S.fall = 0, 1, 0) )"; 
+
 // Active month
 $fields .= ", SM.value as active_month";
 $prePart .= ", ".$pre."standard SM";
@@ -39,15 +43,15 @@ $prePart .= ", ".$pre."semester X";
 
 //Next semester course price
 $fields .= ", cp.amount as next_semester_course_price";
-$leftJoinPart .= " left join ".$pre."course_price cp ON (cp.semester = (S.semester + 1))";
+$leftJoinPart .= " left join ".$pre."course_price cp ON (cp.semester = NS.semester)";
 
 //Next semester train price
 $fields .= ", ct.amount as next_semester_train_price";
-$leftJoinPart .= " left join ".$pre."train_price ct ON (ct.semester = (S.semester + 1))";
+$leftJoinPart .= " left join ".$pre."train_price ct ON (ct.semester = NS.semester)";
 
 //Next semester youth price
 $fields .= ", cy.amount as next_semester_youth_price";
-$leftJoinPart .= " left join ".$pre."youth_price cy ON (cy.semester = (S.semester + 1))";
+$leftJoinPart .= " left join ".$pre."youth_price cy ON (cy.semester = NS.semester)";
 
 // Current YEAR for accounting
 $fields .= ", YEAR.value as year";

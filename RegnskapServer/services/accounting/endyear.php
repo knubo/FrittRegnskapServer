@@ -12,6 +12,7 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
+include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/reporting/report_year.php");
 include_once ("../../classes/accounting/helpers/endyearhelper.php");
 include_once ("../../classes/auth/RegnSession.php");
@@ -37,12 +38,17 @@ switch ($action) {
         
         echo json_encode($data);
 		break;
+	case "test":
+	    $accSemester = new AccountSemester($db);
+	    echo "Next semester is:". $accSemester->getSemesterName($accSemester->getNextSemester());
+	    break;
     case "endyear" :
         $regnSession->checkWriteAccess();
 
         $acStandard = new AccountStandard($db);
+        $accSemester = new AccountSemester($db);
+        
         $db->begin();
-        $semester = $acStandard->getOneValue(AccountStandard::CONST_SEMESTER);
         $year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
         $month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
         
@@ -54,7 +60,8 @@ switch ($action) {
         
         $endYearHelper->endYear($year);
         
-        $acStandard->setValue(AccountStandard::CONST_SEMESTER, ($semester + 1));
+        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());
+                
         $acStandard->setValue(AccountStandard::CONST_YEAR, ($year + 1));
         $acStandard->setValue(AccountStandard::CONST_MONTH, 1);
         

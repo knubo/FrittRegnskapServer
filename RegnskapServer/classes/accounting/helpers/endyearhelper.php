@@ -20,7 +20,6 @@ class EndYearHelper {
 
 	    $endYearData = $this->getEndYearData($active_year);
 		
-		
         $acPostType = new AccountPostType($this->db);
 
 		$lastDay = new eZDate();
@@ -51,6 +50,10 @@ class EndYearHelper {
     function getEndYearData($year) {
         $this->result = array();
         $this->year = $year;
+        
+        $acStandard = new AccountStandard($this->db);
+        $this->endYearPost = $acStandard->getOneValue(AccountStandard::CONST_END_YEAR_POST);
+        
         $this->reportYear = new ReportYear($this->db);
 
         $this->addFor1000_to_2000();
@@ -83,16 +86,16 @@ class EndYearHelper {
 
 
             if($data[$one]["value"] > 0) {
-                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"], "trace" => $one);
                 $add["DEBET"] = -1;
                 $this->result[] = $add;
                 $this->result[] = array("post" => $balancePost, "DEBET" => 1, "value" => $data[$one]["value"]);
 
             } else if($data[$one]["value" < 0]) {
-                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => ~$data[$one]["value"]);
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => 0 - $data[$one]["value"], "trace" => $one);
                 $add["DEBET"] = 1;
                 $this->result[] = $add;
-                $this->result[] = array("post" => $balancePost, "DEBET" => -1, "value" => ~$data[$one]["value"]);
+                $this->result[] = array("post" => $balancePost, "DEBET" => -1, "value" => 0 - $data[$one]["value"]);
             }
         }
 
@@ -113,11 +116,11 @@ class EndYearHelper {
 
 
             if($data[$one]["value"] > 0) {
-                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"]);
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => $data[$one]["value"], "trace" => $one);
                 $add["DEBET"] = -1;
                 $this->result[] = $add;
             } else if($data[$one]["value"] < 0) {
-                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => 0 - $data[$one]["value"]);
+                $add = array("description"=> $data[$one]["description"], "post" => $one, "value" => 0 - $data[$one]["value"], "trace" => $one);
                 $add["DEBET"] = 1;
                 $this->result[] = $add;
             }

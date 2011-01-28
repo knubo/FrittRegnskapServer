@@ -12,6 +12,7 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
 include_once ("../../classes/accounting/accountposttype.php");
+include_once ("../../classes/accounting/accountsemester.php");
 include_once ("../../classes/accounting/helpers/endmonthhelper.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
@@ -38,18 +39,18 @@ switch ($action) {
 
         $res = array();
         $res["posts"] = $endHelper->status();
-        $res["year"] = $acStandard->getOneValue("STD_YEAR");;
-        $res["month"] = $acStandard->getOneValue("STD_MONTH");
+        $res["year"] = $acStandard->getOneValue(AccountStandard::CONST_YEAR);;
+        $res["month"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
 		echo json_encode($res);
 		break;
     case "endsemester" :
         $regnSession->checkWriteAccess();
 
+        $accSemester = new AccountSemester($db);
         $acStandard = new AccountStandard($db);
         $db->begin();
         $res = $endHelper->endMonth();
-        $semester = $acStandard->getOneValue("STD_SEMESTER");
-        $acStandard->setValue("STD_SEMESTER", ($semester + 1));
+        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());
         $db->commit();
         echo json_encode("1");
         break;

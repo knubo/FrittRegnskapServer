@@ -91,12 +91,17 @@ class ReportYear {
         foreach(array_keys($resKredit) as $kredKey) {
             
             if(array_key_exists($kredKey, $sums)) {
-                $sums[$kredKey]["value"] -= ($resKredit[$kredKey]["sumpost"] * $sign);
+                $sums[$kredKey]["value"] -= ($resKredit[$kredKey]["sumpost"] );
             } else {
-                $sums[$kredKey] = array("value" => (0.0 - ($resKredit[$kredKey]["sumpost"] * $sign)));
+                $sums[$kredKey] = array("value" => (0.0 - ($resKredit[$kredKey]["sumpost"])));
             }
             $sums[$kredKey]["description"] = $resKredit[$kredKey]["description"];
         }
+        
+        foreach(array_keys($sums) as $key) {
+            $sums[$key]["value"] = $sums[$key]["value"] * $sign; 
+        }
+        
         return $sums;
     }
 

@@ -10,8 +10,9 @@ create table if not exists installations (
     beta tinyint,
     INTEGER(6) unsigned sqlIdToRun,
     portal_status int,
-    portal_title varchar(255)
-);
+    portal_title varchar(255),
+    archive_limit int
+    );
 
 create table if not exists sqllist (
     id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

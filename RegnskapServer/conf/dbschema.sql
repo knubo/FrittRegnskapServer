@@ -305,3 +305,15 @@ CREATE TABLE IF NOT exists XXX_portal_user (
 	lastlogin TIMESTAMP
 
 );
+
+create table if not exists XXX_email_archive (
+   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+   username varchar(25) not null,
+   sent bit,
+   subject text,
+   body text,
+   format varchar(5),
+   footer int,
+   header int,
+   edit_time TIMESTAMP
+);

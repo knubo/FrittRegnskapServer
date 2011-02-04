@@ -40,6 +40,16 @@ class RegnSession {
 
         return $_SESSION["person_id"];
     }
+    
+    function getArchiveMax() {
+        $m = $_SESSION["archive_limit"];
+        
+        if($m) {
+            return $m;
+        }
+        
+        return 2;
+    }
 
     function getQuota() {
         if(!AppConfig::USE_AUTHENTICATION || !AppConfig::USE_QUOTA) {

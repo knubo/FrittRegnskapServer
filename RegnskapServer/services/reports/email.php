@@ -11,6 +11,7 @@ include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/reporting/emailer.php");
 include_once ("../../classes/reporting/email_content_class.php");
+include_once ("../../classes/reporting/email_archive.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/auth/User.php");
@@ -27,10 +28,13 @@ $header = array_key_exists("header", $_REQUEST) ? $_REQUEST["header"] : 0;
 $footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
 $personid = array_key_exists("personid", $_REQUEST) ? $_REQUEST["personid"] : 0;
 $emailSettings = array_key_exists("emailSettings", $_REQUEST) ? $_REQUEST["emailSettings"] : 0;
+$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : 0;
 
 $db = new DB();
 $regnSession = new RegnSession($db);
 $currentUser = $regnSession->auth();
+
+$_REQUEST["username"] = $currentUser;
 
 $standard = new AccountStandard($db);
 
@@ -41,7 +45,7 @@ switch ($action) {
         if($emailSettings) {
             $accUser->mergeProfile($currentUser, $emailSettings);
         }
-        
+
         $ret = array ();
         switch ($query) {
             case "members" :
@@ -129,6 +133,27 @@ switch ($action) {
 
         $res["status"] = $status ? 1 : 0;
         echo json_encode($res);
+        break;
+
+    case "archive_list":
+        $archive = new EmailArchive($db);
+
+        echo json_encode($archive->listAll());
+        break;
+    case "archive_get":
+        $archive = new EmailArchive($db);
+
+        echo json_encode($archive->getOne($id));
+        break;
+    case "archive_save":
+        $archive = new EmailArchive($db);
+        echo json_encode(array("insert_id" => $archive->saveOrUpdate($_REQUEST, $regnSession->getArchiveMax())));
+        break;
+
+    case "archive_delete":
+        $archive = new EmailArchive($db);
+        $archive->delete($id);
+        echo json_encode(array("result" => 1));
         break;
 
     default :

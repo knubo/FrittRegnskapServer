@@ -58,6 +58,13 @@ switch ($action) {
             $_SESSION["project_required"] = $auth->hasProjectRequired();
             $_SESSION["person_id"] = $auth->getPersonId();
             $_SESSION["can_see_secret"] = $auth->canSeeSecret();
+
+            if($masterRecord["archive_limit"]) {
+                $_SESSION["archive_limit"] = $masterRecord["archive_limit"];
+            } else {
+                $_SESSION["archive_limit"] = 2;
+            }
+            
             $arr = array (
 				'result' => 'ok', 
             );

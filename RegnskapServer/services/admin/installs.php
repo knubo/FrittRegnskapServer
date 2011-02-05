@@ -68,6 +68,9 @@ switch($action) {
     case "sendWelcomeLetter":
         $master->sendWelcomeLetter($id);
         break;
+    case "sendPortalLetter":
+        $master->sendPortalLetter($id);
+        break;
     default:
         die("Unknown action $action");
 }

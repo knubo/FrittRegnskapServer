@@ -44,11 +44,12 @@ if(!$dbprefix) {
 $dbUser = new DB(0, DB::dbhash($domainname));
 $installer = new Installer($dbUser);
 
-
 $installer->createTables($dbprefix);
 $installer->createIndexes($dbprefix);
 $installer->addAccountPlan($dbprefix);
 $installer->addStandardData($dbprefix);
+
+$domainname = strtolower($domainname);
 
 try {
     $db->begin();

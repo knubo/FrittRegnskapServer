@@ -104,7 +104,7 @@
         $prep->bind_params("ii", $newstatus, $install["id"]);
          
         $prep->execute();
-        
+
     }
 
     function update_portal_info($title) {
@@ -143,34 +143,75 @@
         return array("dbprefix" => "regn_", "default"=>true, "diskquota"=>42);
     }
 
-    
+
+    function sendPortalLetter($id) {
+
+        $data = $this->getOneInstallation($id);
+        $prep = $this->db->prepare("select dbprefix,hostprefix from installations where id = ?");
+        $prep->bind_params("i", $id);
+
+        $res = $prep->execute();
+
+        if(count($res) == 0) {
+            die("No install found for "+$id);
+        }
+
+        $hostprefix = $res[0]["hostprefix"];
+
+        $dbUser = new DB(0, DB::dbhash($hostprefix));
+
+        $prefix = $res[0]["dbprefix"];
+        $prep = $dbUser->prepare("select email from ".$prefix."user U, ".$prefix."person P where U.person=P.id ");
+
+        $res = $prep->execute();
+
+        $emails = array();
+        foreach($res as $one) {
+            if($one["email"] && strlen($one["email"]) > 0) 
+            $emails[] = $one["email"];
+        }
+
+        $subject = "Medlemsportalen er aktivert for $hostprefix.frittregnskap.no.";
+        $body="Medlemsportalen er blitt aktivert. Den er tilgjengelig her:\n\n".
+             "  http://$hostprefix.frittregnskap.no/portal\n".
+             "\nMvh\nAdministrajonen for Fritt Regnskap\n";
+
+        $emailer = new Emailer();
+        $email = implode(",", $emails);
+        $emailer->sendEmail($subject, $email,$body,"admin@frittregnskap.no", null,0,0, "admin@frittregnskap.no");
+
+        echo json_encode(array("result"=> ok, "receivers"=>$email));
+
+
+    }
+
     function sendWelcomeLetter($id) {
         $data = $this->getOneInstallation($id);
         $prep = $this->db->prepare("select email from ".AppConfig::WIKKA_PREFIX."users where name like ?");
         $prep->bind_params("s", $data["wikilogin"]);
-        
+
         $res = $prep->execute();
-        
+
         if(count($res) == 0) {
             die("No email found for "+$id);
         }
-        
+
         $email = $res[0]["email"];
-        
+
         if(!$email) {
             die("No email found in:".json_encode($res));
         }
-        
+
         $subject = "Ditt regnskapssystem hos Fritt Regnskap er klart til bruk";
-        $body="Velkommen til Fritt Regnskap!\n\nRegsnakspsystemet ditt er klart til bruk via denne addressen:\n\nhttp://".$data["hostprefix"].".frittregnskap.no/prg/AccountingGWT.html\n".
-                "\nMvh\nAdministrajon for Fritt Regnskap\n";
+        $body="Velkommen til Fritt Regnskap!\n\nRegnskapsystemet ditt er klart til bruk via addressen:\n\nhttp://".$data["hostprefix"].".frittregnskap.no/prg/AccountingGWT.html\n".
+                "\nMvh\nAdministrajonen for Fritt Regnskap\n";
 
         $emailer = new Emailer();
         $emailer->sendEmail($subject, $email,$body,"admin@frittregnskap.no", null,0,0, "admin@frittregnskap.no");
-        
+
         echo json_encode(array("result"=> ok));
     }
-    
+
 
 }
 

@@ -47,6 +47,10 @@ class DB {
         return ($h % 2) + 1;
     }
 
+    function close() {
+        mysqli_close($this->link);
+    }
+    
     /**
      * 
      * @param $keeplatin1 If the database strings should be saved as latin-1 strings.

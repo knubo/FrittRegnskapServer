@@ -18,9 +18,9 @@
         return $prep->execute();
     }
 
-    function updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin,$portal_status,$portal_title,$archive_limit) {
-        $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=?,wikilogin=?, portal_status=?,portal_title=?, archive_limit=? where id = ?");
-        $prep->bind_params("sisssisii", $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $id);
+    function updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin,$portal_status,$portal_title,$archive_limit, $parentdbprefix, $reduced_mode) {
+        $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=?,wikilogin=?, portal_status=?,portal_title=?, archive_limit=?, parentdbprefix=?, reduced_mode=? where id = ?");
+        $prep->bind_params("sisssisisii", $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode, $id);
         $prep->execute();
 
         return $this->db->affected_rows();

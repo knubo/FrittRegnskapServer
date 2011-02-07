@@ -21,6 +21,9 @@ $wikilogin = array_key_exists("wikilogin", $_REQUEST) ? $_REQUEST["wikilogin"] :
 $portal_status = array_key_exists("portal_status", $_REQUEST) ? $_REQUEST["portal_status"] : "";
 $portal_title = array_key_exists("portal_title", $_REQUEST) ? $_REQUEST["portal_title"] : "";
 $archive_limit = array_key_exists("archive_limit", $_REQUEST) ? $_REQUEST["archive_limit"] : "";
+$reduced_mode = array_key_exists("reduced_mode", $_REQUEST) ? $_REQUEST["reduced_mode"] : "";
+$parentdbprefix = array_key_exists("parentdbprefix", $_REQUEST) ? $_REQUEST["parentdbprefix"] : "";
+
 
 $db = new DB();
 $logger = new Logger($db);
@@ -42,7 +45,7 @@ switch($action) {
         echo json_encode($one);
         break;
     case "save":
-        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit);
+        $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode);
         echo json_encode(array ("result" => $res));
         break;
     case "list":

@@ -57,12 +57,12 @@ switch ($action) {
                 $users = $accYearMem->getReportUsersFull($year);
                 break;
             case "newsletter" :
-                $accPerson = new AccountPerson($db);
+                $accPerson = new AccountPerson($db, $regnSession->getSuperDBPrefix());
                 $accPerson->setNewsletter(1);
                 $users = $accPerson->search(false);
                 break;
             case "all" :
-                $accPerson = new AccountPerson($db);
+                $accPerson = new AccountPerson($db, $regnSession->getSuperDBPrefix());
                 $users = $accPerson->allWithEmail();
                 echo json_encode($users);
                 die("");
@@ -71,7 +71,7 @@ switch ($action) {
                 if (!$currentUser) {
                     die("Need current user");
                 }
-                $accPerson = new AccountPerson($db);
+                $accPerson = new AccountPerson($db, $regnSession->getSuperDBPrefix());
                 $accPerson->setUser($currentUser);
                 $users = $accPerson->search(false);
         }
@@ -101,7 +101,7 @@ switch ($action) {
         $attObjs = $attachments ? json_decode($attachments) : null;
         $sender = $standard->getOneValue(AccountStandard :: CONST_EMAIL_SENDER);
 
-        $accPerson = new AccountPerson($db);
+        $accPerson = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 
         $secret = $accPerson->getSecret($personid);
 

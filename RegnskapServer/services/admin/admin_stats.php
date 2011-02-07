@@ -41,6 +41,8 @@ foreach($installs as &$one) {
     $row = $res[0];
     
     $one["data"] = $row;
+    $dbins->close();
+    
 }
 
 echo json_encode($installs);

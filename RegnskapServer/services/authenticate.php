@@ -43,9 +43,11 @@ switch ($action) {
         $dbu = new DB();
         $sess = new RegnSession($dbu, $masterRecord["dbprefix"]);
 
-        $auth = new User($dbu);
+        $dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
 
-        if ($auth->authenticate($user, $password, $masterRecord["dbprefix"]) == User :: AUTH_OK) {
+        $auth = new User($dbu);
+        if ($auth->authenticate($user, $password, $dbp) == User :: AUTH_OK) {
+        
             if(!session_start()) {
                 die("Failed to start session");
             }
@@ -63,6 +65,16 @@ switch ($action) {
                 $_SESSION["archive_limit"] = $masterRecord["archive_limit"];
             } else {
                 $_SESSION["archive_limit"] = 2;
+            }
+            if($masterRecord["reduced_mode"]) {
+                $_SESSION["reduced_mode"] = $masterRecord["reduced_mode"];
+            } else {
+                $_SESSION["reduced_mode"] = 0;
+            }
+            if($masterRecord["parentdbprefix"]) {
+                $_SESSION["parentdbprefix"] = $masterRecord["parentdbprefix"]; 
+            } else {
+                $_SESSION["parentdbprefix"] = 0;
             }
             
             $arr = array (

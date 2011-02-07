@@ -43,18 +43,18 @@ $regnSession->auth();
 
 switch ($action) {
     case "changes":
-		$accPers = new AccountPerson($db);
+		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
         echo json_encode($accPers->allChangedSince($date));
         break;   
 	case "all" :
-		$accPers = new AccountPerson($db);
+		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 		$columnList = $accPers->getAll($onlyEmp);
 		echo json_encode($columnList);
 		break;
 	case "get" :
 	    $accStd = new AccountStandard($db);
 	    
-		$accPers = new AccountPerson($db);
+		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 		$accPers->load($id);
 		
 		
@@ -73,7 +73,7 @@ switch ($action) {
 		echo json_encode($accPers);
 		break;
 	case "search" :
-		$accPers = new AccountPerson($db);
+		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 		$accPers->setId($id);
 		$accPers->setFirstname($firstname);
 		$accPers->setLastname($lastname);
@@ -97,7 +97,7 @@ switch ($action) {
         	$validator->addInvalidField("email");
         }
         $validator->dieIfNotValidated();
-		$accPers = new AccountPerson($db);
+		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 		$accPers->setId($id);
 		$accPers->setFirstname($firstname);
 		$accPers->setLastname($lastname);

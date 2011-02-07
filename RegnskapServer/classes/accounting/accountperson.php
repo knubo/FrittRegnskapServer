@@ -18,8 +18,7 @@ class AccountPerson {
     public $Gender;
     public $Secretaddress;
     public $Comment;
-
-
+    
     /* Populated from outside */
     public $Memberships;
     public $BirthdateRequired;
@@ -27,9 +26,16 @@ class AccountPerson {
     /* Only for querying - not in result set */
     private $User;
     private $db;
-
-    function AccountPerson($db) {
+    private $dbPrefix;
+    
+    function AccountPerson($db, $dbP = 0) {
         $this->db = $db;
+        
+        if(!$dbP) {
+            $this->dbPrefix = AppConfig::pre();
+        } else {
+            $this->dbPrefix = $dbP;
+        }
     }
     function setId($id) {
         $this->Id = $id;
@@ -106,7 +112,7 @@ class AccountPerson {
     }
 
     function getName($id) {
-        $sql = "select firstname,lastname from " . AppConfig::pre() . "person where id = ?";
+        $sql = "select firstname,lastname from " . $this->dbPrefix . "person where id = ?";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
         $res = $prep->execute();
@@ -121,21 +127,21 @@ class AccountPerson {
     function updatePortalPassword($personId, $password) {
         $pass = crypt($password, User::makesalt());
 
-        $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set pass=? where person=?");
+        $bind = $this->db->prepare("update ". $this->dbPrefix ."portal_user set pass=? where person=?");
         $bind->bind_params("si", $pass, $personId);
 
         $bind->execute();
     }
 
     function setPortalBlocked($personId, $blocked) {
-        $bind = $this->db->prepare("update ". AppConfig::pre() ."portal_user set deactivated=? where person=?");
+        $bind = $this->db->prepare("update ". $this->dbPrefix ."portal_user set deactivated=? where person=?");
         $bind->bind_params("ii", $blocked, $personId);
 
         $bind->execute();
     }
 
     function removeUrlField($field, $id) {
-        $prep = $this->db->prepare("update ". AppConfig::pre() ."portal_user set $field = '' where person = ?");
+        $prep = $this->db->prepare("update ". $this->dbPrefix ."portal_user set $field = '' where person = ?");
         $prep->bind_params("i", $id);
         $prep->execute();
     }
@@ -160,18 +166,18 @@ class AccountPerson {
         "(if(show_address, address, '')) as z, (if(show_city, city, '')) as x, ".
         "(if(show_postnmb, postnmb, '')) as v, (if(show_country, country, '')) as b, ".
         "(if(show_birthdate, birthdate, '')) as n, show_image as m, ".
-        "(select min(year) from " . AppConfig::pre() . "year_membership where memberid=person) as y, ".
+        "(select min(year) from " . $this->dbPrefix . "year_membership where memberid=person) as y, ".
         "show_image as s, twitter as t, homepage as h, facebook as j, linkedin as k". 
-        " from " . AppConfig::pre() . "portal_user," . AppConfig::pre() . "person where person = id and show_firstname");        
+        " from " . $this->dbPrefix . "portal_user," . $this->dbPrefix . "person where person = id and show_firstname");        
 
         $arr = $prep->execute();
 
         $accDate = new ezDate();
         $year = $accDate->year();
 
-        $prepOther = $this->db->prepare("select id, firstname, lastname,(select min(year) from " . AppConfig::pre() . "year_membership where memberid=id) as yf ".
-        " from " . AppConfig::pre() . "person, ". AppConfig::pre() . "year_membership ".
-        " where not exists(select null from " . AppConfig::pre() . "portal_user where person=id) and id=memberid and year IN(?, ?) group by id");
+        $prepOther = $this->db->prepare("select id, firstname, lastname,(select min(year) from " . $this->dbPrefix . "year_membership where memberid=id) as yf ".
+        " from " . $this->dbPrefix . "person, ". $this->dbPrefix . "year_membership ".
+        " where not exists(select null from " . $this->dbPrefix . "portal_user where person=id) and id=memberid and year IN(?, ?) group by id");
 
         $prepOther->bind_params("ii", $year, $year-1);
 
@@ -187,7 +193,7 @@ class AccountPerson {
     }
 
     function getAllPortal() {
-        $sql = "select firstname, lastname, U.* from ". AppConfig::pre() . "person," . AppConfig::pre() . "portal_user U where id=person order by firstname, lastname";
+        $sql = "select firstname, lastname, U.* from ". $this->dbPrefix . "person," . $this->dbPrefix . "portal_user U where id=person order by firstname, lastname";
         $prep = $this->db->prepare($sql);
         $res = $prep->execute();
         return $res;
@@ -207,7 +213,7 @@ class AccountPerson {
         $sql = "select deactivated, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".
                 "homepage, twitter, facebook, linkedin, ifnull(newsletter, 0) as newsletter ".
-        		"from " . AppConfig::pre() . "person," . AppConfig::pre() . "portal_user where id = ? and id=person";
+        		"from " . $this->dbPrefix . "person," . $this->dbPrefix . "portal_user where id = ? and id=person";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
         $res = $prep->execute();
@@ -216,7 +222,7 @@ class AccountPerson {
     }
 
     function getOne($id) {
-        $sql = "select * from " . AppConfig::pre() . "person where id = ?";
+        $sql = "select * from " . $this->dbPrefix . "person where id = ?";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
         $res = $prep->execute();
@@ -255,7 +261,7 @@ class AccountPerson {
     }
 
     function getAll($isEmpoyee = 0) {
-        $sql = "select id, firstname,lastname,email from " . AppConfig::pre() . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
+        $sql = "select id, firstname,lastname,email from " . $this->dbPrefix . "person" . ($isEmpoyee ? " where employee = 1" : "") . " order by lastname, firstname";
         $prep = $this->db->prepare($sql);
         $res = $prep->execute();
 
@@ -268,15 +274,15 @@ class AccountPerson {
         $mysqlDate = $bdSave->mySQLDate();
 
         /* Take a backup */
-        $prep = $this->db->prepare("insert ignore into " . AppConfig::pre() . "person_backup (id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit) (select id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit from " . AppConfig::pre() . "person where id = ?)");
+        $prep = $this->db->prepare("insert ignore into " . $this->dbPrefix . "person_backup (id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit) (select id,firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate,newsletter,gender,lastedit from " . $this->dbPrefix . "person where id = ?)");
         $prep->bind_params("i", $id);
         $prep->execute();
 
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,birthdate=?,newsletter=?, gender=?, lastedit=now() where id = ?");
+        $prep = $this->db->prepare("update " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,birthdate=?,newsletter=?, gender=?, lastedit=now() where id = ?");
         $prep->bind_params("ssssssssssisi", $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city, $data->country, $data->phone, $data->cellphone, $mysqlDate, $data->newsletter, $data->gender, $id);
         $prep->execute();
 
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, ".
+        $prep = $this->db->prepare("update " . $this->dbPrefix . "portal_user set show_gender=?, show_birthdate=?, show_cellphone=?, show_phone=?, show_country=?, ".
         							"show_city=?, show_postnmb=?, show_address=?, show_email=?, show_lastname=?, ".
         							"show_firstname=?, show_image=?,twitter=?,homepage=?,linkedin=?,facebook=? where person =? ");
         $prep->bind_params("iiiiiiiiiiiissssi", $data->show_gender, $data->show_birthdate, $data->show_cellphone, $data->show_phone, $data->show_country, $data->show_city, $data->show_postnmb, $data->show_address, $data->show_email, $data->show_lastname, $data->show_firstname, $data->show_image, $data->twitter, $data->homepage,$data->linkedin,$data->facebook,$id);
@@ -294,13 +300,13 @@ class AccountPerson {
             $mysqlDate = $bdSave->mySQLDate();
         }
         if ($this->Id) {
-            $prep = $this->db->prepare("update " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=?,lastedit=now() where id = ?");
+            $prep = $this->db->prepare("update " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=?,lastedit=now() where id = ?");
             $prep->bind_params("sssssssssssiisisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Secretaddress, $this->Comment, $this->Id);
             $prep->execute();
             return $this->db->affected_rows();
         }
 
-        $prep = $this->db->prepare("insert into " . AppConfig::pre() . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?,lastedit=now()");
+        $prep = $this->db->prepare("insert into " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?,lastedit=now()");
         $prep->bind_params("sssssssssssiisis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender,$this->Secretaddress, $this->Comment);
         $prep->execute();
 
@@ -315,13 +321,13 @@ class AccountPerson {
             $accSemester = new AccountSemester($this->db);
             $active_semester = addslashes($accStandard->getOneValue(AccountStandard::CONST_SEMESTER));
             $active_year = addslashes($accStandard->getOneValue(AccountStandard::CONST_YEAR));
-            $cols = "*, (select distinct 1 from " . AppConfig::pre() . "train_membership where memberid=id and semester=$active_semester) as train" .
-			", (select distinct 1 from " . AppConfig::pre() . "course_membership where memberid=id and semester=$active_semester) as course" .
-			", (select distinct 1 from " . AppConfig::pre() . "youth_membership where memberid=id and semester=$active_semester) as youth" .
-			", (select distinct 1 from " . AppConfig::pre() . "year_membership where memberid=id and year=$active_year) as year";
+            $cols = "*, (select distinct 1 from " . $this->dbPrefix . "train_membership where memberid=id and semester=$active_semester) as train" .
+			", (select distinct 1 from " . $this->dbPrefix . "course_membership where memberid=id and semester=$active_semester) as course" .
+			", (select distinct 1 from " . $this->dbPrefix . "youth_membership where memberid=id and semester=$active_semester) as youth" .
+			", (select distinct 1 from " . $this->dbPrefix . "year_membership where memberid=id and year=$active_year) as year";
         }
 
-        $searchWrap = $this->db->search("select $cols from " . AppConfig::pre() . "person", "order by lastname,firstname");
+        $searchWrap = $this->db->search("select $cols from " . $this->dbPrefix . "person", "order by lastname,firstname");
 
         $searchWrap->addAndParam("i", "id", $this->Id);
         $searchWrap->addAndParam("s", "firstname", $this->FirstName."%");
@@ -347,7 +353,7 @@ class AccountPerson {
         if($this->Hidden) {
             $searchWrap->addOnlySql("(hidden is null or hidden <> 1)");
         }
-        $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . AppConfig::pre() . "user where person=id and username=?)");
+        $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . $this->dbPrefix . "user where person=id and username=?)");
 
         $res = $searchWrap->execute();
 
@@ -363,7 +369,7 @@ class AccountPerson {
     }
 
     function allWithEmail() {
-        $searchWrap = $this->db->search("select firstname, lastname, email,newsletter from " . AppConfig::pre() . "person where email is not null order by newsletter desc, lastname, firstname, email");
+        $searchWrap = $this->db->search("select firstname, lastname, email,newsletter from " . $this->dbPrefix . "person where email is not null order by newsletter desc, lastname, firstname, email");
         return $searchWrap->execute();
     }
 
@@ -374,7 +380,7 @@ class AccountPerson {
         }
         
         if(!$prefix) {
-            $prefix = AppConfig::pre();
+            $prefix = $this->dbPrefix;
         }
         
         $prep = $this->db->prepare("update " . $prefix . "person set secret = ? where id = ?");
@@ -385,7 +391,7 @@ class AccountPerson {
     }
 
     function getSecret($id) {
-        $prep = $this->db->prepare("select secret from " . AppConfig::pre() . "person where id=?");
+        $prep = $this->db->prepare("select secret from " . $this->dbPrefix . "person where id=?");
         $prep->bind_params("i", $id);
         $res = $prep->execute();
 
@@ -393,9 +399,9 @@ class AccountPerson {
 
             $secret = $this->setSecret($id);
 
-            return AppConfig::pre().":".$secret;
+            return $this->dbPrefix.":".$secret;
         }
-        return AppConfig::pre().":".$res[0]["secret"];
+        return $this->dbPrefix.":".$res[0]["secret"];
     }
 
     function requirePortaluserSecretMatchAndUpdateSecret($secret, $id, $prefix) {
@@ -428,12 +434,12 @@ class AccountPerson {
     }
 
     function getFirst() {
-        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person limit 1");
+        $prep = $this->db->prepare("select * from ".$this->dbPrefix . "person limit 1");
         return $prep->execute();
     }
 
     function allChangedSince($date) {
-        $prep = $this->db->prepare("select * from ".AppConfig::pre() . "person where firstname is not null and length(firstname) > 0 and lastedit >= ? and (hidden is null or hidden = 0)");
+        $prep = $this->db->prepare("select * from ".$this->dbPrefix . "person where firstname is not null and length(firstname) > 0 and lastedit >= ? and (hidden is null or hidden = 0)");
         $prep->bind_params("s", $date);
 
         $res =  $prep->execute();

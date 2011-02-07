@@ -174,6 +174,8 @@ if(!$arr["info"]["first_time_complete"] && $arr["info"]["last_desc"]) {
 
 $arr["see_secret"] = $regnSession->canSeeSecret();
 
+$arr["reduced_mode"] = $regnSession->getReducedMode();
+
 echo json_encode($arr);
 
 

@@ -11,7 +11,9 @@ create table if not exists installations (
     INTEGER(6) unsigned sqlIdToRun,
     portal_status int,
     portal_title varchar(255),
-    archive_limit int
+    archive_limit int,
+    reduced_mode int,
+    parentdbprefix varchar(20) 
     );
 
 create table if not exists sqllist (

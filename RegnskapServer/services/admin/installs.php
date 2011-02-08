@@ -18,6 +18,7 @@ $beta = array_key_exists("beta", $_REQUEST) ? $_REQUEST["beta"] : "";
 $quota = array_key_exists("quota", $_REQUEST) ? $_REQUEST["quota"] : "";
 $description = array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : "";
 $wikilogin = array_key_exists("wikilogin", $_REQUEST) ? $_REQUEST["wikilogin"] : "";
+$domain = array_key_exists("domain", $_REQUEST) ? $_REQUEST["domain"] : "";
 $portal_status = array_key_exists("portal_status", $_REQUEST) ? $_REQUEST["portal_status"] : "";
 $portal_title = array_key_exists("portal_title", $_REQUEST) ? $_REQUEST["portal_title"] : "";
 $archive_limit = array_key_exists("archive_limit", $_REQUEST) ? $_REQUEST["archive_limit"] : "";
@@ -73,6 +74,11 @@ switch($action) {
         break;
     case "sendPortalLetter":
         $master->sendPortalLetter($id);
+        break;
+        
+    case "installprep":
+        $secret = $master->prepareAndAddSecret($wikilogin, $domain);
+        echo json_encode(array("secret" => $secret));
         break;
     default:
         die("Unknown action $action");

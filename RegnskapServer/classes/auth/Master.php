@@ -167,7 +167,7 @@
 
         $emails = array();
         foreach($res as $one) {
-            if($one["email"] && strlen($one["email"]) > 0) 
+            if($one["email"] && strlen($one["email"]) > 0)
             $emails[] = $one["email"];
         }
 
@@ -212,6 +212,37 @@
         echo json_encode(array("result"=> ok));
     }
 
+    function prepareAndAddSecret($wikilogin, $domain) {
+
+        $prep = $this->db->prepare("select * from ".AppConfig::WIKKA_PREFIX."users where name = ?");
+        $prep->bind_params("s", $wikilogin);
+        $res = $prep->execute();
+
+        if(count($res) == 0) {
+            header("HTTP/1.0 513 Validation Error");
+            die(json_encode(array("wikilogin")));
+        }
+
+        $prep = $this->db->prepare("select * from installations where hostprefix = ?");
+        $prep->bind_params("s", $domain);
+        $res = $prep->execute();
+
+        if(count($res) != 0) {
+            header("HTTP/1.0 513 Validation Error");
+            die(json_encode(array("domain")));
+        }
+        
+        $secret = "";
+        for ($i=0; $i<80; $i++) {
+            $secret.= chr(mt_rand(97, 122));
+        }
+
+        $prep = $this->db->prepare("insert into to_install (wikilogin, secret) values (?,?)");
+        $prep->bind_params("ss", $wikilogin, $secret);
+        $prep->execute();
+
+        return $secret;
+    }
 
 }
 

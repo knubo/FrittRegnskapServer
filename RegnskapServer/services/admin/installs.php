@@ -38,8 +38,20 @@ if($regnSession->getPrefix() != "master_") {
 $master = new Master($db);
 
 switch($action) {
-    case "get":
+    case "adminlogin":
+        $secret = $master->updateSecret($id);
+        $one = $master->getOneInstallation($id);
         
+        $srv = $_SERVER['SERVER_NAME'];
+        $parts = explode(".", $srv);        
+        
+        array_shift($parts);
+        
+        $domain = $one["hostprefix"].".".implode(".", $parts);
+        
+        echo json_encode(array("secret" => $secret, "domain" => $domain));
+        break;
+    case "get":
         $dbinfo = AppConfig::db(DB::dbhash($one["hostprefix"]));
         $one = $master->getOneInstallation($id);
         $one["db"] = $dbinfo[3];

@@ -25,18 +25,22 @@ $wherePart = " S.semester = SS.value and SS.id = '".AccountStandard::CONST_SEMES
 
 // Next semester
 $fields .= ", NS.semester as NextSemester";
-$leftJoinPart .= " left join ".$pre."semester NS on (NS.year = if(S.fall = 1, S.year+1,S.year) and NS.fall = if(S.fall = 0, 1, 0) )"; 
+$leftJoinPart .= " left join ".$pre."semester NS on (NS.year = if(S.fall = 1, S.year+1,S.year) and NS.fall = if(S.fall = 0, 1, 0) )";
 
 // Active month
 $fields .= ", SM.value as active_month";
 $prePart .= ", ".$pre."standard SM";
 $wherePart .= " and SM.id = '".AccountStandard::CONST_MONTH."'";
 
-// Person name and last login
-$fields .= ", P.firstname as firstname, P.lastname as lastname, U.lastlogin as lastlogin";
-$prePart .= ", ".$pre."user U, ".$pre."person P ";
-$wherePart .= " and U.username = ? and U.person = P.id";
 
+if($regnSession->getPersonId() > 0) {
+    // Person name and last login
+    $fields .= ", P.firstname as firstname, P.lastname as lastname, U.lastlogin as lastlogin";
+    $prePart .= ", ".$pre."user U, ".$pre."person P ";
+    $wherePart .= " and U.username = ? and U.person = P.id";
+} else {
+    $fields .= ", 'Admin' as firstname, 'Fritt Regnskap' as lastname, '...' as lastlogin";
+}
 //Max semester id
 $fields .= ", max(X.semester) as max_semester_id";
 $prePart .= ", ".$pre."semester X";
@@ -103,7 +107,10 @@ $fields .=", (select concat(firstname, ' ', lastname) from ".$pre."person LP whe
 $query .= "select $fields from ($prePart) $leftJoinPart where $wherePart group by SM.value";
 
 $prep = $db->prepare($query);
-$prep->bind_params("s", $user);
+
+if($regnSession->getPersonId() > 0) {
+    $prep->bind_params("s", $user);
+}
 $info = $prep->execute();
 
 
@@ -127,7 +134,7 @@ $arr["accountstatus"] = $accountstatus;
 
 /* Spesial case - first time no semesters are registered... */
 if(!$arr["info"]) {
-    $arr["info"] = array("first_time_complete" => 0, "firstname" => "", "lastname" => "", "lastlogin" => "...");    
+    $arr["info"] = array("first_time_complete" => 0, "firstname" => "", "lastname" => "", "lastlogin" => "...");
 }
 
 
@@ -167,9 +174,9 @@ if($arr["info"]["active_month"] >= 6 && $arr["info"]["is_fall"] == 0) {
 
 /* Updates fist time complete to reflect that wizard has been used */
 if(!$arr["info"]["first_time_complete"] && $arr["info"]["last_desc"]) {
-	$arr["info"]["first_time_complete"] = 1;
-	$standard = new AccountStandard($db);
-	$standard->setValue(AccountStandard::CONST_FIRST_TIME_SETUP, 1);
+    $arr["info"]["first_time_complete"] = 1;
+    $standard = new AccountStandard($db);
+    $standard->setValue(AccountStandard::CONST_FIRST_TIME_SETUP, 1);
 }
 
 $arr["see_secret"] = $regnSession->canSeeSecret();

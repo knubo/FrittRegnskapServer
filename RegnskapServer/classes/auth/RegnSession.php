@@ -262,5 +262,11 @@ class RegnSession {
         header ("Location: " . $url);
         exit;
     }
+    
+    function allSessions() {
+        $prep = $this->db->prepare("select LastUpdated, DataValue from ".$this->prefix."sessions order by LastUpdated");
+        return $prep->execute();
+    }
+    
 }
 ?>

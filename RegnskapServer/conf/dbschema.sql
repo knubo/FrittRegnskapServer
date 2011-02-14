@@ -317,3 +317,8 @@ create table if not exists XXX_email_archive (
    header int,
    edit_time TIMESTAMP
 );
+
+create table if not exists XXX_email_forward (
+  personid int(11) unsigned
+);
+

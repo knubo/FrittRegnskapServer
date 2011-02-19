@@ -53,17 +53,38 @@ class User {
 
         $crypted = $result[0]["pass"];
 
-        $this->read_only = $result[0]["readonly"];
-        $this->reduced_write = $result[0]["reducedwrite"];
-        $this->project_required = $result[0]["project_required"];
-        $this->personId = $result[0]["person"];
-        $this->can_see_secret = $result[0]["see_secret"];
+        $this->setVariables($result);
 
         if (crypt($password, $crypted) == $crypted) {
             return User::AUTH_OK;
         }
         return User::AUTH_FAILED;
     }
+
+    function authenticateBySecret($secret, $username, $prefix) {
+        $prep = $this->db->prepare("select pass,readonly,reducedwrite,project_required,person,see_secret from ". $prefix ."user, ". $prefix ."person where username = ? and secret=?");
+        $prep->bind_params("ss", $username, $secret);
+        
+        $result = $prep->execute();
+
+        if(count($result) == 0) {
+            return 0;
+        }
+        
+        $this->setVariables($result);
+    
+        return 1;
+    }
+
+
+    function setVariables($result) {
+        $this->read_only = $result[0]["readonly"];
+        $this->reduced_write = $result[0]["reducedwrite"];
+        $this->project_required = $result[0]["project_required"];
+        $this->personId = $result[0]["person"];
+        $this->can_see_secret = $result[0]["see_secret"];
+    }
+
 
     function hasOnlyReadAccess() {
         return $this->read_only ? 1 : 0;
@@ -90,12 +111,12 @@ class User {
         $profile = $this->getProfile($user);
         $toMerge = json_decode($toMergeStr);
 
-        
+
         if(is_array($profile)) {
             foreach($toMerge as $key => $value) {
                 $profile[$key] = $value;
             }
-            
+
         } else {
             foreach($toMerge as $key => $value) {
                 $profile->$key = $value;
@@ -179,5 +200,7 @@ class User {
 
         return $this->db->affected_rows();
     }
+
+
 }
 ?>

@@ -5,6 +5,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/accounting/accountcount.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
@@ -33,6 +34,14 @@ $regnSession = new RegnSession($db);
 $regnSession->auth();
 $regnSession->checkWriteAccess();
 
+
+$validator = new ValidatorStatus();
+if($project == 0 && $regnSession->projectRequired()) {
+    $validator->addInvalidField("project");
+}
+$validator->dieIfNotValidated();
+
+
 $db->begin();
 
 $acStandard = new AccountStandard($db);
@@ -47,8 +56,8 @@ $accLine->store();
 
 $lineId = $accLine->getId();
 
-$accLine->addPostSingleAmount($lineId, '1', $debet, $amount, $project); 
-$accLine->addPostSingleAmount($lineId, '-1', $kredit, $amount, $project); 
+$accLine->addPostSingleAmount($lineId, '1', $debet, $amount, $project);
+$accLine->addPostSingleAmount($lineId, '-1', $kredit, $amount, $project);
 
 $nextAttachment = $accLine->getNextAttachmentNmb($active_year);
 $nextPostNmb = $accLine->getNextPostnmb($active_year, $active_month);

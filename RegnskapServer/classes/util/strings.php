@@ -32,7 +32,7 @@ class Strings {
 
     function createSecret() {
         $secret = "";
-        for ($i=0; $i<40; $i++) {
+        for ($i=0; $i < 40; $i++) {
             $secret.= chr(mt_rand(97, 122));
         }
 

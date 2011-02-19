@@ -137,6 +137,11 @@ if(!$arr["info"]) {
     $arr["info"] = array("first_time_complete" => 0, "firstname" => "", "lastname" => "", "lastlogin" => "...");
 }
 
+if($regnSession->getPersonId() == 0) {
+    $arr["info"]["first_time_complete"] = 1;
+}
+
+
 
 $now = new eZDate();
 

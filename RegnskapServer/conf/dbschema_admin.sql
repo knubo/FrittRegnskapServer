@@ -13,7 +13,8 @@ create table if not exists installations (
     portal_title varchar(255),
     archive_limit int,
     reduced_mode int,
-    parentdbprefix varchar(20) 
+    parentdbprefix varchar(20),
+    parenthostprefix varchar(40)
     );
 
 create table if not exists sqllist (

@@ -36,10 +36,10 @@ $secretaddress = array_key_exists("secretaddress", $_REQUEST) ? trim($_REQUEST["
 $comment = array_key_exists("comment", $_REQUEST) ? trim($_REQUEST["comment"]) : '';
 $date = array_key_exists("date", $_REQUEST) ? trim($_REQUEST["date"]) : "";
 
-$db = new DB();
-$regnSession = new RegnSession($db);
+$regnSession = new RegnSession(new DB());
 $regnSession->auth();
 
+$db = new DB(0, $regnSession->getSuperDBIfAny());
 
 switch ($action) {
     case "changes":

@@ -8,7 +8,7 @@
 class DB {
 
     const MASTER_DB = 1;
-    
+
     private $link;
 
     function link() {
@@ -34,11 +34,11 @@ class DB {
         if($string == "master" || $string == "beta") {
             return 1;
         }
-        
+
         if($string == "bsc") {
             return -1;
         }
-        
+
         $len = count($string);
         for ($i = 0; $i < $len; $i++) {
             $h = 31 * $h + ord(mb_substr($string, $i, 1));
@@ -50,19 +50,19 @@ class DB {
     function close() {
         mysqli_close($this->link);
     }
-    
+
     /**
-     * 
+     *
      * @param $keeplatin1 If the database strings should be saved as latin-1 strings.
-     * @param $dbselect Selects which database shoudl be used. 1 is the location of the master database. 
+     * @param $dbselect Selects which database shoudl be used. 1 is the location of the master database.
      */
     function __construct($keeplatin1 = 0, $dbselect = 0) {
         if(file_exists("../../conf/closed")) {
             header("HTTP/1.0 516 Site Closed");
             die(file_get_contents("../../conf/closed"));
-            
+
         }
-        
+
         error_reporting(0);
 
         $dbinfo = AppConfig::db($dbselect);
@@ -404,13 +404,17 @@ class SearchWrapper {
     function execute() {
         if(sizeof($this->Params) == 0) {
             $sql = $this->Prequery. " ".$this->OuterJoin." ".$this->SqlWhere." ".$this->OrderBy;
+            //die("SQL:$sql");
             $prep = $this->Db->prepare($sql);
+
             return $prep->execute();
         }
 
         $sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
+        //die("SQL2:$sql");
         $prep = $this->Db->prepare($sql);
         $prep->bind_array_params($this->Type, $this->Params);
+
         return $prep->execute();
     }
 }

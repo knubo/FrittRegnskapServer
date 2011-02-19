@@ -41,11 +41,19 @@ class RegnSession {
         return $_SESSION["person_id"];
     }
 
+    function getSuperDBIfAny() {
+        if(!array_key_exists("parentdb", $_SESSION)) {
+            return 0;
+        }
+
+        return $_SESSION["parentdb"];
+    }
+
     function getSuperDBPrefix() {
         if(!array_key_exists("parentdbprefix", $_SESSION)) {
             return 0;
         }
-        
+
         return $_SESSION["parentdbprefix"];
     }
 
@@ -262,11 +270,78 @@ class RegnSession {
         header ("Location: " . $url);
         exit;
     }
-    
+
     function allSessions() {
         $prep = $this->db->prepare("select LastUpdated, DataValue from ".$this->prefix."sessions order by LastUpdated");
         return $prep->execute();
     }
-    
+
+
+    function setSessionVariablesForAdmin($masterRecord) {
+        $_SESSION["username"] = "fradmin";
+        $_SESSION["readonly"] = 0;
+        $_SESSION["reducedwrite"] = 0;
+        $_SESSION["project_required"] = 0;
+        $_SESSION["person_id"] = 0;
+        $_SESSION["can_see_secret"] = 1;
+
+        $_SESSION["ip"] = $_SERVER["REMOTE_ADDR"];
+         
+        $_SESSION["prefix"] = $masterRecord["dbprefix"];
+        $_SESSION["diskquota"] = $masterRecord["diskquota"];
+        if($masterRecord["archive_limit"]) {
+            $_SESSION["archive_limit"] = $masterRecord["archive_limit"];
+        } else {
+            $_SESSION["archive_limit"] = 2;
+        }
+        if($masterRecord["reduced_mode"]) {
+            $_SESSION["reduced_mode"] = $masterRecord["reduced_mode"];
+        } else {
+            $_SESSION["reduced_mode"] = 0;
+        }
+        if($masterRecord["parentdbprefix"]) {
+            $_SESSION["parentdbprefix"] = $masterRecord["parentdbprefix"];
+        } else {
+            $_SESSION["parentdbprefix"] = 0;
+        }
+    }
+
+    function setSessionVarialbesForUser($user, $auth, $masterRecord) {
+
+        $_SESSION["username"] = $user;
+        $_SESSION["readonly"] = $auth->hasOnlyReadAccess();
+        $_SESSION["reducedwrite"] = $auth->hasReducedWrite();
+        $_SESSION["project_required"] = $auth->hasProjectRequired();
+        $_SESSION["person_id"] = $auth->getPersonId();
+        $_SESSION["can_see_secret"] = $auth->canSeeSecret();
+        $_SESSION["ip"] = $_SERVER["REMOTE_ADDR"];
+
+        $_SESSION["prefix"] = $masterRecord["dbprefix"];
+        $_SESSION["diskquota"] = $masterRecord["diskquota"];
+        if($masterRecord["archive_limit"]) {
+            $_SESSION["archive_limit"] = $masterRecord["archive_limit"];
+        } else {
+            $_SESSION["archive_limit"] = 2;
+        }
+        if($masterRecord["reduced_mode"]) {
+            $_SESSION["reduced_mode"] = $masterRecord["reduced_mode"];
+        } else {
+            $_SESSION["reduced_mode"] = 0;
+        }
+        if($masterRecord["parentdbprefix"]) {
+            $_SESSION["parentdbprefix"] = $masterRecord["parentdbprefix"];
+        } else {
+            $_SESSION["parentdbprefix"] = 0;
+        }
+
+        if($masterRecord["parentdb"]) {
+            $_SESSION["parentdb"] = $masterRecord["parentdb"];
+        } else {
+            $_SESSION["parentdb"] = 0;
+        }
+
+    }
+
+
 }
 ?>

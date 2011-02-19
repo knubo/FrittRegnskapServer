@@ -4,29 +4,16 @@ class AppConfig {
 
     function db($dbselect = 0) {
 
-        if(1) {
-            return array("localhost","root","","bsc_kopi");
+        if($dbselect == 2) {
+            return array("localhost","root","","knubo2");
+
         }
-
-        $host = $_SERVER["SERVER_NAME"];
-
-        $split = explode(".",$host);
-
-
-        if($split[0] == 'localhost') {
-            return array("localhost","root","","bsc_kopi");
-        }
-        if($split[0] == 'bsc') {
-            return array("","","","");
-        }
-
-        return array("","","","");
-
+        return array("localhost","root","","bsc_kopi");
     }
-    
+
     const DOMENESHOP_USER = "knutbo@ifi.uio.no";
     const DOMENESHOP_PASS = "";
-    
+
 
     const DB_HOST_NAME="localhost";
     const DB_USER="root";
@@ -48,10 +35,10 @@ class AppConfig {
     const CONVERT = "export PATH=\$PATH:/opt/local/bin;convert";
 
     const WIKKA_PREFIX = "wikka2_";
-    
+
     function pre() {
         if(!$_SESSION) {
-            return "regn_";            
+            return "regn_";
         }
         return $_SESSION["prefix"];
     }
@@ -85,7 +72,7 @@ class AppConfig {
     }
 
     const RELATIVE_PATH_MAIN_SERVICES = "../../../RegnskapServer";
-    
+
     #Fond - club account post
     const ClubAccountPost=1920;
     #

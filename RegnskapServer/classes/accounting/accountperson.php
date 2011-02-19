@@ -18,7 +18,7 @@ class AccountPerson {
     public $Gender;
     public $Secretaddress;
     public $Comment;
-    
+
     /* Populated from outside */
     public $Memberships;
     public $BirthdateRequired;
@@ -27,15 +27,16 @@ class AccountPerson {
     private $User;
     private $db;
     private $dbPrefix;
-    
+
     function AccountPerson($db, $dbP = 0) {
         $this->db = $db;
-        
+
         if(!$dbP) {
             $this->dbPrefix = AppConfig::pre();
         } else {
             $this->dbPrefix = $dbP;
         }
+        
     }
     function setId($id) {
         $this->Id = $id;
@@ -202,11 +203,11 @@ class AccountPerson {
     function searchByEmailInDb($email, $dbprefix) {
         $email = "%".$email."%";
         $sql = "select id, secret from ".$dbprefix."person where email like ?";
-        
+
         $prep = $this->db->prepare($sql);
         $prep->bind_params("s", $email);
         return $prep->execute();
-        
+
     }
 
     function getOnePortal($id) {
@@ -378,11 +379,11 @@ class AccountPerson {
         for ($i=0; $i<40; $i++) {
             $secret.= chr(mt_rand(97, 122));
         }
-        
+
         if(!$prefix) {
             $prefix = $this->dbPrefix;
         }
-        
+
         $prep = $this->db->prepare("update " . $prefix . "person set secret = ? where id = ?");
         $prep->bind_params("si", $secret, $id);
         $prep->execute();
@@ -408,7 +409,7 @@ class AccountPerson {
         $prepins = $this->db->prepare("insert ignore into ".$prefix . "portal_user (person, show_firstname, show_lastname) values (?,1,1)");
         $prepins->bind_params("i", $id);
         $prepins->execute();
-        
+
         $prep = $this->db->prepare("select id from " . $prefix . "person," . $prefix . "portal_user where secret=? and id =? and id=person");
         $prep->bind_params("si", $secret, $id);
         $res = $prep->execute();
@@ -473,5 +474,41 @@ class AccountPerson {
         }
 
         return $res;
+    }
+    
+    function updateSecretIfUserMatches($email, $secret) {
+        $prep = $this->db->prepare("select email, username from ".$this->dbPrefix .
+        			"person P, ".$this->dbPrefix ."user U where P.email like ? and U.person = P.id");
+        $prep->bind_params("s", '%'.$email.'%');
+
+        $res = $prep->execute();
+
+        if(count($res) != 1) {
+            return array("error" => "Bad match:".count($res),"email"=>$email, "dbprefix" => $this->dbPrefix);
+        }
+
+        $registeredEmail = $res[0]["email"];
+
+        $emails = explode(",", $registeredEmail);
+
+        $found = false;
+        foreach($emails as $one) {
+            if($one == $email) {
+                $found = true;
+            }
+        }
+
+        if(!$found) {
+            return array("error" => "email not unique", "email"=>$email);
+        }
+
+        $prep = $this->db->prepare("update ".$this->dbPrefix .
+        			"person P set secret=? where exists (select null from ".$this->dbPrefix .
+        						   "user U where P.email like ? and U.person = P.id)");
+        $prep->bind_params("ss", $secret, '%'.$email.'%');
+
+        $prep->execute();
+
+        return array("email" => $registeredEmail, "username" => $res[0]["username"]);
     }
 }

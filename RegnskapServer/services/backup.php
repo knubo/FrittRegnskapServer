@@ -42,6 +42,13 @@ switch ($action) {
         break;
 
     case "dump_plain":
+    	echo "#Data $table;\n";
+
+		/* Don't send out other people sessions */    	
+    	if($table == "sessions") {
+    		break;
+    	}
+    	
         echo preg_replace("/$prefix/","", $backup->dump_plain($prefix.$table));
         break;
 

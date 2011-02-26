@@ -156,6 +156,7 @@ switch ($action) {
 
         } else {
             $arr = array (
+            	'result ' => 'failed',
 				'error' => 'Ugyldig brukernavn eller passord.',
                 'dbprefix' => $masterRecord["dbprefix"]
             );

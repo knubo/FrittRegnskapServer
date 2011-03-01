@@ -606,5 +606,18 @@ class AccountLine {
 
         $this->EditedByPersonName = $accperson->getName($this->EditedByPerson);
 	}
+	
+	function listUniqeYears() {
+	    $prep = $this->db->prepare("select distinct year from ". AppConfig::pre() . "line order by year desc");
+	    
+	    $res = $prep->execute();
+	    $data = array();
+
+	    foreach ($res as $one) {
+	        $data[] = $one["year"];
+	    }
+	    
+	    return $data;
+	} 
 }
 ?>

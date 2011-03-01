@@ -7,6 +7,7 @@ include_once ("../../classes/util/logger.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/util/fileutil.php");
+include_once ("../../classes/accounting/accountline.php");
 
 $db = new DB();
 $logger = new Logger($db);
@@ -15,6 +16,8 @@ $regnSession->auth();
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $file = array_key_exists("file", $_REQUEST) ? $_REQUEST["file"] : "";
+$includeYears = array_key_exists("years", $_REQUEST) ? $_REQUEST["years"] : "0";
+
 
 switch($action) {
     case "list":
@@ -52,10 +55,17 @@ switch($action) {
             $percentUsed = sprintf("%01.2f",(($total / ($regnSession->getQuota() * 1024 * 1024)) * 100));
         }
 
-        echo json_encode(array("files" => $res,
+        $arr = array("files" => $res,
         					"totalsize" => Strings::formatBytes($total), 
         					"quota" => $regnSession->getQuota(). " MB", 
-        					"used" => $percentUsed));
+        					"used" => $percentUsed);
+        
+        if($includeYears == 1) {
+            $acLine = new AccountLine($db);
+            $arr["years"] = $acLine->listUniqeYears();
+        }
+        
+        echo json_encode($arr);
 
         break;
     case "image":

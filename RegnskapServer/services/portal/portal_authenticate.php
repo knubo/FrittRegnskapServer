@@ -8,6 +8,7 @@ include_once ("../../classes/auth/PortalUser.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/auth/User.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/reporting/emailer.php");
@@ -81,14 +82,16 @@ switch ($action) {
             echo json_encode(array("error"=>"Du er registrert ".count($res)." ganger i regnskapsdatabasen. Ta kontakt med styret i din klubb slik at de kan fikse dette."));
             break;
         } else {
+            $person = $res[0];
+            $secret = $accPerson->setSecret($person["id"],$masterRecord["dbprefix"]);
+            
             $standard = new AccountStandard($dbu, $masterRecord["dbprefix"]);
 
-            $person = $res[0];
 
             $emailer = new Emailer();
 
             $body = "Linken under gir direkte innlogging til medlemsportalen til Fritt Regnskap. Etter innlogging kan du endre til et nytt passord.\n\n".
-             "http://".$_SERVER["SERVER_NAME"]."/RegnskapServer/services/portal/portal_authenticate.php?action=secret&email=$email&id=".$person["id"]."&secret=".$person["secret"].
+             "http://".$_SERVER["SERVER_NAME"]."/RegnskapServer/services/portal/portal_authenticate.php?action=secret&email=$email&id=".$person["id"]."&secret=".$secret.
             "\n\nVenligst hilsen Fritt Regnskap.\n\n".
             "Om du mottar denne eposten og ikke har bedt om engangslink fra medlemsportalen kan du ignorere denne eposten og ditt passord forblir uendret.";
             $sender = $standard->getOneValue(AccountStandard :: CONST_EMAIL_SENDER);

@@ -493,7 +493,7 @@ class AccountPerson {
 
         $found = false;
         foreach($emails as $one) {
-            if($one == $email) {
+            if(strtolower($one) == strtolower($email)) {
                 $found = true;
             }
         }

@@ -53,6 +53,8 @@ switch ($action) {
         $accUser = new User($dbu);
         $ok =  $accUser->authenticateBySecret($secret, $username, $dbp);
 
+        $emailer = new Emailer();
+        
         if(!$ok) {
             $emailer->sendEmail("Mulig hackefors¿k", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
 

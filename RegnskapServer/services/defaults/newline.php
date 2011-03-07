@@ -23,11 +23,21 @@ $ret = $standard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::
 $year = $ret[AccountStandard::CONST_YEAR];
 $month = $ret[AccountStandard::CONST_MONTH];
 $semester = $ret[AccountStandard::CONST_SEMESTER];
-$attachment = $accLine->getNextAttachmentNmb($year);
 
-$postnmb = $accLine->getNextPostnmb($year, $month);
+$newLineData = $accLine->getNewLineData($year,$month);
 
-$res = array("year"=>$year, "month"=>$month, "attachment"=>$attachment, "postnmb"=>$postnmb, "first_time_complete" => $first_time, "semester" => $semester);
+$attachment = $newLineData["attachnmb"];
+$postnmb = $newLineData["postnmb"];
+
+$res = array("year"=>$year,
+		     "month"=>$month, 
+		     "attachment"=> $attachment + 1, 
+		     "postnmb"=> $postnmb ? $postnmb : ($postnmb + 5),
+             "first_time_complete" => $first_time, 
+             "semester" => $semester,
+             "line" => $newLineData["line"],
+             "debet" => $newLineData["debet"],
+             "kredit" => $newLineData["kredit"]);
 
 echo json_encode($res)
 

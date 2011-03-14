@@ -334,6 +334,7 @@ create table if not exists XXX_belonging (
     deprecation_account INT(5) UNSIGNED,
     added_by_person INT(11) unsigned,
     added_date DATE,
+    purchase_date DATE,
     current_price NUMERIC(8,2) UNSIGNED,
     deprecation_amount NUMERIC(8,2) UNSIGNED,
     deleted tinyint

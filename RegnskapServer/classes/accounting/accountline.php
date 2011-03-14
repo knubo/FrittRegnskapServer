@@ -147,16 +147,17 @@ class AccountLine {
         return $result_lines[0]["s"];
     }
 
-    function setNewLatest($description, $day, $year, $month) {
+    function setNewLatest($description, $day, $year, $month, $editByPerson = 0) {
         $this->Description = $description;
 
         $this->Occured = & new eZDate();
         $this->Occured->setDay($day);
         $this->Occured->setMonth($month);
         $this->Occured->setYear($year);
-
+   
         $this->Postnmb = $this->getNextPostnmb($year, $month);
         $this->Attachment = $this->getNextAttachmentNmb($year);
+        $this->EditedByPerson = $editByPerson;
     }
 
     function update() {

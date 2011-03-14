@@ -40,6 +40,7 @@ $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 $regnSession->checkWriteAccess();
+$personId = $regnSession->getPersonId();
 
 
 $db->begin();
@@ -53,7 +54,7 @@ $active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
 $active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
   
 $accLine = new AccountLine($db);
-$accLine->setNewLatest($desc, $day, $active_year, $active_month);
+$accLine->setNewLatest($desc, $day, $active_year, $active_month, $personId);
 $accLine->setAttachment($attachment);
 $accLine->setPostnmb($postnmb);
 $accLine->store();

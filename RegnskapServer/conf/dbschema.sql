@@ -322,3 +322,20 @@ create table if not exists XXX_email_forward (
   personid int(11) unsigned
 );
 
+create table if not exists XXX_belonging (
+	id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+	belonging varchar(80),
+	description TEXT,
+	serial varchar(80),
+	year_deprecation int,
+    purchase_price NUMERIC(8,2) UNSIGNED,
+    warrenty_date DATE,
+    owning_account INT(5) UNSIGNED, 
+    deprecation_account INT(5) UNSIGNED,
+    added_by_person INT(11) unsigned,
+    added_date DATE,
+    current_price NUMERIC(8,2) UNSIGNED,
+    deprecation_amount NUMERIC(8,2) UNSIGNED,
+    deleted tinyint
+    
+);

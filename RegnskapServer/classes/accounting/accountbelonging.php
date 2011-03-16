@@ -10,7 +10,7 @@ class AccountBelonging {
     function listAll($filter) {
         $filterSQL = "where 1 = 1";
 
-        $searchWrap = $this->db->search("select * from " . AppConfig::pre() . "belonging", "limit 200");
+        $searchWrap = $this->db->search("select * from " . AppConfig::pre() . "belonging", "order by belonging limit 200");
 
         if($filter["belonging"]) {
             $searchWrap->addAndParam("s", "belonging", "%".(array_key_exists("belonging", $filter) ? $filter["belonging"] : "")."%");
@@ -33,17 +33,21 @@ class AccountBelonging {
             $warrenty_date = NULL;
 
             if($req["warrentyDate"]) {
-                $warrenty_date = new eZDate();
-                $warrenty_date->setDate($req["warrentyDate"]);
-                $warrenty_date = $warrenty_date->displayAccount();
+                $wd = new eZDate();
+                $wd->setDate($req["warrentyDate"]);
+                $warrenty_date = $wd->mySQLDate();
             }
 
-            $added_date = new eZDate();
-            $added_date = $added_date->displayAccount();
+            $pd = new eZDate();
+            $pd->setDate($req["purchaseDate"]);
+            $purchase_date = $pd->mySQLDate();
+            
+            $ad = new eZDate();
+            $added_date = $ad->mySQLDate();
 
             if($req["accountDeprecation"] && $req["currentAmount"] > 0) {
                 $prep = $this->db->prepare("insert into " . AppConfig::pre() . "belonging (belonging,description,serial,year_deprecation,purchase_price,warrenty_date,owning_account,deprecation_account,added_by_person,added_date,current_price,deprecation_amount,deleted,purchase_date) values (?,?,?,?,?,?,?,?,?,?,?,?,0),?");
-                $prep->bind_params("sssiddiiiddd", $req["owning"],$req["description"],$req["serial"],$req["yearsDeprecation"],$req["purchasePrice"],$warrenty_date,$req["accountOwning"],$req["accountDeprecation"],$added_by_person,$added_date,$req["currentAmount"],$req["eachMonth"], $req["purchaseDate"]);
+                $prep->bind_params("sssidsiiisds", $req["owning"],$req["description"],$req["serial"],$req["yearsDeprecation"],$req["purchasePrice"],$warrenty_date,$req["accountOwning"],$req["accountDeprecation"],$added_by_person,$added_date,$req["currentAmount"],$req["eachMonth"], $purchase_date);
                 $prep->execute();
 
                 $accLine = new AccountLine($this->db);
@@ -58,7 +62,7 @@ class AccountBelonging {
                 $accLine->addPostSingleAmount($lineId, '-1', $req["accountDeprecation"], $req["currentAmount"]);
             } else {
                 $prep = $this->db->prepare("insert into " . AppConfig::pre() . "belonging (belonging,description,serial,purchase_price,warrenty_date,added_by_person,added_date,deleted,purchase_date) values (?,?,?,?,?,?,?,0,?)");
-                $prep->bind_params("sssddid",$req["owning"],$req["description"],$req["serial"],$req["purchasePrice"],$warrenty_date,$added_by_person,$added_date,$req["purchaseDate"]);
+                $prep->bind_params("sssdsiss",$req["owning"],$req["description"],$req["serial"],$req["purchasePrice"],$warrenty_date,$added_by_person,$added_date,$purchase_date);
                 $prep->execute();
             }
 

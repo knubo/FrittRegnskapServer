@@ -24,7 +24,10 @@ switch($action) {
     
     case "list":
         echo json_encode($accBelonging->listAll($_REQUEST));
-        break;    
+        break;
+    case "get":
+        echo json_encode($accBelonging->getOne($_REQUEST["id"]));
+        break;
     case "add":
         $regnSession->checkWriteAccess();
         

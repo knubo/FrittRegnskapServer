@@ -7,6 +7,13 @@ class AccountBelonging {
         $this->db = $db;
     }
 
+    function getOne($id) {
+         $prep = $this->db->prepare("select * from " . AppConfig::pre() . "belonging where id = ?");
+         $prep->bind_params("i", $id);
+         
+         return array_shift($prep->execute());
+    }
+    
     function listAll($filter) {
         $filterSQL = "where 1 = 1";
 

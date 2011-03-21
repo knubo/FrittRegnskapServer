@@ -8,12 +8,16 @@ class AccountBelonging {
     }
 
     function getOne($id) {
-         $prep = $this->db->prepare("select * from " . AppConfig::pre() . "belonging where id = ?");
-         $prep->bind_params("i", $id);
+        $prep = $this->db->prepare("select B.*,P.firstname,P.lastname from " .
+        AppConfig::pre() .
+        	"belonging B left join " . AppConfig::pre() .
+        	"person P on (P.id = B.person) where B.id = ?");
+
+        $prep->bind_params("i", $id);
          
-         return array_shift($prep->execute());
+        return array_shift($prep->execute());
     }
-    
+
     function listAll($filter) {
         $filterSQL = "where 1 = 1";
 
@@ -48,7 +52,7 @@ class AccountBelonging {
             $pd = new eZDate();
             $pd->setDate($req["purchaseDate"]);
             $purchase_date = $pd->mySQLDate();
-            
+
             $ad = new eZDate();
             $added_date = $ad->mySQLDate();
 
@@ -81,4 +85,55 @@ class AccountBelonging {
             return array("error" => $error, "status" => 0);
         }
     }
+
+    function updateBelonging($req, $personId) {
+        $pd = new eZDate();
+        $now_date = $pd->mySQLDate();
+        $person = array_key_exists("person", $req) ? $req["person"] : NULL;
+
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set person = ?, changed_by_person=?,changed_date=?");
+
+        $prep->bind_params("iis", $person, $personId, $now_date);
+
+        $prep->execute();
+    }
+
+    function updatePreview($req) {
+
+    }
+
+    function deprecateBelongingFully($id, $changeData, $personId) {
+        $data = $this->getOne($id);
+
+        if($data["current_price"] > 0) {
+            $accLine = new AccountLine($this->db);
+
+            $accLine->setNewLatest($changeData->description, $changeData->day, $changeData->year, $changeData->month,$added_by_person);
+            $accLine->setAttachment($changeData->attachment);
+            $accLine->setPostnmb($changeData->postNmb);
+            $accLine->store();
+            $lineId = $accLine->getId();
+
+            $accLine->addPostSingleAmount($lineId, '1', $data["deprecation_account"], $data["current_price"]);
+            $accLine->addPostSingleAmount($lineId, '-1', $data["owning_account"], $data["current_price"]);
+            
+            $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set current_price = 0 where id = ?");
+            $prep->bind_params("i", $id);
+            $prep->execute();
+        }
+    }
+
+    function deleteBeloning($id, $change, $personId) {
+        $this->deprecateBelongingFully($id, json_decode($change), $personId);
+
+        $pd = new eZDate();
+        $now_date = $pd->mySQLDate();
+
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set deleted = 1, changed_by_person=?,changed_date=? where id = ?");
+        $prep->bind_params("isi", $personId, $now_date, $id);
+        $prep->execute();
+
+        return array("status" => 1);
+    }
 }
+

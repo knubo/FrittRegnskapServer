@@ -21,7 +21,7 @@ $personId = $regnSession->getPersonId();
 $accBelonging = new AccountBelonging($db);
 
 switch($action) {
-    
+
     case "list":
         echo json_encode($accBelonging->listAll($_REQUEST));
         break;
@@ -30,14 +30,37 @@ switch($action) {
         break;
     case "add":
         $regnSession->checkWriteAccess();
-        
+
         $res = $accBelonging->addBelonging($_REQUEST, $personId);
+
+        echo json_encode($res);
+
+        break;
+
+    case "delete":
+        $regnSession->checkWriteAccess();
+        $res = $accBelonging->deleteBeloning($_REQUEST["id"], $_REQUEST["change"], $personId);
         
         echo json_encode($res);
-        
         break;
-        
-        
+
+    case "update":
+        $regnSession->checkWriteAccess();
+
+        $res = $accBelonging->updateBelonging($_REQUEST, $personId);
+
+        echo json_encode($res);
+
+        break;
+    case "updatePreview":
+        $regnSession->checkWriteAccess();
+        $res = $accBelonging->updatePreview($_REQUEST);
+
+        echo json_encode($res);
+
+        break;
+
+
 }
 
 

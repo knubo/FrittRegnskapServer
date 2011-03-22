@@ -57,8 +57,9 @@ class AccountBelonging {
             $added_date = $ad->mySQLDate();
 
             if($req["accountDeprecation"] && $req["currentAmount"] > 0) {
-                $prep = $this->db->prepare("insert into " . AppConfig::pre() . "belonging (belonging,description,serial,year_deprecation,purchase_price,warrenty_date,owning_account,deprecation_account,added_by_person,added_date,current_price,deprecation_amount,deleted,purchase_date) values (?,?,?,?,?,?,?,?,?,?,?,?,0),?");
-                $prep->bind_params("sssidsiiisds", $req["owning"],$req["description"],$req["serial"],$req["yearsDeprecation"],$req["purchasePrice"],$warrenty_date,$req["accountOwning"],$req["accountDeprecation"],$added_by_person,$added_date,$req["currentAmount"],$req["eachMonth"], $purchase_date);
+                $prep = $this->db->prepare("insert into " . AppConfig::pre() . "belonging (belonging,description,serial,year_deprecation,purchase_price,warrenty_date,owning_account,deprecation_account,added_by_person,added_date,current_price,deprecation_amount,deleted,purchase_date) values (?,?,?,?,?,?,?,?,?,?,?,?,0,?)");
+                $prep->bind_params("sssidsiiisdss", $req["owning"],$req["description"],$req["serial"],$req["yearsDeprecation"],$req["purchasePrice"],$warrenty_date,
+                $req["accountOwning"],$req["accountDeprecation"],$added_by_person,$added_date,$req["currentAmount"],$req["eachMonth"], $purchase_date);
                 $prep->execute();
 
                 $accLine = new AccountLine($this->db);

@@ -70,10 +70,6 @@ class EndMonthHelper {
 		foreach (array_keys($amounts) as $post) {
 			$amount = $amounts[$post];
 
-			if ($amount == 0) {
-				continue;
-			}
-
 			$this->transferPost(($active_month + 1), $active_month, $active_year, $post, $amount, $daysInMonth, $endTransferPost, 1);
 			$this->transferPost($active_month, ($active_month + 1), $active_year, $post, $amount, 1, $endTransferPost, -1);
 		}

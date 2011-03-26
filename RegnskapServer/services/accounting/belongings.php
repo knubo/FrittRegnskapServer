@@ -56,6 +56,10 @@ switch($action) {
         $regnSession->checkWriteAccess();
         $res = $accBelonging->updatePreview($_REQUEST);
 
+        if(count($res) == 0) {
+            $res = $accBelonging->updateBelonging($_REQUEST, $personId);
+        }
+        
         echo json_encode($res);
 
         break;

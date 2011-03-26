@@ -183,10 +183,11 @@ class User {
             return $this->db->affected_rows();
         }
 
-        $bind = $this->db->prepare("insert into ". AppConfig::pre() ."user set pass=?, person=?, username=?,readonly=?,project_required=?,see_secret=? ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?,see_secret=?");
+        $bind = $this->db->prepare("insert into ". AppConfig::pre() ."user set pass=?, person=?, username=?,readonly=?,project_required=?,see_secret=?,reducedwrite=? ".
+        									" ON DUPLICATE KEY UPDATE pass=?,person=?,readonly=?,reducedwrite=?,project_required=?,see_secret=?");
         $pass = crypt($password, $this->makesalt());
 
-        $bind->bind_params("sisiiisiiiii", $pass, $person, $user, $readonly, $project_required, $see_secret, $pass, $person, $readonly,$reducedwrite, $project_required,$see_secret);
+        $bind->bind_params("sisiiiisiiiii", $pass, $person, $user, $readonly, $project_required, $see_secret, $reducedwrite, $pass, $person, $readonly,$reducedwrite, $project_required,$see_secret);
         $bind->execute();
 
         return $this->db->affected_rows();

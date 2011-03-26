@@ -92,14 +92,64 @@ class AccountBelonging {
         $now_date = $pd->mySQLDate();
         $person = array_key_exists("person", $req) ? $req["person"] : NULL;
 
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set person = ?, changed_by_person=?,changed_date=?");
+        $pd = new eZDate();
+        $pd->setDate($req["purchaseDate"]);
+        $purchase_date = $pd->mySQLDate();
 
-        $prep->bind_params("iis", $person, $personId, $now_date);
+        $warrenty_date = NULL;
+
+        if($req["warrentyDate"]) {
+            $wd = new eZDate();
+            $wd->setDate($req["warrentyDate"]);
+            $warrenty_date = $wd->mySQLDate();
+        }
+
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set person = ?, changed_by_person=?,changed_date=?,belonging=?,description=?,serial=?,deprecation_amount=?,purchase_date=?,warrenty_date=?,purchase_price=?,deprecation_account=?,owning_account=?,current_price=? where id = ?");
+
+        $prep->bind_params("iissssdssdiidi", $person, $personId, $now_date, $req["owning"], $req["description"], $req["serial"], $req["eachMonth"], $purchase_date, $warrenty_date, $req["purchasePrice"], $req["accountDeprecation"], $req["accountOwning"], $req["currentAmount"], $req["id"]);
 
         $prep->execute();
+
+        return array("updated" => 1);
+    }
+
+    function addToResult($result, $key, $diff) {
+        if(array_key_exists($key, $result)) {
+            $result[$key] += $diff;
+        } else {
+            $result[$key] = $diff;
+        }
     }
 
     function updatePreview($req) {
+        $data = $this->getOne($req["id"]);
+
+        $result = array();
+
+        if($req["accountDeprecation"] != $data["deprecation_account"]) {
+            $result[$data["deprecation_account"]] = $data["current_price"];
+            $result[$req["accountDeprecation"]] = 0 - $data["current_price"];
+        }
+
+        if($req["accountOwning"] != $data["owning_account"]) {
+            $result[$data["owning_account"]] = 0 - $data["current_price"];
+            $result[$req["accountOwning"]] = $data["current_price"];
+        }
+
+
+        if($req["currentAmount"] != $data["current_price"]) {
+            $diff = $req["currentAmount"] - $data["current_price"];
+
+            if($diff < 0) {
+                $this->addToResult(&$result, $req["accountOwning"], $diff);
+                $this->addToResult(&$result, $req["accountDeprecation"], 0 - $diff);
+            } else {
+                $this->addToResult(&$result, $req["accountDeprecation"], $diff);
+                $this->addToResult(&$result, $req["accountOwning"], 0 - $diff);
+            }
+        }
+
+        return $result;
 
     }
 
@@ -117,7 +167,7 @@ class AccountBelonging {
 
             $accLine->addPostSingleAmount($lineId, '1', $data["deprecation_account"], $data["current_price"]);
             $accLine->addPostSingleAmount($lineId, '-1', $data["owning_account"], $data["current_price"]);
-            
+
             $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set current_price = 0 where id = ?");
             $prep->bind_params("i", $id);
             $prep->execute();

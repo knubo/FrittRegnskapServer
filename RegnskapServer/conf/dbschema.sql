@@ -144,7 +144,8 @@ CREATE TABLE IF NOT exists XXX_post (
    project INT(8) UNSIGNED,
    person INT(11) UNSIGNED,
    amount NUMERIC(8,2) UNSIGNED,
-   edited_by_person INT(11) unsigned
+   edited_by_person INT(11) unsigned,
+   belonging_id INTEGER(6) UNSIGNED
 );
 
 create table if not exists XXX_project (

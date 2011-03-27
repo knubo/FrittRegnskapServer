@@ -22,6 +22,10 @@ $accBelonging = new AccountBelonging($db);
 
 switch($action) {
 
+    case "monthEndPreview":
+        echo json_encode($accBelonging->listItemsToDeprecate());
+        break;
+    
     case "list":
         echo json_encode($accBelonging->listAll($_REQUEST));
         break;

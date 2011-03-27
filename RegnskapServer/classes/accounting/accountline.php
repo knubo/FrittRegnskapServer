@@ -202,9 +202,10 @@ class AccountLine {
 
     }
 
-    function addPostSingleAmount($line, $debet, $post_type, $amount, $project = 0, $person = 0) {
+    function addPostSingleAmount($line, $debet, $post_type, $amount, $project = 0, $person = 0, $belonging = 0) {
 
         $post = new AccountPost($this->db, $line, $debet, $post_type, $amount, 0, $project, $person);
+        $post->setBelonging($belonging);
 
         $post->store();
 

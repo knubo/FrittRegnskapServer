@@ -1,13 +1,14 @@
 <?php
 
-
 /*
+
  * Created on May 28, 2007
  *
  */
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/accounting/accountbelonging.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
@@ -36,11 +37,14 @@ switch ($action) {
         break;
 	case "status" :
         $acStandard = new AccountStandard($db);
-
+        $belongings = new AccountBelonging($db);
+        
         $res = array();
         $res["posts"] = $endHelper->status();
         $res["year"] = $acStandard->getOneValue(AccountStandard::CONST_YEAR);;
         $res["month"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
+        $res["deprecation"] = $belongings->listItemsToDeprecate();
+        
 		echo json_encode($res);
 		break;
     case "endsemester" :

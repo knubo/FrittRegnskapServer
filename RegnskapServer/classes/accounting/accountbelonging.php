@@ -18,10 +18,17 @@ class AccountBelonging {
         return array_shift($prep->execute());
     }
 
+    function listItemsToDeprecate() {
+        $prep = $this->db->prepare("select id, belonging, serial, deprecation_amount, current_price,owning_account, deprecation_account from  " . AppConfig::pre() ."belonging where (current_price > deprecation_amount) or (current_price < deprecation_amount and current_price > 0);");
+
+        return $prep->execute();
+    }
+    
     function listAll($filter) {
         $filterSQL = "where 1 = 1";
 
-        $searchWrap = $this->db->search("select * from " . AppConfig::pre() . "belonging", "order by belonging limit 200");
+        $searchWrap = $this->db->search("select B.*,P.firstname,P.lastname from " . AppConfig::pre() . "belonging B left join ". AppConfig::pre() .
+        	"person P on (P.id = B.person)", "order by belonging limit 200");
 
         if($filter["belonging"]) {
             $searchWrap->addAndParam("s", "belonging", "%".(array_key_exists("belonging", $filter) ? $filter["belonging"] : "")."%");
@@ -62,6 +69,8 @@ class AccountBelonging {
                 $req["accountOwning"],$req["accountDeprecation"],$added_by_person,$added_date,$req["currentAmount"],$req["eachMonth"], $purchase_date);
                 $prep->execute();
 
+                $belongingId = $this->db->insert_id();
+
                 $accLine = new AccountLine($this->db);
 
                 $accLine->setNewLatest($req["deprecationTitle"].":".$req["owning"], $req["day"], $req["year"], $req["month"],$added_by_person);
@@ -70,8 +79,8 @@ class AccountBelonging {
                 $accLine->store();
                 $lineId = $accLine->getId();
 
-                $accLine->addPostSingleAmount($lineId, '1', $req["accountOwning"], $req["currentAmount"]);
-                $accLine->addPostSingleAmount($lineId, '-1', $req["accountDeprecation"], $req["currentAmount"]);
+                $accLine->addPostSingleAmount($lineId, '1', $req["accountOwning"], $req["currentAmount"],0,0,$belongingId);
+                $accLine->addPostSingleAmount($lineId, '-1', $req["accountDeprecation"], $req["currentAmount"],0,0,$belongingId);
             } else {
                 $prep = $this->db->prepare("insert into " . AppConfig::pre() . "belonging (belonging,description,serial,purchase_price,warrenty_date,added_by_person,added_date,deleted,purchase_date) values (?,?,?,?,?,?,?,0,?)");
                 $prep->bind_params("sssdsiss",$req["owning"],$req["description"],$req["serial"],$req["purchasePrice"],$warrenty_date,$added_by_person,$added_date,$purchase_date);
@@ -87,7 +96,34 @@ class AccountBelonging {
         }
     }
 
+    function belongingChangeAccounting($req, $added_by_person) {
+        $posts = $this->updatePreview($req);
+
+        $changeData = json_decode($req["change"]);
+
+        $accLine = new AccountLine($this->db);
+
+        $accLine->setNewLatest($changeData->description, $changeData->day, $changeData->year, $changeData->month,$added_by_person);
+        $accLine->setAttachment($changeData->attachment);
+        $accLine->setPostnmb($changeData->postNmb);
+        $accLine->store();
+        $lineId = $accLine->getId();
+
+        foreach($posts as $post => $value) {
+            if($value > 0) {
+                $accLine->addPostSingleAmount($lineId, '1', $post, $value,0,0,$req["id"]);
+            } else {
+                $accLine->addPostSingleAmount($lineId, '-1', $post, 0 - $value,0,0,$req["id"]);
+            }
+        }
+    }
+
     function updateBelonging($req, $personId) {
+
+        if(array_key_exists("change", $req)) {
+            $this->belongingChangeAccounting($req, $personId);
+        }
+
         $pd = new eZDate();
         $now_date = $pd->mySQLDate();
         $person = array_key_exists("person", $req) ? $req["person"] : NULL;
@@ -165,8 +201,8 @@ class AccountBelonging {
             $accLine->store();
             $lineId = $accLine->getId();
 
-            $accLine->addPostSingleAmount($lineId, '1', $data["deprecation_account"], $data["current_price"]);
-            $accLine->addPostSingleAmount($lineId, '-1', $data["owning_account"], $data["current_price"]);
+            $accLine->addPostSingleAmount($lineId, '1', $data["deprecation_account"], $data["current_price"],0,0,$id);
+            $accLine->addPostSingleAmount($lineId, '-1', $data["owning_account"], $data["current_price"],0,0,$id);
 
             $prep = $this->db->prepare("update " . AppConfig::pre() . "belonging set current_price = 0 where id = ?");
             $prep->bind_params("i", $id);

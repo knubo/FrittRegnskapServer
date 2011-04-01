@@ -54,7 +54,7 @@ switch ($action) {
         $ok =  $accUser->authenticateBySecret($secret, $username, $dbp);
 
         $emailer = new Emailer();
-        
+
         if(!$ok) {
             $emailer->sendEmail("Mulig hackefors¿k", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
 
@@ -113,6 +113,31 @@ switch ($action) {
         header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
 
         break;
+
+    case "test":
+        $user = $_REQUEST["user"];
+        $password = $_REQUEST["password"];
+
+        if (!$user || !$password) {
+            die("Must supply user and password.");
+        }
+
+        $db = new DB(0, DB::MASTER_DB);
+        $master = new Master($db);
+        $masterRecord = $master->get_master_record();
+
+        if(!$masterRecord) {
+            $arr = array (
+				'error' => 'Ikke identifisert database.'
+				);
+				echo json_encode($arr);
+				break;
+        }
+
+        $sess = new RegnSession(new DB());
+
+        echo json_encode($masterRecord);
+        break;      
 
     case "forward":
         $forward = 1;

@@ -8,10 +8,13 @@ class AccountBelonging {
     }
 
     function getOne($id) {
-        $prep = $this->db->prepare("select B.*,P.firstname,P.lastname from " .
+        $prep = $this->db->prepare("select B.*,P.firstname,P.lastname,A.firstname as addedFirstName,A.lastname as addedLastName,C.firstname as changedFirstName,C.lastname as changedLastName from " .
         AppConfig::pre() .
-        	"belonging B left join " . AppConfig::pre() .
-        	"person P on (P.id = B.person) where B.id = ?");
+        	"belonging B ".
+        	"left join " . AppConfig::pre() . "person P on (P.id = B.person) ".
+        	"left join " . AppConfig::pre() . "person A on (A.id = B.added_by_person) ".
+        	"left join " . AppConfig::pre() . "person C on (C.id = B.changed_by_person) ".
+        	"where B.id = ?");
 
         $prep->bind_params("i", $id);
          
@@ -23,12 +26,58 @@ class AccountBelonging {
 
         return $prep->execute();
     }
-    
+
+    function addDeprecationLine($params, $changePersonId, $desc) {
+        $accLine = new AccountLine($this->db);
+
+        $accLine->setNewLatest($desc, $params["day"], $params["year"], $params["month"],$changePersonId);
+
+        $accLine->store();
+        $lineId = $accLine->getId();
+
+        $prep = $this->db->prepare("insert into ".AppConfig::pre() ."post(line, debet, post_type, amount, belonging_id, edited_by_person) ".
+			"select ?, '1', deprecation_account, deprecation_amount,id, ? ". 
+     		"from ".AppConfig::pre() ."belonging where current_price > deprecation_amount ".
+ 			"union ".
+  			"select ?, '1',deprecation_account , current_price,id, ? ". 
+            "from ".AppConfig::pre() ."belonging where current_price > 0 ". 
+     		"and deprecation_amount > 0 and deprecation_amount > current_price ".
+ 			"union ".
+ 			"select ?, '-1', owning_account, deprecation_amount,id, ? ". 
+     		"from ".AppConfig::pre() ."belonging where current_price > deprecation_amount ".
+ 			"union ".
+  			"select ?, '-1',owning_account , current_price,id, ? ". 
+     		"from ".AppConfig::pre() ."belonging where current_price > 0 ". 
+     		"and deprecation_amount > 0 and deprecation_amount > current_price");
+
+        $changeId = $params["changed_by_id"];
+        
+        $prep->bind_params("iiiiiiii", $lineId,$changeId, $lineId,$changeId, $lineId,$changeId, $lineId,$changeId);
+        $prep->execute();
+        
+        $prep = $this->db->prepare("update ".AppConfig::pre() ."belonging set ". 
+				"current_price = current_price - deprecation_amount ". 
+	    		"where deprecation_amount > 0 and current_price > deprecation_amount");
+        $prep->execute();
+
+        $prep = $this->db->prepare("update ".AppConfig::pre() ."belonging set current_price = 0 where ".
+	            "current_price > 0 and deprecation_amount > 0 and ". 
+		        "deprecation_amount > current_price");
+        $prep->execute();
+        
+    }
+
+    function listAllByResponsible() {
+        $prep = $this->db->prepare("select P.firstname,P.lastname,B.* from " . AppConfig::pre() . "belonging B left join " . AppConfig::pre() . "person P on (B.person = P.id) order by P.firstname desc, P.lastname desc");
+        
+        return $prep->execute();
+    }
+
     function listAll($filter) {
         $filterSQL = "where 1 = 1";
 
         $searchWrap = $this->db->search("select B.*,P.firstname,P.lastname from " . AppConfig::pre() . "belonging B left join ". AppConfig::pre() .
-        	"person P on (P.id = B.person)", "order by belonging limit 200");
+        	"person P on (P.id = B.person)", "order by belonging limit 50");
 
         if($filter["belonging"]) {
             $searchWrap->addAndParam("s", "belonging", "%".(array_key_exists("belonging", $filter) ? $filter["belonging"] : "")."%");

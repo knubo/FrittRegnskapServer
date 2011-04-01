@@ -12,7 +12,8 @@ class AccountPost {
     public $Earning;
     public $Cost;
 	public $Belonging;
-    
+    public $BelongingDesc;
+	
 	private $db;
 
 	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0, $edited_by_person = 0, $earning = 0,$cost = 0) {
@@ -31,6 +32,10 @@ class AccountPost {
 
 	function setBelonging($belonging) {
 	    $this->Belonging = $belonging;
+	}
+	
+	function setBelongingDesc($desc) {
+	    $this->BelongingDesc = $desc;
 	}
 	
 	function getProject() {
@@ -81,7 +86,9 @@ class AccountPost {
 	}
 
 	function getAll($parent) {
-		$prep = $this->db->prepare("SELECT * FROM " . AppConfig::pre() . "post where line=?");
+		$prep = $this->db->prepare("SELECT P.*,B.belonging,B.serial FROM " . AppConfig::pre() . "post P ".
+		    "left join " . AppConfig::pre() . "belonging B on (P.belonging_id = B.id) ".
+		"where line=?");
 		$prep->bind_params("i", $parent);
 
 		return $this->filled_result($prep->execute());
@@ -91,7 +98,13 @@ class AccountPost {
 		$return_array = array ();
 
 		foreach ($group_array as $one) {
-		    $return_array[] = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"], $one["earning"], $one["cost"]);
+		    $post = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"], $one["earning"], $one["cost"]);
+		    $return_array[] = $post;
+		    $post->setBelonging($one["belonging"]);
+		    
+		    if($one["belonging"]) {
+		        $post->setBelongingDesc($one["belonging"]. " ".$one["serial"]);
+		    }
 		}
 		return $return_array;
 	}

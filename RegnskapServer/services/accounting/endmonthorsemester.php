@@ -2,9 +2,9 @@
 
 /*
 
- * Created on May 28, 2007
- *
- */
+* Created on May 28, 2007
+*
+*/
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
@@ -24,48 +24,81 @@ $db = new DB();
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
-
 $endHelper = new EndMonthHelper($db);
 
+$accountBelonging = new AccountBelonging($db);
+
+
 switch ($action) {
-	case "test":
+    case "test":
         $acStandard = new AccountStandard($db);
         $acPostType = new AccountPostType($db);
         $endPostIds = $acStandard->getOneValueAsArray(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS);
         $endPosts = $acPostType->getSomeIndexedById($endPostIds);
         echo json_encode($endPosts);
         break;
-	case "status" :
+    case "status" :
         $acStandard = new AccountStandard($db);
         $belongings = new AccountBelonging($db);
-        
+
         $res = array();
         $res["posts"] = $endHelper->status();
         $res["year"] = $acStandard->getOneValue(AccountStandard::CONST_YEAR);;
         $res["month"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
         $res["deprecation"] = $belongings->listItemsToDeprecate();
-        
-		echo json_encode($res);
-		break;
+
+        echo json_encode($res);
+        break;
     case "endsemester" :
         $regnSession->checkWriteAccess();
 
         $accSemester = new AccountSemester($db);
         $acStandard = new AccountStandard($db);
+        $res = $endHelper->insertParams();
+
+        if ($res["month"] == 12) {
+            header("HTTP/1.0 514 Illegal state");
+
+            die("Can't end last month in year - use end year");
+        }
+
         $db->begin();
-        $res = $endHelper->endMonth();
+
+
+        if($_REQUEST["deprecate"]) {
+            $accountBelonging->addDeprecationLine($res, $regnSession->getPersonId(), $_REQUEST["deprdesc"]);
+        }
+
+        $res = $endHelper->endMonth($res, $regnSession->getPersonId());
+
         $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());
         $db->commit();
         echo json_encode("1");
         break;
-	case "endmonth" :
+    case "endmonth" :
         $regnSession->checkWriteAccess();
-		$db->begin();
-		$res = $endHelper->endMonth();
-		$db->commit();
-		echo json_encode("1");
-		break;
-     default:
+        $res = $endHelper->insertParams();
+
+        if ($res["month"] == 12) {
+            header("HTTP/1.0 514 Illegal state");
+
+            die("Can't end last month in year - use end year");
+        }
+
+
+        $db->begin();
+
+
+        if($_REQUEST["deprecate"]) {
+            $accountBelonging->addDeprecationLine($res, $regnSession->getPersonId(), $_REQUEST["deprdesc"]);
+        }
+         
+        $res = $endHelper->endMonth($res, $regnSession->getPersonId());
+
+        $db->commit();
+        echo json_encode("1");
+        break;
+    default:
         echo "Unknown action $action";
         break;
 

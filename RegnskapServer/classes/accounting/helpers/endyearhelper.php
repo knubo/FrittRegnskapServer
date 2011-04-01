@@ -11,10 +11,24 @@ class EndYearHelper {
         $this->db = $db;
     }
 
-    function endYear($db) {
+    function insertParams() {
         $acStandard = new AccountStandard($this->db);
-		$active_month = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
-		$active_year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
+        $values = $acStandard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH));
+        $year = $values[AccountStandard::CONST_YEAR];
+        $month = $values[AccountStandard::CONST_MONTH];
+         
+        $lastDay = new eZDate();
+        $lastDay->setDay(1);
+        $lastDay->setMonth($active_month);
+        $lastDay->setYear($active_year);
+        $daysInMonth = $lastDay->daysInMonth();
+        return array("month" => $month, "year" => $year, "lastDay" => $daysInMonth);
+    }
+    
+    function endYear($res) {
+        $acStandard = new AccountStandard($this->db);
+		$active_month = $res["month"];
+		$active_year = $res["year"];
 
 		$this->endYearPost = $acStandard->getOneValue(AccountStandard::CONST_END_YEAR_POST);
 
@@ -22,11 +36,7 @@ class EndYearHelper {
 		
         $acPostType = new AccountPostType($this->db);
 
-		$lastDay = new eZDate();
-		$lastDay->setDay(1);
-		$lastDay->setMonth($active_month);
-		$lastDay->setYear($active_year);
-		$daysInMonth = $lastDay->daysInMonth();
+		$daysInMonth = $res["lastDay"];
 
 		$accountLineCurrentYear = new AccountLine($this->db);
 		$accountLineCurrentYear->setNewLatest("UB ".$active_year, $daysInMonth, $active_year, $active_month);

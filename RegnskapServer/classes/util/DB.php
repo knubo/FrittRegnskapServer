@@ -7,7 +7,7 @@
  */
 class DB {
 
-    const MASTER_DB = 1;
+    const MASTER_DB = -2;
 
     private $link;
 

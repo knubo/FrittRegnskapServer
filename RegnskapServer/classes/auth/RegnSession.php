@@ -317,7 +317,7 @@ class RegnSession {
         $_SESSION["ip"] = $_SERVER["REMOTE_ADDR"];
 
         $_SESSION["prefix"] = $masterRecord["dbprefix"];
-        $_SESSION["diskquota"] = $masterRecord["diskquota"];
+        $_SESSION["diskquota"] = $masterRecord["diskquota"] > 0 ? $masterRecord["diskquota"] : 5;
         if($masterRecord["archive_limit"]) {
             $_SESSION["archive_limit"] = $masterRecord["archive_limit"];
         } else {

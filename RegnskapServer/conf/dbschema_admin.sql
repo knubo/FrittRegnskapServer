@@ -14,7 +14,8 @@ create table if not exists installations (
     archive_limit int,
     reduced_mode int,
     parentdbprefix varchar(20),
-    parenthostprefix varchar(40)
+    parenthostprefix varchar(40),
+    integration varchar(80)
     );
 
 create table if not exists sqllist (

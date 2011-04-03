@@ -19,7 +19,8 @@ class AccountStandard {
 	const CONST_BIRTHDATE_REQUIRED = "BIRTHDATE_REQ";
 	const CONST_FIRST_TIME_SETUP = "FIRST_TIME";
     const CONST_NO_DELETE_USERS = "DISABLE_DEL_USER";
-
+    const CONST_INTEGRATION_SECRET = "INTEGRATION_SEC";
+    
 	private $db;
 
 	function AccountStandard($db, $prefix = 0) {

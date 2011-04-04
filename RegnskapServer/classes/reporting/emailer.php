@@ -62,7 +62,7 @@ class Emailer {
                 $msg.= "Content-Disposition: INLINE;".$eol;
                 $msg.= "	filename*=\"$fileName\"".$eol;
                 $msg.= "Content-Type: $contentType;".$eol;
-	            $msg.= "	name*=\"$fileName\"".$eol;
+                $msg.= "	name*=\"$fileName\"".$eol;
                 $msg.= "Content-Transfer-Encoding: base64".$eol;
                 $msg.= $eol;
                 $msg.= $fileData.$eol;
@@ -84,19 +84,15 @@ class Emailer {
         return $mail_sent;
     }
 
-    function findContentType($file) {
-        $mimepath='/usr/share/file/magic'; // may differ depending on your machine
-        // try /usr/share/file/magic if it doesn't work
-        $mime = finfo_open(FILEINFO_MIME,$mimepath);
-        if ($mime===FALSE) {
-            throw new Exception('Unable to open finfo');
+    function findContentType($filepath) {
+        ob_start();
+        system("file -i -b {$filepath}");
+        $output = ob_get_clean();
+        $output = explode("; ",$output);
+        if ( is_array($output) ) {
+            $output = $output[0];
         }
-        $filetype = finfo_file($mime,$file);
-        finfo_close($mime);
-        if ($filetype===FALSE) {
-            throw new Exception('Unable to recognise filetype');
-        }
-        return $filetype;
+        return $output;
     }
 }
 ?>

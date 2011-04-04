@@ -50,7 +50,7 @@ switch($action) {
 
         $ids = array();
 
-        if ($handle = opendir($dir)) {
+        if ($handle = @opendir($dir)) {
             /* This is the correct way to loop over the directory. */
             while (false !== ($file = readdir($handle))) {
                 $matches = array();
@@ -59,7 +59,9 @@ switch($action) {
                 }
             }
         }
-        closedir($handle);
+        if($handle) {
+           closedir($handle);
+        }
         echo json_encode($ids);
         break;
     case "all":

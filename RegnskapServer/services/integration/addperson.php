@@ -7,10 +7,23 @@ include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/validators/emailvalidator.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/reporting/emailer.php");
 
-$db = new DB();
+$db = new DB(0, DB::MASTER_DB);
+$master = new Master($db);
+$masterRecord = $master->get_master_record();
 
-$accStd = new AccountStandard($db);
+if(!$masterRecord) {
+    $arr = array (
+				'error' => 'Ikke identifisert database.'
+				);
+				die(json_encode($arr));
+}
+
+$dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
+$dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
+
+$accStd = new AccountStandard($dbu);
 
 $vals = $accStd->getValues(array(AccountStandard::CONST_INTEGRATION_SECRET,
 AccountStandard::CONST_INTEGRATION_EMAIL,
@@ -63,7 +76,17 @@ if((!$birthdate || strlen($birthdate)) && $vals[AccountStandard::CONST_BIRTHDATE
     die("F¿dselsdato mangler");
 }
 
-$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+if(!preg_match("/\d\d\.\d\d\.\d\d\d\d/", $birthdate)) {
+    die("F¿dselsdato skal v¾re pŒ format dd.mm.yyyy");
+}
+
+$emailer = new Emailer();
+
+$body = "Nyregistering av peron:\nFornavn:$firstname\nEtternavn:$lastname\nEpost:$email\n\nAutomatisk sendt av Fritt Regnskap.\n";
+$emailer->sendEmail("Nyregistrering/New entry", $vals[AccountStandard::CONST_INTEGRATION_EMAIL],
+$body,"admin@frittregnskap.no",0);
+
+$accPers = new AccountPerson($dbu);
 $accPers->setFirstname($firstname);
 $accPers->setLastname($lastname);
 $accPers->setAddress($address);
@@ -77,5 +100,5 @@ $accPers->setBirthdate($birthdate);
 $accPers->setNewsletter($newsletter);
 $accPers->setGender($gender);
 
-echo json_encode(array("satus" => $accPers->save()));
+echo json_encode(array("status" => $accPers->save()));
 ?>

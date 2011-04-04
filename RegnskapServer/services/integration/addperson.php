@@ -20,10 +20,10 @@ if(!$masterRecord) {
 				die(json_encode($arr));
 }
 
+$dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : DB::dbhash($masterRecord["hostprefix"]));
 $dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
-$dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
 
-$accStd = new AccountStandard($dbu);
+$accStd = new AccountStandard($dbu, $dbp);
 
 $vals = $accStd->getValues(array(AccountStandard::CONST_INTEGRATION_SECRET,
 AccountStandard::CONST_INTEGRATION_EMAIL,
@@ -86,7 +86,7 @@ $body = "Nyregistering av peron:\nFornavn:$firstname\nEtternavn:$lastname\nEpost
 $emailer->sendEmail("Nyregistrering/New entry", $vals[AccountStandard::CONST_INTEGRATION_EMAIL],
 $body,"admin@frittregnskap.no",0);
 
-$accPers = new AccountPerson($dbu);
+$accPers = new AccountPerson($dbu, $dbp);
 $accPers->setFirstname($firstname);
 $accPers->setLastname($lastname);
 $accPers->setAddress($address);

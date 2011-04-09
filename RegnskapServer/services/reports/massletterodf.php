@@ -5,6 +5,7 @@ require_once('../../classes/odf/odf.php');
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/strings.php");
+include_once ("../../classes/util/KID.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountmemberprice.php");
@@ -23,9 +24,19 @@ if($file[0] == '.') {
     die("Bad file name");
 }
 
+
 $db = new DB(0);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
+
+$db = new DB(0, DB::MASTER_DB);
+$master = new Master($db);
+$masterRecord = $master->get_master_record();
+
+if(!$masterRecord) {
+    $arr = array ('error' => 'Ikke identifisert database.');
+    die(json_encode($arr));
+}
 
 
 $prefix = "";
@@ -63,6 +74,7 @@ $yearprice = round($prices["year"]);
 $courseprice = round($prices["course"]);
 $trainprice = round($prices["train"]);
 
+$kid = new KID();
 
 $article = $odf->setSegment('page');
 
@@ -79,6 +91,7 @@ foreach($users as $one) {
     $article->setVarsSilent("telefon", $one["phone"], 0, $charset);
     $article->setVarsSilent("mobil", $one["cellphone"], 0, $charset);
     $article->setVarsSilent("medlemsnr", $one["id"], 0, $charset);
+    $article->setVarsSilent("kid", $kid->generateKIDmod10($masterRecord[id], 4, $one["id"],5), 0, $charset);
     
     if ($one["birthdate"] && $one["birthdate"] != "0000-00-00") {
         $date->setMySQLDate($one["birthdate"]);
@@ -93,7 +106,7 @@ foreach($users as $one) {
     $article->kurspris($courseprice);
     $article->treningspris($trainprice);
     $article->ar($year);
-    
+
     $article->merge();
 }
 

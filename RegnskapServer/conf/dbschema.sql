@@ -343,3 +343,14 @@ create table if not exists XXX_belonging (
     deleted tinyint,
 	person INT(11) unsigned    
 );
+
+create table if not exists XXX_kid (
+    shipment_number INTEGER(7) UNSIGNED,
+    transaction_number INTEGER(7) UNSIGNED,
+    kid varchar(10),
+    form_number INTEGER(10) UNSIGNED,
+    amount NUMERIC(8,2) UNSIGNED,
+    settlement_date DATE,
+    regn_line INTEGER(8) UNSIGNED,
+    kid_status INTEGER(1) UNSIGNED
+);

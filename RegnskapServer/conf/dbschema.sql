@@ -345,6 +345,7 @@ create table if not exists XXX_belonging (
 );
 
 create table if not exists XXX_kid (
+    id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     shipment_number INTEGER(7) UNSIGNED,
     transaction_number INTEGER(7) UNSIGNED,
     kid varchar(10),

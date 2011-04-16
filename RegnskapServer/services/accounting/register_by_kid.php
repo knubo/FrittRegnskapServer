@@ -24,12 +24,18 @@ $personId = $regnSession->getPersonId();
 
 $accKid = new AccountKid($db);
 $accPrice = new AccountMemberPrice($db);
+$accStandard = new AccountStandard($db);
 
 switch($action) {
     case "unhandled":
         $result = array();
         $result["data"] = $accKid->unhandled();
         $result["price"] = $accPrice->getCurrentPrices();
+        $posts = array(AccountStandard::CONST_BUDGET_YEAR_POST,
+                       AccountStandard::CONST_BUDGET_TRAIN_POST,
+                       AccountStandard::CONST_BUDGET_COURSE_POST,
+                       AccountStandard::CONST_BUDGET_YOUTH_POST);
+        $result["posts"] = $accStandard->getValues($posts);
         
         echo json_encode($result);
         break;

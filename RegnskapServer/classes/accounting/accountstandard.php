@@ -6,15 +6,23 @@ class AccountStandard {
 	const CONST_SEMESTER = "STD_SEMESTER";
 	const CONST_EMAIL_SENDER = "STD_EMAIL_SENDER";
 	const CONST_MASSLETTER_DUE_DATE = "MASSLETTER_DUE_DATE";
+    
+    /* Post for kredit when register year memberships */
 	const CONST_BUDGET_YEAR_POST = "BDG_YEAR_POST";
+	
+	/* Post for kredit when register course memberships*/
 	const CONST_BUDGET_COURSE_POST = "BDG_COURSE_POST";
+	/* Post for kredit when register train memberships*/
 	const CONST_BUDGET_TRAIN_POST = "BDG_TRAIN_POST";
+	/* Post for kredit when register youth memberships*/
 	const CONST_BUDGET_YOUTH_POST = "BDG_YOUTH_POST";
 	const CONST_END_YEAR_POST = "END_YEAR_POST";
 	const CONST_IB_POST = "FIRST_IB_POST";
 	const CONST_END_MONTH_POST = "END_MONTH_POST";
 	const CONST_FORDRINGER_POSTS = "FORDRINGER_POSTS";
 	const CONST_END_MONTH_TRANSFER_POSTS = "END_MONTH_TRPOSTS";
+
+	/** These posts are the posts available to choose from when registering new memberships */
 	const CONST_REGISTER_MEMBERSHIP_POSTS = "REGI_MEMB_POSTS";
 	const CONST_BIRTHDATE_REQUIRED = "BIRTHDATE_REQ";
 	const CONST_FIRST_TIME_SETUP = "FIRST_TIME";
@@ -76,15 +84,16 @@ class AccountStandard {
 	static function question($q) {
 		return "?";
 	}
-	static function i($q) {
-		return "i";
+	static function s($q) {
+		return "s";
 	}
 
 	function getValues($ids) {
 		$params = array_map(array("AccountStandard","question"), $ids);
-		$vals = array_map(array("AccountStandard","i"), $ids);
+		$vals = array_map(array("AccountStandard","s"), $ids);
 
-		$prep = $this->db->prepare("select value,id from " . $this->prefix . "standard where id IN(" . implode(",", $params) . ")");
+		$sql = "select value,id from " . $this->prefix . "standard where id IN(" . implode(",", $params) . ")";
+		$prep = $this->db->prepare($sql);
 		$prep->bind_array_params(implode("", $vals), $ids);
 
 		$return_array = array ();

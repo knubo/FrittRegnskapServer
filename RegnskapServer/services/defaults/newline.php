@@ -32,7 +32,7 @@ $postnmb = $newLineData["postnmb"];
 $res = array("year"=>$year,
 		     "month"=>$month, 
 		     "attachment"=> $attachment + 1, 
-		     "postnmb"=> $postnmb ? $postnmb : ($postnmb + 5),
+		     "postnmb"=> $postnmb ? $postnmb+5 : 5,
              "first_time_complete" => $first_time, 
              "semester" => $semester,
              "line" => $newLineData["line"],

@@ -22,6 +22,7 @@ $accYearMem = new AccountYearMembership($db);
 
 $users = $accYearMem->getReportUsersBirthdate($year);
 
+date_default_timezone_set(AppConfig::TIMEZONE);
 $now = getdate();
 $thisYear = $now["year"];
 

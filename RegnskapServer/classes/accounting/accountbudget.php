@@ -38,10 +38,10 @@ class AccountBudget {
 
     function getBudgetData($year = 0) {
         if($year) {
-            $prep = $this->db->prepare("select * from " . AppConfig::pre() . "budsjett where year = ?");
+            $prep = $this->db->prepare("select * from " . AppConfig::pre() . "budsjett where year = ? order by post_type");
             $prep->bind_params("i", $year);
         } else {
-            $prep = $this->db->prepare("select * from " . AppConfig::pre() . "budsjett where year = (select max(year) from " . AppConfig::pre() . "budsjett)");
+            $prep = $this->db->prepare("select * from " . AppConfig::pre() . "budsjett where year = (select max(year) from " . AppConfig::pre() . "budsjett) order by post_type");
         }
          
         return $prep->execute();

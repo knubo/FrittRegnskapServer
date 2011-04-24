@@ -39,6 +39,11 @@ switch($action) {
         
         echo json_encode($result);
         break;
+    case "register":
+        $status = $accKid->register($_REQUEST["data"]);
+        
+        echo json_encode(array("status" => $status));
+        break;
 }
 
 ?>

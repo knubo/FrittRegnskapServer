@@ -39,6 +39,15 @@ class AccountKID {
 
         return $prep->execute();
     }
+    
+    function register($data) {
+        $kids = json_decode($data);
+        
+        foreach ($kid as $kids) {
+            
+        }
+        
+    }
 }
 
 

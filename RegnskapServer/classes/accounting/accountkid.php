@@ -10,9 +10,9 @@ class AccountKID {
 
     function unhandled() {
         $prep = $this->db->prepare("select K.*,P.id as personId, P.firstname,P.lastname,M.memberid, C.memberid as course, T.memberid as train, Y.memberid as youth from "
-        			 . AppConfig::pre() . "kid K ".
+        . AppConfig::pre() . "kid K ".
         "left join ".AppConfig::pre() . "person P on (P.id = SUBSTRING(kid, 5,5)) ".
-        
+
         " left join ".AppConfig::pre() . "year_membership M ON ".
         "(M.memberid = SUBSTRING(kid, 5,5) and year = (select value from ".AppConfig::pre() . "standard S where S.id = 'STD_YEAR')) ".
 
@@ -35,18 +35,28 @@ class AccountKID {
 										"'-',".
 										"(SELECT value from ".AppConfig::pre() . "standard S where S.id = 'STD_MONTH'),".
 										"'-1'), '%Y-%m-%d'), interval 1 MONTH)"   
-        );
+										);
 
-        return $prep->execute();
+										return $prep->execute();
+    }
+
+    function save($kids) {
+        
+        foreach($kids as $kid) {
+            echo "ID:".$kid->id;
+        }
     }
     
     function register($data) {
         $kids = json_decode($data);
-        
-        foreach ($kid as $kids) {
-            
+
+        $this->db->begin();
+        try {
+            $this->save($kids);
+            $this->db->commit();
+        } catch(exception $e) {
+            $this->db->rollback();
         }
-        
     }
 }
 

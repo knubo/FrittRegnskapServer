@@ -147,6 +147,15 @@ class AccountLine {
         return $result_lines[0]["s"];
     }
 
+    function setLatestWithDate($description, $when, $year, $month, $editByPerson) {
+        $this->Description = $description;
+        $this->Occured = & new eZDate();
+        $this->Occured->setMySQLDate($when);
+        $this->Postnmb = $this->getNextPostnmb($year, $month);
+        $this->Attachment = $this->getNextAttachmentNmb($year);
+        $this->EditedByPerson = $editByPerson;
+    }
+    
     function setNewLatest($description, $day, $year, $month, $editByPerson = 0) {
         $this->Description = $description;
 

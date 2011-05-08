@@ -40,23 +40,73 @@ class AccountKID {
 										return $prep->execute();
     }
 
-    function save($kids) {
-        
+    function save($kids, $editedByPerson) {
+        $accStd = new AccountStandard($this->db);
+        $std = $accStd->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::CONST_SEMESTER,AccountStandard::CONST_KID_BANK_ACCOUNT));
+
         foreach($kids as $kid) {
-            echo "ID:".$kid->id;
+            $accLine = new AccountLine($this->db);
+
+            $desc = $kid->description;
+
+            $accLine->setLatestWithDate($desc, $kid->settlement_date, $std[AccountStandard::CONST_YEAR],$std[AccountStandard::CONST_MONTH] , $editByPerson);
+            $accLine->store();
+
+            $lineId = $accLine->Id;
+
+            $kidPosts = $kid->accounting;
+            foreach($kidPosts as $post => $value) {
+                if(substr($post, -4) == "_tip") {
+                    continue;
+                }
+
+                $accLine->addPostSingleAmount($lineId,
+		        '-1', 
+                $post,
+                $value);
+            }
+
+            $accLine->addPostSingleAmount($lineId, '1', $std[AccountStandard::CONST_KID_BANK_ACCOUNT], $kid->amount);
+
+            $memberships = $kid->payments;
+
+            foreach($memberships as $memb) {
+                switch($memb) {
+                    case "year":
+                        $yearM = new AccountYearMembership($this->db, $kid->personId, $std[AccountStandard::CONST_YEAR], $lineId);
+                        $yearM->store();
+                        break;
+                    case "yearyouth":
+                        $yearM = new AccountYearMembership($this->db, $kid->personId, $std[AccountStandard::CONST_YEAR], $lineId, 1);
+                        $yearM->store();
+                        break;
+                    default:
+                        $memb = new AccountSemesterMembership($this->db,$memb , $kid->personId, $std[AccountStandard::CONST_SEMESTER], $lineId);
+                        $memb->store();
+                        break;
+                }
+            }
+            
+            $prep = $this->db->prepare("update ". AppConfig::pre() . "kid set kid_status = 1, regn_line=? where id =?");
+            $prep->bind_params("ii", $lineId, $kid->id);
+            $prep->execute();
+            
+            return 1;
         }
     }
-    
-    function register($data) {
+
+    function register($data, $personId) {
         $kids = json_decode($data);
 
         $this->db->begin();
         try {
-            $this->save($kids);
+            $this->save($kids, $personId);
             $this->db->commit();
         } catch(exception $e) {
             $this->db->rollback();
         }
+        
+        return 1;
     }
 }
 

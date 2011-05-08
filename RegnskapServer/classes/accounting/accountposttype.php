@@ -12,7 +12,8 @@ class AccountPostType {
     public $Capital;
     public $Owning;
     public $Deprecation;
-
+    public $Bank;
+    
     private $AllEntries;
     private $db;
 
@@ -132,10 +133,13 @@ class AccountPostType {
                 $isEarning = (($pt >= 3000 && $pt < 4000) || $pt == 8400 || $pt ==8040);
                 $isCost = $pt > 4000 && $pt <= 8500 && $pt <> 8040 && $pt <> 8400;
                 $isCapital = $pt >= 1900 && $pt < 2000;
+                $isBank = $pt >= 1920 && $pt < 2000;
                 $isOwning = $pt >= 1200 && $pt < 1300;
                 $isDeprecation = $pt >= 6000 && $pt < 6100;
 
                 $one = new AccountPostType($this->db, $pt, $group_array[$i]["coll_post"], $group_array[$i]["description"], $group_array[$i]["detail_post"], $group_array[$i]["in_use"], $isEarning, $isCost, $isCapital, $isOwning, $isDeprecation);
+                $one->Bank = $isBank;
+                
                 $return_array[$i] = $one;
                 $this->AllEntries[$pt] = $one;
             }

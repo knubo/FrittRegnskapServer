@@ -103,6 +103,7 @@ class Installer {
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('FORDRINGER_POSTS','1370,1380,1390,1570')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('REGI_MEMB_POSTS','1920,1900')");
         $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_TRPOSTS','1900,1920')");
+        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('KID_BANK_ACCOUNT','1920')");
 
     }
 

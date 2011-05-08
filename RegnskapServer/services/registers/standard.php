@@ -28,6 +28,7 @@ $fordringer_posts = array_key_exists("fordringer_posts", $_REQUEST) ? $_REQUEST[
 $register_membership_posts = array_key_exists("register_membership_posts", $_REQUEST) ? $_REQUEST["register_membership_posts"] : "0";
 $end_month_transfer_posts = array_key_exists("end_month_transfer_posts", $_REQUEST) ? $_REQUEST["end_month_transfer_posts"] : "0"; 
 $birthdate_required = array_key_exists("birthdate_required", $_REQUEST) ? $_REQUEST["birthdate_required"] : "0";
+$bank_kid_post = array_key_exists("bank_kid_post", $_REQUEST) ? $_REQUEST["bank_kid_post"] : "0";
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -55,6 +56,7 @@ switch ($action) {
         $res["register_membership_posts"] = $accStd->getOneValue(AccountStandard::CONST_REGISTER_MEMBERSHIP_POSTS);
         $res["end_month_transfer_posts"] = $accStd->getOneValue(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS);
         $res["birthdate_required"] = $accStd->getOneValue(AccountStandard::CONST_BIRTHDATE_REQUIRED);
+        $res["bank_kid_post"] = $accStd->getOneValue(AccountStandard::CONST_KID_BANK_ACCOUNT);
 
         $accPrices = new AccountMemberPrice($db);
         $prices = $accPrices->getCurrentPrices();
@@ -82,6 +84,7 @@ switch ($action) {
         $res = $res | $accStd->setValue(AccountStandard::CONST_REGISTER_MEMBERSHIP_POSTS, $register_membership_posts);
         $res = $res | $accStd->setValue(AccountStandard::CONST_END_MONTH_TRANSFER_POSTS, $end_month_transfer_posts);
         $res = $res | $accStd->setValue(AccountStandard::CONST_BIRTHDATE_REQUIRED, $birthdate_required);
+        $res = $res | $accStd->setValue(AccountStandard::CONST_KID_BANK_ACCOUNT, $bank_kid_post);
         $report = array();
         $report["result"] = $res ? 1 : 0;
 

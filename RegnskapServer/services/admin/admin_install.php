@@ -29,7 +29,7 @@ $prep->bind_params("ss", $secret, $wikilogin);
 $res = $prep->execute();
 
 if(count($res) == 0) {
-    die("Illegal combination of secret and wikilogin provided");
+    die("Illegal combination of secret and wikilogin provided: $secret, $wikilogin");
 }
 
 $installer->validate($_REQUEST);

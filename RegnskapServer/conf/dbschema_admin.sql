@@ -8,11 +8,11 @@ create table if not exists installations (
 	wikilogin varchar(40) not null,
     secret varchar(40),
     beta tinyint,
-    INTEGER(6) unsigned sqlIdToRun,
+    sqlIdToRun INTEGER(6) unsigned,
     portal_status int,
     portal_title varchar(255),
-    archive_limit int,
     reduced_mode int,
+    archive_limit int,
     parentdbprefix varchar(20),
     parenthostprefix varchar(40),
     integration varchar(80)

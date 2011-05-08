@@ -23,11 +23,12 @@ $regnSession->auth();
 $personId = $regnSession->getPersonId();
 
 $accKid = new AccountKid($db);
-$accPrice = new AccountMemberPrice($db);
-$accStandard = new AccountStandard($db);
 
 switch($action) {
     case "unhandled":
+        $accPrice = new AccountMemberPrice($db);
+        $accStandard = new AccountStandard($db);
+
         $result = array();
         $result["data"] = $accKid->unhandled();
         $result["price"] = $accPrice->getCurrentPrices();
@@ -40,7 +41,7 @@ switch($action) {
         echo json_encode($result);
         break;
     case "register":
-        $status = $accKid->register($_REQUEST["data"]);
+        $status = $accKid->register($_REQUEST["data"], $personId);
         
         echo json_encode(array("status" => $status));
         break;

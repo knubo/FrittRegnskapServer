@@ -1,12 +1,10 @@
 <?php
 
-class AccountKID
-{
+class AccountKID {
 
     private $db;
 
-    function AccountKID($db)
-    {
+    function AccountKID($db) {
         if (!$db) {
             $db = new DB();
         }
@@ -14,8 +12,7 @@ class AccountKID
         $this->db = $db;
     }
 
-    function unhandled()
-    {
+    function unhandled() {
         $prep = $this->db->prepare("select K.*,P.id as personId, P.firstname,P.lastname,M.memberid, C.memberid as course, T.memberid as train, Y.memberid as youth from "
                                    . AppConfig::pre() . "kid K " .
                                    "left join " . AppConfig::pre() . "person P on (P.id = SUBSTRING(kid, 5,5)) " .
@@ -47,8 +44,7 @@ class AccountKID
         return $prep->execute();
     }
 
-    function save($kids, $editedByPerson)
-    {
+    function save($kids, $editedByPerson) {
         $accStd = new AccountStandard($this->db);
         $std = $accStd->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::CONST_SEMESTER, AccountStandard::CONST_KID_BANK_ACCOUNT));
 
@@ -103,8 +99,7 @@ class AccountKID
         }
     }
 
-    function register($data, $personId)
-    {
+    function register($data, $personId) {
         $kids = json_decode($data);
 
         $this->db->begin();
@@ -118,21 +113,36 @@ class AccountKID
         return 1;
     }
 
-    public function listKID($masterRecord, $data)
-    {
-        $searchWrap = $this->db->search("select * from " . AppConfig::pre() . "kid", "order by id");
+    public function listKID($masterRecord, $data) {
+        $searchWrap = $this->db->search("select K.*,P.firstname, P.lastname from " . AppConfig::pre() .
+                                        "kid K left join " .
+                                        AppConfig::pre() . "person P on (P.id = SUBSTRING(kid, 5,5))",
+                                        "order by id");
 
-        if ($data["memberid"] > 0) {
+        if ($data["member"] > 0) {
             $kidTool = new KID();
-
-            $kid = $kidTool->generateKIDmod10($masterRecord[id], 4, $data["memberid"],5);
+            $kid = $kidTool->generateKIDmod10($masterRecord[id], 4, $data["member"], 5);
             $searchWrap->addAndParam("s", "kid", $kid);
-
-            if($data["fromdate"]) {
-                $searchWrap->addAndQuery("s", , "fromdate")
-            }
         }
+
+        if ($data["fromDate"]) {
+            $date = new eZDate();
+            $date->setDate($data["fromDate"]);
+            $searchWrap->addAndQuery("s", $date->mySQLDate(), "settlement_date >= ?");
+        }
+
+        if ($data["toDate"]) {
+            $date = new eZDate();
+            $date->setDate($data["toDate"]);
+            $searchWrap->addAndQuery("s", $date->mySQLDate(), "settlement_date <= ?");
+        }
+
+        $searchWrap->addAndParam("i", "kid_status", $data["status"]);
+
+
+        return $searchWrap->execute();
     }
+
 }
 
 

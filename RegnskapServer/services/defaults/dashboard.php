@@ -16,7 +16,6 @@ $user = $regnSession->auth();
 
 $pre = AppConfig::pre();
 
-
 $leftJoinPart = "";
 // Semester
 $fields = "S.description as semester_description, S.semester as semester_id, S.fall as is_fall";
@@ -31,6 +30,8 @@ $leftJoinPart .= " left join ".$pre."semester NS on (NS.year = if(S.fall = 1, S.
 $fields .= ", SM.value as active_month";
 $prePart .= ", ".$pre."standard SM";
 $wherePart .= " and SM.id = '".AccountStandard::CONST_MONTH."'";
+
+$fields .= ", (select count(*) from ".$pre."kid where kid_status = 0) as kids";
 
 
 if($regnSession->getPersonId() > 0) {
@@ -111,8 +112,11 @@ $prep = $db->prepare($query);
 if($regnSession->getPersonId() > 0) {
     $prep->bind_params("s", $user);
 }
-$info = $prep->execute();
-
+try {
+    $info = $prep->execute();
+} catch(Exception $e) {
+    $info = array();
+}
 
 // Status for accounts.
 

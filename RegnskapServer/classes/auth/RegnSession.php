@@ -334,12 +334,7 @@ class RegnSession {
             $_SESSION["parentdbprefix"] = 0;
         }
 
-        if($masterRecord["parentdb"]) {
-            $_SESSION["parentdb"] = $masterRecord["parentdb"];
-        } else {
-            $_SESSION["parentdb"] = 0;
-        }
-
+        $_SESSION["parentdb"] = $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0;
     }
 
 

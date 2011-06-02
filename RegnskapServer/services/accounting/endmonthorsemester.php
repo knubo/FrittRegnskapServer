@@ -9,6 +9,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountbelonging.php");
+include_once ("../../classes/accounting/accountkid.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
@@ -40,12 +41,16 @@ switch ($action) {
     case "status" :
         $acStandard = new AccountStandard($db);
         $belongings = new AccountBelonging($db);
+        $accKid = new AccountKID($db);
+
+        $std = $acStandard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH));
 
         $res = array();
         $res["posts"] = $endHelper->status();
-        $res["year"] = $acStandard->getOneValue(AccountStandard::CONST_YEAR);;
-        $res["month"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH);
+        $res["year"] = $std[AccountStandard::CONST_YEAR];
+        $res["month"] = $std[AccountStandard::CONST_MONTH];
         $res["deprecation"] = $belongings->listItemsToDeprecate();
+        $res["kids"] =  $accKid->unhandledForMonth($res["year"], $res["month"]);
 
         echo json_encode($res);
         break;
@@ -92,7 +97,7 @@ switch ($action) {
         if($_REQUEST["deprecate"]) {
             $accountBelonging->addDeprecationLine($res, $regnSession->getPersonId(), $_REQUEST["deprdesc"]);
         }
-         
+
         $res = $endHelper->endMonth($res, $regnSession->getPersonId());
 
         $db->commit();

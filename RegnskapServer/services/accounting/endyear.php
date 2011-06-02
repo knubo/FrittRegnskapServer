@@ -9,6 +9,7 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountbelonging.php");
+include_once ("../../classes/accounting/accountkid.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountline.php");
 include_once ("../../classes/accounting/accountpost.php");
@@ -31,12 +32,15 @@ $accountBelonging = new AccountBelonging($db);
 
 switch ($action) {
     case "status" :
+        $accKid = new AccountKID($db);
+
         $year = $acStandard->getOneValue(AccountStandard::CONST_YEAR);
-         
+
         $data = array();
         $data["data"] = $endYearHelper->getEndYearData($year);
         $data["readonly"] = $acStandard->getOneValue(AccountStandard::CONST_MONTH) != 12;
         $data["deprecation"] = $accountBelonging->listItemsToDeprecate();
+        $data["kids"] =  $accKid->unhandledForMonth($year, 12);
 
         echo json_encode($data);
         break;
@@ -62,11 +66,11 @@ switch ($action) {
             header("HTTP/1.0 514 Illegal state");
             die("Can only end year in last month of year.");
         }
-        
+
         if($_REQUEST["deprecate"]) {
             $accountBelonging->addDeprecationLine($res, $regnSession->getPersonId(), $_REQUEST["deprdesc"]);
         }
-        
+
         $endYearHelper->endYear($res);
 
         $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());

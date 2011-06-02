@@ -51,7 +51,11 @@ while(strlen($secret) < 40) {
     $secret.= chr(mt_rand(97, 122));
 }
 
-$res = $accPerson->updateSecretIfUserMatches($email, $secret);
+if(strpos($email, "@") > 0) {
+    $res = $accPerson->updateSecretIfUserMatches($email, $secret);
+} else {
+    $res = $accPerson->updateSecretIfUserExists($email, $secret);
+}
 
 $emailer = new Emailer();
 if($res["error"]) {
@@ -59,7 +63,7 @@ if($res["error"]) {
     die(json_encode(array("status" => 0, "res" => $res)));
 }
 
-$user = $res["username"]; 
+$user = $res["username"];
 
 $body = "Linken under gir direkte innlogging til regnskapssystemet i Fritt Regnskap. Etter innlogging kan du endre til et nytt passord.\n\n".
              "http://".$_SERVER["SERVER_NAME"]."/RegnskapServer/services/authenticate.php?action=secret&username=$user&secret=".$secret.

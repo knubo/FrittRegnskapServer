@@ -89,6 +89,9 @@ switch ($action) {
         $accPers->setGender($gender);
 		echo json_encode($accPers->search($queryMembership));
 		break;
+	case "test":
+	    echo "Hum:".$regnSession->getSuperDBPrefix();
+	    break;
 	case "save" :
         $regnSession->checkReducedWriteAccess();
 

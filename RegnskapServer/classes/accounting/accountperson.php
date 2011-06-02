@@ -36,7 +36,7 @@ class AccountPerson {
         } else {
             $this->dbPrefix = $dbP;
         }
-        
+
     }
     function setId($id) {
         $this->Id = $id;
@@ -117,7 +117,7 @@ class AccountPerson {
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);
         $res = $prep->execute();
-         
+
         if(count($res) == 0) {
             return "";
         }
@@ -168,8 +168,8 @@ class AccountPerson {
         "(if(show_postnmb, postnmb, '')) as v, (if(show_country, country, '')) as b, ".
         "(if(show_birthdate, birthdate, '')) as n, show_image as m, ".
         "(select min(year) from " . $this->dbPrefix . "year_membership where memberid=person) as y, ".
-        "show_image as s, twitter as t, homepage as h, facebook as j, linkedin as k". 
-        " from " . $this->dbPrefix . "portal_user," . $this->dbPrefix . "person where person = id and show_firstname");        
+        "show_image as s, twitter as t, homepage as h, facebook as j, linkedin as k".
+        " from " . $this->dbPrefix . "portal_user," . $this->dbPrefix . "person where person = id and show_firstname");
 
         $arr = $prep->execute();
 
@@ -318,14 +318,14 @@ class AccountPerson {
     function search($incMemberInfo) {
         $cols = "*";
         if ($incMemberInfo) {
-            $accStandard = new AccountStandard($this->db);
-            $accSemester = new AccountSemester($this->db);
+            $accStandard = new AccountStandard($this->db, $this->dbPrefix);
+            $accSemester = new AccountSemester($this->db, $this->dbPrefix);
             $active_semester = addslashes($accStandard->getOneValue(AccountStandard::CONST_SEMESTER));
             $active_year = addslashes($accStandard->getOneValue(AccountStandard::CONST_YEAR));
             $cols = "*, (select distinct 1 from " . $this->dbPrefix . "train_membership where memberid=id and semester=$active_semester) as train" .
 			", (select distinct 1 from " . $this->dbPrefix . "course_membership where memberid=id and semester=$active_semester) as course" .
 			", (select distinct 1 from " . $this->dbPrefix . "youth_membership where memberid=id and semester=$active_semester) as youth" .
-			", (select distinct 1 from " . $this->dbPrefix . "year_membership where memberid=id and year=$active_year) as year";
+			", (select if(youth = 1, 2, 1) from " . $this->dbPrefix . "year_membership where memberid=id and year=$active_year) as year";
         }
 
         $searchWrap = $this->db->search("select $cols from " . $this->dbPrefix . "person", "order by lastname,firstname");
@@ -352,7 +352,7 @@ class AccountPerson {
         }
 
         if($this->Hidden) {
-            $searchWrap->addOnlySql("(hidden is null or hidden <> 1)");
+            $searchWrap->addAndParam("i", "hidden",1);
         }
         $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . $this->dbPrefix . "user where person=id and username=?)");
 
@@ -429,9 +429,9 @@ class AccountPerson {
         $prep = $this->db->prepare("update " . $prefix . "person set newsletter = 0 where secret = ? and id = ?");
         $prep->bind_params("si", $secret, $id);
         $prep->execute();
-         
+
         return $this->db->affected_rows();
-         
+
     }
 
     function getFirst() {
@@ -475,13 +475,36 @@ class AccountPerson {
 
         return $res;
     }
-    
-    function updateSecretIfUserMatches($email, $secret) {
+
+    function updateSecretIfUserExists($user, $secret) {
         $prep = $this->db->prepare("select email, username from ".$this->dbPrefix .
-        			"person P, ".$this->dbPrefix ."user U where P.email like ? and U.person = P.id");
-        $prep->bind_params("s", '%'.$email.'%');
+                    "person P, ".$this->dbPrefix ."user U where U.person = P.id and U.username = ?");
+        $prep->bind_params("s", $user);
 
         $res = $prep->execute();
+
+        if(count($res) != 1) {
+            return array("error" => "Bad match:".count($res),"user"=>$user, "dbprefix" => $this->dbPrefix);
+        }
+
+        $prep = $this->db->prepare("update ".$this->dbPrefix .
+        			"person P set secret=? where exists (select null from ".$this->dbPrefix .
+        						   "user U where U.username = ? and U.person = P.id)");
+        $prep->bind_params("ss", $secret, $user);
+
+        $prep->execute();
+
+        return array("email" => $res[0]["email"], "username" => $user);
+
+    }
+
+    function updateSecretIfUserMatches($email, $secret) {
+
+            $prep = $this->db->prepare("select email, username from ".$this->dbPrefix .
+                        "person P, ".$this->dbPrefix ."user U where P.email like ? and U.person = P.id");
+            $prep->bind_params("s", '%'.$email.'%');
+
+            $res = $prep->execute();
 
         if(count($res) != 1) {
             return array("error" => "Bad match:".count($res),"email"=>$email, "dbprefix" => $this->dbPrefix);

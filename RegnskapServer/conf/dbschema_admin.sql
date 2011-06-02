@@ -33,5 +33,13 @@ create table if not exists sqllist (
 create table if not exists to_install (
 	secret varchar(80) not null unique,
 	wikilogin varchar(40) not null unique
-)
+);
+
+create table if not exists kid_log (
+    id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    owning_install int,
+    occured timestamp,
+	transaction_count int,
+	transaction_file varchar(80)
+);
 

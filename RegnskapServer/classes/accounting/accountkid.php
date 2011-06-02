@@ -143,6 +143,16 @@ class AccountKID {
         return $searchWrap->execute();
     }
 
+    public function unhandledForMonth($year, $month) {
+        $startDate = new eZDate($year, $month, 1);
+        $endDate = new eZDate($year, $month, $startDate->daysInMonth());
+
+        $prep = $this->db->prepare("select count(*) as kids from " . AppConfig::pre() ."kid where settlement_date >= ? and settlement_date <=? and kid_status = 0");
+        $prep->bind_params("ss", $startDate->mySQLDate(), $endDate->mySQLDate());
+
+        return array_shift($prep->execute());
+    }
+
 }
 
 

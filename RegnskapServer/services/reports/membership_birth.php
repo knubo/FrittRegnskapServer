@@ -46,7 +46,7 @@ foreach($users as $one) {
   }
   if(!$birth) {
     $year_unset[] = $one;
-  } else if(strlen($birth) != 10 || $age > 150) {
+  } else if(strlen($birth) != 10 || $age > 150 || $age < 0) {
     $year_wrong[] = $one;
   } else if($age <= 19) {
     $year_19[] = $one;

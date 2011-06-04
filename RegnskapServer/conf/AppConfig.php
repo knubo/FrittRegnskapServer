@@ -11,6 +11,8 @@ class AppConfig {
         return array("localhost","root","","bsc_kopi");
     }
 
+    const DB_HASH_POSTCODES = 1;
+
     const DOMENESHOP_USER = "knutbo@ifi.uio.no";
     const DOMENESHOP_PASS = "";
 

@@ -43,3 +43,12 @@ create table if not exists kid_log (
 	transaction_file varchar(80)
 );
 
+create table if not exists norwegiancities (
+	zipcode INTEGER(4) unsigned,
+	city varchar(80),
+	street varchar(80)
+);
+
+create INDEX streetIndex on norwegiancities(street);
+create INDEX zipIndex on norwegiancities(zipcode);
+

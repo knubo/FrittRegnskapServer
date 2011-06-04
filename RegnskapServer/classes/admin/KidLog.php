@@ -12,7 +12,7 @@ class KidLog {
     }
 
     function log($filename, $transaction_count, $install) {
-        $prep = $this->db->prepare("insert into kid_log (owning_install, occured, transaction_count, transaction_file) values (?,now(),?,?)")
+        $prep = $this->db->prepare("insert into kid_log (owning_install, occured, transaction_count, transaction_file) values (?,now(),?,?)");
 
         $prep->bind_params("isis", $install["id"], $transaction_count, $filename);
 

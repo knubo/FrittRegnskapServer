@@ -46,5 +46,6 @@ if ($handle) {
     echo "Failed to read file $fileName";
 }
 
+echo json_encode(array("status" => 1));
 
 ?>

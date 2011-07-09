@@ -12,6 +12,7 @@ include_once ("../../classes/validators/emailvalidator.php");
 include_once ("../../classes/validators/validatorstatus.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
+include_once ("../../classes/admin/CityAddress.php");
 
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "get";
@@ -26,9 +27,9 @@ $country = array_key_exists("country", $_REQUEST) ? trim($_REQUEST["country"]) :
 $phone = array_key_exists("phone", $_REQUEST) ? trim($_REQUEST["phone"]) : "";
 $cellphone = array_key_exists("cellphone", $_REQUEST) ? trim($_REQUEST["cellphone"]) : "";
 $employee = array_key_exists("employee", $_REQUEST) ? trim($_REQUEST["employee"]) : "";
-$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"]: 0;
+$id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : 0;
 $onlyEmp = array_key_exists("onlyemp", $_REQUEST) ? trim($_REQUEST["onlyemp"]) : "";
-$queryMembership = array_key_exists("getmemb", $_REQUEST) ? trim($_REQUEST["getmemb"]) :1;
+$queryMembership = array_key_exists("getmemb", $_REQUEST) ? trim($_REQUEST["getmemb"]) : 1;
 $newsletter = array_key_exists("newsletter", $_REQUEST) ? trim($_REQUEST["newsletter"]) : 0;
 $hidden = array_key_exists("hidden", $_REQUEST) ? trim($_REQUEST["hidden"]) : 0;
 $gender = array_key_exists("gender", $_REQUEST) ? trim($_REQUEST["gender"]) : '';
@@ -43,21 +44,21 @@ $db = new DB(0, $regnSession->getSuperDBIfAny());
 
 switch ($action) {
     case "changes":
-		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+        $accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
         echo json_encode($accPers->allChangedSince($date));
-        break;   
-	case "all" :
-		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
-		$columnList = $accPers->getAll($onlyEmp);
-		echo json_encode($columnList);
-		break;
-	case "get" :
-	    $accStd = new AccountStandard($db);
-	    
-		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
-		$accPers->load($id);
-		
-		
+        break;
+    case "all" :
+        $accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+        $columnList = $accPers->getAll($onlyEmp);
+        echo json_encode($columnList);
+        break;
+    case "get" :
+        $accStd = new AccountStandard($db);
+
+        $accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+        $accPers->load($id);
+
+
         $accSemesterMembership = new AccountSemesterMembership($db);
         $accYearMembership = new AccountyearMembership($db);
         $accYouthMembership = new AccountSemesterMembership($db);
@@ -67,51 +68,61 @@ switch ($action) {
         $memberships["year"] = $accYearMembership->getUserMemberships($id, "train");
         $memberships["youth"] = $accYouthMembership->getUserMemberships($id, "youth");
         $accPers->Memberships = $memberships;
-        
+
         $accPers->BirthdateRequired = $accStd->getOneValue(AccountStandard::CONST_BIRTHDATE_REQUIRED);
-        
-		echo json_encode($accPers);
-		break;
-	case "search" :
-		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
-		$accPers->setId($id);
-		$accPers->setFirstname($firstname);
-		$accPers->setLastname($lastname);
-		$accPers->setIsEmployee($employee);
-		$accPers->setAddress($address);
-		$accPers->setPostnmb($postnmb);
-		$accPers->setCity($city);
-		$accPers->setCountry($country);
-		$accPers->setPhone($phone);
-		$accPers->setEmail($email);
-		$accPers->setCellphone($cellphone);
+
+        echo json_encode($accPers);
+        break;
+    case "search" :
+        $accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+        $accPers->setId($id);
+        $accPers->setFirstname($firstname);
+        $accPers->setLastname($lastname);
+        $accPers->setIsEmployee($employee);
+        $accPers->setAddress($address);
+        $accPers->setPostnmb($postnmb);
+        $accPers->setCity($city);
+        $accPers->setCountry($country);
+        $accPers->setPhone($phone);
+        $accPers->setEmail($email);
+        $accPers->setCellphone($cellphone);
         $accPers->setHidden($hidden);
         $accPers->setGender($gender);
-		echo json_encode($accPers->search($queryMembership));
-		break;
-	case "test":
-	    echo "Hum:".$regnSession->getSuperDBPrefix();
-	    break;
-	case "save" :
+        echo json_encode($accPers->search($queryMembership));
+        break;
+    case "test":
+        echo "Hum:" . $regnSession->getSuperDBPrefix();
+        break;
+    case "save" :
         $regnSession->checkReducedWriteAccess();
 
         $validator = new ValidatorStatus();
-        if($email && !EmailValidator::check_email_address($email)) {
-        	$validator->addInvalidField("email");
+        if ($email && !EmailValidator::check_email_address($email)) {
+            $validator->addInvalidField("email");
         }
+
+        $dbc = new DB(0, AppConfig::DB_HASH_POSTCODES);
+
+        $cityAddress = new CityAddress($dbc);
+
+        if (!$cityAddress->validZip($country, $postnmb)) {
+            $validator->addInvalidField("zip");
+        }
+
         $validator->dieIfNotValidated();
-		$accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
-		$accPers->setId($id);
-		$accPers->setFirstname($firstname);
-		$accPers->setLastname($lastname);
-		$accPers->setIsEmployee($employee);
-		$accPers->setAddress($address);
-		$accPers->setPostnmb($postnmb);
-		$accPers->setCity($city);
-		$accPers->setCountry($country);
-		$accPers->setPhone($phone);
-		$accPers->setEmail($email);
-		$accPers->setCellphone($cellphone);
+
+        $accPers = new AccountPerson($db, $regnSession->getSuperDBPrefix());
+        $accPers->setId($id);
+        $accPers->setFirstname($firstname);
+        $accPers->setLastname($lastname);
+        $accPers->setIsEmployee($employee);
+        $accPers->setAddress($address);
+        $accPers->setPostnmb($postnmb);
+        $accPers->setCity($city);
+        $accPers->setCountry($country);
+        $accPers->setPhone($phone);
+        $accPers->setEmail($email);
+        $accPers->setCellphone($cellphone);
         $accPers->setBirthdate($birthdate);
         $accPers->setNewsletter($newsletter);
         $accPers->setHidden($hidden);
@@ -123,6 +134,6 @@ switch ($action) {
         $res["result"] = $accPers->save();
 
         echo json_encode($res);
-		break;
+        break;
 }
 ?>

@@ -84,13 +84,27 @@ class AccountMemberPrice {
     function save($year, $yearPrice, $springCoursePrice, $springTrainPrice, $springYouthPrice, $fallCoursePrice, $fallTrainPrice, $fallYouthPrice, $yearYouthPrice) {
         $res = false;
 
-        $res = $res | ($this->updateYear($yearPrice, $yearYouthPrice, $year) != 0);
-        $res = $res | ($this->courseUpdate($year, $springCoursePrice, 0, "course") != 0);
-        $res = $res | ($this->courseUpdate($year, $fallCoursePrice, 1, "course") != 0);
-        $res = $res | ($this->courseUpdate($year, $springTrainPrice, 0, "train") != 0);
-        $res = $res | ($this->courseUpdate($year, $fallTrainPrice, 1, "train") != 0);
-        $res = $res | ($this->courseUpdate($year, $springYouthPrice, 0, "youth") != 0);
-        $res = $res | ($this->courseUpdate($year, $fallYouthPrice, 1, "youth") != 0);
+        if ($this->updateYear($yearPrice, $yearYouthPrice, $year) != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $springCoursePrice, 0, "course") != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $fallCoursePrice, 1, "course") != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $springTrainPrice, 0, "train") != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $fallTrainPrice, 1, "train") != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $springYouthPrice, 0, "youth") != 0) {
+            $res = true;
+        }
+        if ($this->courseUpdate($year, $fallYouthPrice, 1, "youth") != 0) {
+            $res = true;
+        }
 
         return $res;
     }

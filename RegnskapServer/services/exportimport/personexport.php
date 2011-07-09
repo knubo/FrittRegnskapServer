@@ -21,7 +21,7 @@ $logger = new Logger($db);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
-    
+
 $prep = $db->prepare("select id as memberid, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,employee,birthdate,newsletter, gender from ".AppConfig::pre()."person where hidden=0");
 $res = $prep->execute();
 
@@ -53,9 +53,14 @@ foreach($res as $one) {
                 echo $one[field];
                 break;
             case "birthdate":
-                $tmpdate = new eZDate();
-                $tmpdate->setMySQLDate($one["birthdate"]);
-                echo "\"".$tmpdate->displayAccount()."\"";
+
+                if( preg_match( "/([0-9]{4})-([0-9]{2})-([0-9]{2})/", $one["birthdate"])) {
+                    $tmpdate = new eZDate();
+                    $tmpdate->setMySQLDate($one["birthdate"]);
+                    echo "\"".$tmpdate->displayAccount()."\"";
+                } else {
+                    echo "\"".$one["birthdate"]."\"";
+                }
                 break;
             default:
                 echo "\"".$one[$field]."\"";

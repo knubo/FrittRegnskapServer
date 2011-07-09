@@ -60,4 +60,17 @@ class CityAddress {
         return $prep->execute();
     }
 
+    public function validZip($country, $postnmb) {
+        if($country != "NO") {
+            return 1;
+        }
+
+        $prep = $this->db->prepare("select count(*) as c from norwegiancities where zipcode = ?");
+        $prep->bind_params("i", $postnmb);
+
+        $res = $prep->execute();
+
+        return $res[0]["c"] > 0;
+    }
+
 }

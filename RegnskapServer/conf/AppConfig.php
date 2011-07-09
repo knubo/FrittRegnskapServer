@@ -13,6 +13,8 @@ class AppConfig {
 
     const DB_HASH_POSTCODES = 1;
 
+
+
     const DOMENESHOP_USER = "knutbo@ifi.uio.no";
     const DOMENESHOP_PASS = "";
 

@@ -50,6 +50,7 @@ switch ($action) {
 
         $result = array();
         $result["status"] = $ret ? 1 : 0;
+        $result["year"] = $year;
         echo json_encode($result);
         break;
 }

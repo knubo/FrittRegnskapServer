@@ -15,8 +15,21 @@ create table if not exists installations (
     archive_limit int,
     parentdbprefix varchar(20),
     parenthostprefix varchar(40),
-    integration varchar(80)
+    integration varchar(80),
     );
+
+
+create table if not exists change_request (
+  id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  installation_id INTEGER(6) UNSIGNED,
+  action varchar(40),
+  addedTime timestamp,
+  executedTime timestamp,
+  addedBy varchar(80),
+  reason varchar(255)
+
+);
+
 
 create table if not exists sqllist (
     id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

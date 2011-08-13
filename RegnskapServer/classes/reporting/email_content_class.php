@@ -54,7 +54,7 @@ class EmailContent {
             $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
             $prep->bind_params("i", $header);
             $res = $prep->execute();
-            
+
             $body = $res[0]["content"].$body;
         }
 
@@ -62,7 +62,7 @@ class EmailContent {
             $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
             $prep->bind_params("i", $footer);
             $res = $prep->execute();
-            
+
             $body = $body.$res[0]["content"];
         }
 
@@ -80,11 +80,11 @@ class EmailContent {
         $html = preg_replace("/<.+?>/", "", $html);
         return $html;
     }
-    
+
     function makeHTMLFromWiki($body) {
         $lines = explode("\n", $body);
         reset($lines);
-        
+
         $res = "";
         foreach($lines as $one) {
             if(strncasecmp("h1.", $one, 3) == 0) {
@@ -106,14 +106,26 @@ class EmailContent {
                 $res.="$one\n";
             }
         }
-        
+
         return "<html><body>$res</body></html>";
     }
-    
+
     function fillInUnsubscribeURL($body, $secret, $personId) {
-        $protocol = $_SERVER["https"] ? "https://" : "http://"; 
+        $protocol = $_SERVER["https"] ? "https://" : "http://";
         $url = $protocol.$_SERVER["SERVER_NAME"].AppConfig::ABSOLUTE_URL_TO_SERVICES."newsletter/unsubscribe.php?secret=".$personId.$secret;
         return preg_replace("/\{unsubscribeurl\}/", $url, $body);
+    }
+
+    public function replaceCommonVariables($body) {
+        $now = new eZDate();
+
+        $body = preg_replace("/\{day\}/", $now->day(), $body);
+        $body = preg_replace("/\{month\}/", $now->month(), $body);
+        $body = preg_replace("/\{year\}/", $now->year(), $body);
+        $body = preg_replace("/\{week\}/", $now->week(), $body);
+
+
+        return $body;
     }
 }
 

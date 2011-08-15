@@ -7,8 +7,6 @@ include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/auth/User.php");
 
-
-
 /* Used for admin */
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "setup_init";
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : "";
@@ -30,7 +28,7 @@ switch ($action) {
         $accUser = new User($db);
         $data = $contentHelper->getAll();
         $data["profile"] = $accUser->getProfile($currentUser);
-        
+
         echo json_encode($data);
         break;
     case "setup_init":

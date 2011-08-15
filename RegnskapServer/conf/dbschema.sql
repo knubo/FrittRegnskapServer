@@ -38,7 +38,7 @@ CREATE TABLE IF NOT exists XXX_grouping_head (
   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   occured DATE,
   description varchar(80)
-); 
+);
 
 CREATE TABLE IF NOT exists XXX_possessions (
   id INTEGER(5) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -226,7 +226,7 @@ CREATE TABLE IF NOT exists XXX_telling (
    regn_line INT(8) UNSIGNED,
    a1000 INT(3) UNSIGNED,
    a500 INT(3) UNSIGNED,
-   a200 INT(3) UNSIGNED,	
+   a200 INT(3) UNSIGNED,
    a100 INT(3) UNSIGNED,
    a50 INT(3) UNSIGNED,
    a20 INT(3) UNSIGNED,
@@ -263,7 +263,7 @@ create table if not exists XXX_budget_membership (
   spring_youth int(5) unsigned,
   year_youth int(5) unsigned
 );
-  
+
 
 CREATE TABLE IF NOT exists XXX_budsjett (
    year INT(4) UNSIGNED NOT NULL,
@@ -277,8 +277,8 @@ CREATE TABLE IF NOT exists XXX_fond_action (
    description varchar(40),
    fond varchar(3),
    defaultdesc varchar(50),
-   actionclub INTEGER(1), 
-   actionfond INTEGER(1), 
+   actionclub INTEGER(1),
+   actionfond INTEGER(1),
    debetpost INTEGER(5),
    creditpost INTEGER(5)
 );
@@ -319,10 +319,6 @@ create table if not exists XXX_email_archive (
    edit_time TIMESTAMP
 );
 
-create table if not exists XXX_email_forward (
-  personid int(11) unsigned
-);
-
 create table if not exists XXX_belonging (
 	id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 	belonging varchar(80),
@@ -331,7 +327,7 @@ create table if not exists XXX_belonging (
 	year_deprecation int,
     purchase_price NUMERIC(8,2) UNSIGNED,
     warrenty_date DATE,
-    owning_account INT(5) UNSIGNED, 
+    owning_account INT(5) UNSIGNED,
     deprecation_account INT(5) UNSIGNED,
     added_by_person INT(11) unsigned,
     added_date DATE,
@@ -341,7 +337,7 @@ create table if not exists XXX_belonging (
     current_price NUMERIC(8,2) UNSIGNED,
     deprecation_amount NUMERIC(8,2) UNSIGNED,
     deleted tinyint,
-	person INT(11) unsigned    
+	person INT(11) unsigned
 );
 
 create table if not exists XXX_kid (

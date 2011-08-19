@@ -4,19 +4,21 @@
 class AccountDelete {
 
     private $db;
+    private $masterId;
 
-    function AccountDelete($db) {
+    function AccountDelete($db, $masterId) {
         if(!$db) {
             $db = new DB(); // For Code Assist
         }
 
         $this->db = $db;
+        $this->masterId = $masterId;
     }
 
 
     function registerDeleteActionsAndSendEmail($input) {
 
-        $prep = $this->db->prepare("insert into ");
+        $prep = $this->db->prepare("insert into change_request (installation_id, action, addedTime,addedBy, reason) values (?,?,now(), ?)");
 
 
         $emailer = new Emailer();

@@ -19,7 +19,7 @@ class AccountSemesterMembership {
     function addCreditPost($line, $amount) {
 
         $standard = new AccountStandard($this->db);
-         
+
         switch ($this->Type) {
             case "course" :
                 $postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_COURSE_POST);
@@ -39,10 +39,10 @@ class AccountSemesterMembership {
 
 
     function getAll() {
-        $prep = $this->db->prepare("select * from " . AppConfig::pre() . $this->Type. "_membership");
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . $this->Type . "_membership");
         $res = $prep->execute();
 
-        foreach($res as &$one) {            
+        foreach ($res as &$one) {
             unset($one["regn_line"]);
         }
         return $res;
@@ -60,13 +60,13 @@ class AccountSemesterMembership {
         $prep->bind_params("i", $semester);
         $query_array = $prep->execute();
 
-        $result = array ();
+        $result = array();
 
         foreach ($query_array as $one) {
-            $result[] = array (
-            $one["firstname"],
-            $one["lastname"],
-            $one["id"]
+            $result[] = array(
+                $one["firstname"],
+                $one["lastname"],
+                $one["id"]
             );
         }
         return $result;
@@ -75,7 +75,7 @@ class AccountSemesterMembership {
 
 
     function delete($semester, $person) {
-        $prep = $this->db->prepare("delete from " . AppConfig::pre() . $this->Type."_membership where memberid = ? and semester=?");
+        $prep = $this->db->prepare("delete from " . AppConfig::pre() . $this->Type . "_membership where memberid = ? and semester=?");
         $prep->bind_params("ii", $person, $semester);
         $prep->execute();
         return $this->db->affected_rows();
@@ -83,11 +83,11 @@ class AccountSemesterMembership {
 
     function getUserMemberships($user, $type) {
 
-        $prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig::pre() . $type."_membership M, " . AppConfig::pre() ."semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");
+        $prep = $this->db->prepare("select M.memberid, M.semester, M.regn_line, S.description from " . AppConfig::pre() . $type . "_membership M, " . AppConfig::pre() . "semester S where memberid = ? and S.semester = M.semester group by memberid, semester, regn_line order by semester");
         $prep->bind_params("i", $user);
         $query_array = $prep->execute();
 
-        $result = array ();
+        $result = array();
 
         foreach ($query_array as $one) {
             $result[] = & new AccountSemesterMembership(null, $type, $user, $one["semester"], $one["regn_line"], $one["description"]);
@@ -115,28 +115,28 @@ class AccountSemesterMembership {
     }
 
     function getOverview() {
-        $prep = $this->db->prepare("select count(*) as C, M.semester,fall,year from " . AppConfig::pre() . $this->Type . "_membership M," . AppConfig::pre() ."semester S where S.semester=M.semester group by semester;");
+        $prep = $this->db->prepare("select count(*) as C, M.semester,fall,year from " . AppConfig::pre() . $this->Type . "_membership M," . AppConfig::pre() . "semester S where S.semester=M.semester group by semester;");
         return $prep->execute();
     }
 
     function getFirstSemester($default) {
         $prep = $this->db->prepare("select min(C.semester) as c, min(T.semester) as t, min(Y.semester) as y from " .
-        AppConfig::pre()  . $this->course() . "_membership C,".
-        AppConfig::pre()  . $this->train() . "_membership T,".
-        AppConfig::pre()  . $this->youth() . "_membership Y");
+                                   AppConfig::pre() . $this->course() . "_membership C," .
+                                   AppConfig::pre() . $this->train() . "_membership T," .
+                                   AppConfig::pre() . $this->youth() . "_membership Y");
         $res = $prep->execute();
-         
-        foreach($res as $one) {
+
+        foreach ($res as $one) {
             $min = $default;
-            if($one["c"] && $one["c"] < $min) {
+            if ($one["c"] && $one["c"] < $min) {
                 $min = $one["c"];
             }
 
-            if($one["t"] && $one["t"] < $min) {
+            if ($one["t"] && $one["t"] < $min) {
                 $min = $one["t"];
             }
 
-            if($one["y"] && $one["y"] < $min) {
+            if ($one["y"] && $one["y"] < $min) {
                 $min = $one["y"];
             }
 
@@ -157,5 +157,23 @@ class AccountSemesterMembership {
     function youth() {
         return "youth";
     }
+
+    function getSemesterList() {
+        $prep = $this->db->prepare("select distinct S.semester, description from " . AppConfig::pre() . $this->Type . "_membership M, " . AppConfig::pre() . "semester S where S.semester = M.semester order by year,fall");
+
+        return $prep->execute();
+    }
+
+    public function getAllSemestersWithYears() {
+        $prep = $this->db->prepare("select * from ". AppConfig::pre() ."semester where semester IN (" .
+                                   "select semester from ". AppConfig::pre() ."train_membership union " .
+                                   "select semester from ". AppConfig::pre() ."youth_membership union " .
+                                   "select semester from ". AppConfig::pre() ."course_membership course_membership) ".
+                                   "or year in (select year from ". AppConfig::pre() ."year_membership) order by year, fall");
+
+
+        return $prep->execute();
+    }
 }
+
 ?>

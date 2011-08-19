@@ -34,7 +34,13 @@ foreach ($one as $users) {
 $data["to"] = $to;
 $data["from"] = "admin@frittregnskap.no";
 
-$accDelete = new AccountDelete($db);
+
+$masterdb = new DB(0, DB::MASTER_DB);
+$master = new Master($masterdb);
+$masterRecord = $master->get_master_record();
+
+$accDelete = new AccountDelete($masterdb, $masterRecord["id"]);
+
 $accDelete->registerDeleteActionsAndSendEmail($data);
 
 echo json_encode(array("status" => 1));

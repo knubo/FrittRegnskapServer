@@ -17,7 +17,7 @@ class AccountyearMembership {
     function addCreditPost($line, $amount) {
 
         $standard = new AccountStandard($this->db);
-         
+
         $postType = $standard->getOneValue(AccountStandard::CONST_BUDGET_YEAR_POST);
 
         $post = new AccountPost($this->db, $line, "-1", $postType, $amount);
@@ -145,11 +145,25 @@ class AccountyearMembership {
     function getFirstYear($default) {
         $prep = $this->db->prepare("select min(year) as y from " . AppConfig::pre() . "year_membership");
         $res = $prep->execute();
-         
+
         foreach($res as $one) {
             return $one["y"];
         }
-        return $default;         
+        return $default;
+    }
+
+    public function getYearList() {
+        $prep = $this->db->prepare("select distinct(year) from " . AppConfig::pre() . "year_membership");
+
+        $res = $prep->execute();
+
+        $years = array();
+
+        foreach($res as $one) {
+            $years[] = $one["year"];
+        }
+
+        return $years;
     }
 }
 ?>

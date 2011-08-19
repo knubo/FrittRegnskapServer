@@ -29,70 +29,103 @@ $standard = new AccountStandard($db);
 $semesterAcc = new AccountSemester($db);
 
 if (!$year) {
-	$year = $standard->getOneValue(AccountStandard::CONST_YEAR);
+    $year = $standard->getOneValue(AccountStandard::CONST_YEAR);
 }
 
 if (!$semester) {
-	$semester = $standard->getOneValue(AccountStandard::CONST_SEMESTER);
+    $semester = $standard->getOneValue(AccountStandard::CONST_SEMESTER);
 }
 
-$result = array ();
+$result = array();
 
 switch ($action) {
-	case "deleteyear" :
-		$regnSession->checkWriteAccess();
-		$acc = new AccountYearMembership($db);
+    case "deleteyear" :
+        $regnSession->checkWriteAccess();
+        $acc = new AccountYearMembership($db);
         $res = $acc->delete($year, $personId);
 
         $result = array("result" => $res);
-		break;
-	case "deletetrain" :
-		$regnSession->checkWriteAccess();
-		$acc = new AccountSemesterMembership($db, "train");
+        break;
+    case "deletetrain" :
+        $regnSession->checkWriteAccess();
+        $acc = new AccountSemesterMembership($db, "train");
         $res = $acc->delete($semester, $personId);
 
         $result = array("result" => $res);
-		break;
-	case "deletecourse" :
-		$regnSession->checkWriteAccess();
-		$acc = new AccountSemesterMembership($db, "course");
+        break;
+    case "deletecourse" :
+        $regnSession->checkWriteAccess();
+        $acc = new AccountSemesterMembership($db, "course");
         $res = $acc->delete($semester, $personId);
 
         $result = array("result" => $res);
-		break;
-	case "year" :
-		$acc = new AccountYearMembership($db);
-		$result["members"] = $acc->getAllMemberNames($year);
-		$result["year"] = $year;
-		$result["text"] = $year;
-		break;
-	case "class" :
-		$acc = new AccountSemesterMembership($db, "course");
-		$result["members"] = $acc->getAllMemberNames($semester);
-		$result["semester"] = $semester;
-		$result["text"] = $semesterAcc->getSemesterName($semester);
-		break;
-	case "training" :
-		$acc = new AccountSemesterMembership($db, "train");
-		$result["members"] = $acc->getAllMemberNames($semester);
-		$result["semester"] = $semester;
-		$result["text"] = $semesterAcc->getSemesterName($semester);
-		break;
+        break;
+    case "year" :
+        $acc = new AccountYearMembership($db);
+        $result["members"] = $acc->getAllMemberNames($year);
+        $result["year"] = $year;
+        $result["text"] = $year;
+        break;
+
+    case "yearlist":
+        $acc = new AccountYearMembership($db);
+
+        $result = $acc->getYearList();
+        break;
+
+    case "classlist":
+        $acc = new AccountSemesterMembership($db, "course");
+
+        $result = $acc->getSemesterList();
+        break;
+
+    case "class" :
+        $acc = new AccountSemesterMembership($db, "course");
+        $result["members"] = $acc->getAllMemberNames($semester);
+        $result["semester"] = $semester;
+        $result["text"] = $semesterAcc->getSemesterName($semester);
+        break;
+
+    case "trainlist":
+        $acc = new AccountSemesterMembership($db, "train");
+
+        $result = $acc->getSemesterList();
+        break;
+
+    case "training" :
+        $acc = new AccountSemesterMembership($db, "train");
+        $result["members"] = $acc->getAllMemberNames($semester);
+        $result["semester"] = $semester;
+        $result["text"] = $semesterAcc->getSemesterName($semester);
+        break;
+
+    case "youthlist":
+        $acc = new AccountSemesterMembership($db, "youth");
+
+        $result = $acc->getSemesterList();
+        break;
+
     case "youth" :
         $acc = new AccountSemesterMembership($db, "youth");
         $result["members"] = $acc->getAllMemberNames($semester);
         $result["semester"] = $semester;
         $result["text"] = $semesterAcc->getSemesterName($semester);
         break;
-     case "overview":
+    case "overview":
         $accYear = new AccountYearMembership($db);
         $accCourse = new AccountSemesterMembership($db, "course");
         $accTrain = new AccountSemesterMembership($db, "train");
         $accYouth = new AccountSemesterMembership($db, "youth");
 
-        $result = MembersFormatter::group($accYear->getOverview(), $accCourse->getOverview(),$accTrain->getOverview(), $accYouth->getOverview());
+        $result = MembersFormatter::group($accYear->getOverview(), $accCourse->getOverview(), $accTrain->getOverview(), $accYouth->getOverview());
         break;
-      case "all":
+    case "alllist":
+        $accAll = new AccountSemesterMembership($db, "all");
+        $accYear = new AccountYearMembership($db);
+
+        $result = $accAll->getAllSemestersWithYears();
+        break;
+    case "all":
         $accTrain = new AccountSemesterMembership($db, "train");
         $accYouth = new AccountSemesterMembership($db, "youth");
         $accCourse = new AccountSemesterMembership($db, "course");
@@ -105,8 +138,8 @@ switch ($action) {
 
         break;
 
-	default :
-		die("Unknown action $action");
+    default :
+        die("Unknown action $action");
 }
 echo json_encode($result);
 ?>

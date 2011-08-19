@@ -42,11 +42,11 @@ switch ($action) {
     case "list" :
         $accUser = new User($db);
 
-        if($emailSettings) {
+        if ($emailSettings) {
             $accUser->mergeProfile($currentUser, $emailSettings);
         }
 
-        $ret = array ();
+        $ret = array();
         switch ($query) {
             case "members" :
             case "simulate" :
@@ -80,7 +80,7 @@ switch ($action) {
             if (!array_key_exists("email", $one) || !$one["email"]) {
                 continue;
             }
-            $u = array ();
+            $u = array();
             $u["name"] = $one["lastname"] . ", " . $one["firstname"];
             $u["email"] = $one["email"];
             $u["id"] = $one["id"];
@@ -89,11 +89,37 @@ switch ($action) {
 
         echo json_encode($ret);
         break;
+
+    case "preview":
+        $secret = "preview";
+        $body = urldecode($body);
+
+        $emailContent = new EmailContent($db);
+        $body = $emailContent->attachFooterHeader($body, $footer, $header);
+
+        $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
+        $body = $emailContent->replaceCommonVariables($body);
+
+        $html = 0;
+        if ($format == "HTML") {
+            $html = $body;
+            $body = $emailContent->makePlainText($html);
+        } else if ($format == "WIKI") {
+            $html = $emailContent->makeHTMLFromWiki($body);
+            $body = $emailContent->makePlainText($html);
+        }
+
+        if($html) {
+            echo $html;
+        } else {
+            echo "<pre>$body</pre>";
+        }
+        break;
     case "email" :
     case "simulatemail" :
         $regnSession->checkReducedWriteAccess();
         $emailer = new Emailer();
-        $res = array ();
+        $res = array();
 
         $subject = urldecode($subject);
         $body = urldecode($body);
@@ -122,10 +148,10 @@ switch ($action) {
                 $html = $body;
                 $body = $emailContent->makePlainText($html);
             } else
-            if ($format == "WIKI") {
-                $html = $emailContent->makeHTMLFromWiki($body);
-                $body = $emailContent->makePlainText($html);
-            }
+                if ($format == "WIKI") {
+                    $html = $emailContent->makeHTMLFromWiki($body);
+                    $body = $emailContent->makePlainText($html);
+                }
 
             $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
         } else {

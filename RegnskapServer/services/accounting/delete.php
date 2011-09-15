@@ -5,6 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountdelete.php");
+include_once ("../../classes/accounting/accountperson.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/reporting/emailer.php");
@@ -18,12 +19,16 @@ $accPerson = new AccountPerson($db, $regnSession->getSuperDBPrefix());
 $accPerson->setUser($currentUser);
 $users = $accPerson->search(false);
 
+if(!$users) {
+    die("Did not find any email");
+}
+
 $data = $_REQUEST;
 
 $to = "admin@frittregnskap.no";
 
 
-foreach ($one as $users) {
+foreach ($users as $one) {
     if (!array_key_exists("email", $one) || !$one["email"]) {
         continue;
     }
@@ -33,6 +38,7 @@ foreach ($one as $users) {
 
 $data["to"] = $to;
 $data["from"] = "admin@frittregnskap.no";
+$data["user"] = $currentUser;
 
 
 $masterdb = new DB(0, DB::MASTER_DB);

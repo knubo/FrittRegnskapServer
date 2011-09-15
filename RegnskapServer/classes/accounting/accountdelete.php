@@ -18,8 +18,24 @@ class AccountDelete {
 
     function registerDeleteActionsAndSendEmail($input) {
 
-        $prep = $this->db->prepare("insert into change_request (installation_id, action, addedTime,addedBy, reason) values (?,?,now(), ?)");
+        $prep = $this->db->prepare("insert into change_request (installation_id, action, addedTime,addedBy, reason) values (?,?,now(), ?, ?)");
 
+        if($input["deleteAccountingData"]) {
+            $action = "deleteAccountingData";
+            $prep->bind_params("isss", $this->masterId, $action, $input["user"], $input["reason"]);
+            $prep->execute();
+        }
+
+        if($input["deletePeopleMembers"]) {
+            $action = "deletePeopleMembers";
+            $prep->bind_params("isss", $this->masterId, $action, $input["user"], $input["reason"]);
+            $prep->execute();
+        }
+        if($input["deleteAll"]) {
+            $action = "deleteAll";
+            $prep->bind_params("isss", $this->masterId, $action, $input["user"], $input["reason"]);
+            $prep->execute();
+        }
 
         $emailer = new Emailer();
 

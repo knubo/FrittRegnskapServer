@@ -331,8 +331,8 @@ class AccountPerson {
         $searchWrap = $this->db->search("select $cols from " . $this->dbPrefix . "person", "order by lastname,firstname");
 
         $searchWrap->addAndParam("i", "id", $this->Id);
-        $searchWrap->addAndParam("s", "firstname", $this->FirstName."%");
-        $searchWrap->addAndParam("s", "lastname", $this->LastName."%");
+        $searchWrap->addAndParam("s", "firstname", $this->FirstName ? $this->FirstName."%" : NULL);
+        $searchWrap->addAndParam("s", "lastname", $this->LastName ? $this->LastName."%" : NULL);
         $searchWrap->addAndParam("i", "employee", $this->IsEmployee);
         $searchWrap->addAndParam("s", "address", $this->Address);
         $searchWrap->addAndParam("s", "postnmb", $this->PostNmb);

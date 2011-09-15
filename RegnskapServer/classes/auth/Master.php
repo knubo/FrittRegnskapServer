@@ -3,17 +3,29 @@
     public $db;
 
     function Master($db) {
+        if(!$db) {
+            $db = new DB();
+        }
         $this->db = $db;
     }
 
     function getOneInstallation($id) {
         $prep = $this->db->prepare("select * from installations where id = ?");
         $prep->bind_params("i", $id);
-        return array_shift($prep->execute());
+
+
+        $insObj = array_shift($prep->execute());
+
+        $prepc = $this->db->prepare("select * from change_request where installation_id = ?");
+        $prepc->bind_params("i", $id);
+
+        $insObj["changes"] = $prepc->execute();
+
+        return $insObj;
     }
 
     function getAllInstallations($sort = "") {
-        $prep = $this->db->prepare("select * from installations $sort");
+        $prep = $this->db->prepare("select *, (select count(*) FROM change_request where installation_id = I.id) as cr from installations I $sort");
 
         return $prep->execute();
     }
@@ -24,7 +36,7 @@
         $prep->execute();
 
         return $this->db->affected_rows();
-         
+
     }
 
     function doDelete($id, $secret) {
@@ -102,7 +114,7 @@
 
         $prep = $this->db->prepare("update installations set portal_status=? where id=?");
         $prep->bind_params("ii", $newstatus, $install["id"]);
-         
+
         $prep->execute();
 
     }
@@ -112,7 +124,7 @@
 
         $prep = $this->db->prepare("update installations set portal_title=? where id=?");
         $prep->bind_params("si", $title, $install["id"]);
-         
+
         $prep->execute();
     }
 
@@ -231,7 +243,7 @@
             header("HTTP/1.0 513 Validation Error");
             die(json_encode(array("domain")));
         }
-        
+
         $secret = "";
         for ($i=0; $i<80; $i++) {
             $secret.= chr(mt_rand(97, 122));

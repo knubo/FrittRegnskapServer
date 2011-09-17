@@ -2,7 +2,7 @@
 
 class PersonImportClass {
     private $errorCount = 0;
-    
+
     function startParsing() {
         echo "<table class=\"importtable\">\n";
     }
@@ -31,6 +31,13 @@ class PersonImportClass {
 
     function cleanData($field, $value) {
 
+        if($field == "firstname" || $field == "lastname") {
+            if($value == "") {
+                $this->errorCount++;
+                return "###ERROR###";
+            }
+        }
+
         if($field == "birthdate") {
             if(preg_match("/\d\d?\.\d\d?\.\d\d\d\d/", $value) == 0) {
                 $this->errorCount++;
@@ -42,7 +49,7 @@ class PersonImportClass {
             $this->errorCount++;
             return "###ERROR###";
         }
-        
+
         if($field == "newsletter" && $value != 1 && $value != 0) {
             $this->errorCount++;
             return "###ERROR###";
@@ -56,13 +63,22 @@ class PersonImportClass {
 
         $lines = explode("\n", $content);
 
-        $excludeList = explode(",", $exclude);
+        if($exclude) {
+            $excludeList = explode(",", $exclude);
+        }
 
         $this->startParsing();
 
         $row = 0;
         foreach($lines as $one) {
-            if((array_search($row, $excludeList) === FALSE)) {
+
+            $one = trim($one);
+
+            if(!$one) {
+                continue;
+            }
+
+            if(!$excludeList || (array_search($row, $excludeList) === FALSE)) {
 
                 $matches = array();
                 $one = preg_replace("/(\Q".$delimiter."\E)(?=(?:[^\"]|\"[^\"]*\")*$)/", "|#|", $one);
@@ -86,6 +102,7 @@ class PersonImportClass {
 
                 $this->endRow($data);
             }
+
             $row++;
         }
         $this->endParsing();

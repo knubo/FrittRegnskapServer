@@ -19,6 +19,14 @@ class PersonImportPersisterClass extends PersonImportClass {
 
     function cleanData($field, $value) {
 
+         if($field == "firstname" || $field == "lastname") {
+            if($value == "") {
+                $this->error++;
+                return NULL;
+            }
+        }
+        
+        
         if($field == "birthdate") {
             if(preg_match("/\d\d?\.\d\d?\.\d\d\d\d/", $value) == 1) {
                 $bdSave = new eZDate();
@@ -44,7 +52,7 @@ class PersonImportPersisterClass extends PersonImportClass {
             }
 
             $this->error++;
-            return "";
+            return NULL;
         }
         
         if(!$value) {
@@ -64,6 +72,11 @@ class PersonImportPersisterClass extends PersonImportClass {
         foreach ($keys as $one) {
             $types.= $this->getType($one);
             $values[] = $data[$one];
+            
+            if($data[$one] === NULL) {
+                $this->db->rollback();
+                return;
+            } 
         }
 
         $sql = "insert into ".AppConfig::pre()."person (".join(",",$keys).") values (".join(",", array_fill(0, count($keys), "?")).")";

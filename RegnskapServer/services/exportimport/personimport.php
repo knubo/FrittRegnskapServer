@@ -32,6 +32,11 @@ switch($action) {
         $headers = 0;
         foreach($lines as $one) {
 
+            $one = trim($one);
+            if(!$one) {
+                continue;
+            }
+            
             if(!$headers) {
                 $colCount = preg_match_all("/(\Q".$delimiter."\E)(?=(?:[^\"]|\"[^\"]*\")*$)/", $one, $matches);
                 echo "<tr><td><!-- --></td>";

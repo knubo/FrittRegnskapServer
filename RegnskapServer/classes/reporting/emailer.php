@@ -77,6 +77,10 @@ class Emailer {
         $sendmail_from = 0;
         ini_set("sendmail_from",$sender);  // the INI lines are to force the From Address to be used !
 
+        if(true) {
+
+        }
+
         $mail_sent = mail($email, $subject, $msg, $headers);
 
         ini_restore("sendmail_from");

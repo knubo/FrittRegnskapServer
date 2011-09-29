@@ -31,24 +31,24 @@ $logger = new Logger($db);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
 
-if($regnSession->getPrefix() != "master_") {
-    die("Not authenticated for master database:".$regnSession->getPrefix());    
+if ($regnSession->getPrefix() != "master_") {
+    die("Not authenticated for master database:" . $regnSession->getPrefix());
 }
 
 $master = new Master($db);
 
-switch($action) {
+switch ($action) {
     case "adminlogin":
         $secret = $master->updateSecret($id);
         $one = $master->getOneInstallation($id);
-        
+
         $srv = $_SERVER['SERVER_NAME'];
-        $parts = explode(".", $srv);        
-        
+        $parts = explode(".", $srv);
+
         array_shift($parts);
-        
-        $domain = $one["hostprefix"].".".implode(".", $parts);
-        
+
+        $domain = $one["hostprefix"] . "." . implode(".", $parts);
+
         echo json_encode(array("secret" => $secret, "domain" => $domain));
         break;
     case "get":
@@ -59,35 +59,75 @@ switch($action) {
         break;
     case "save":
         $res = $master->updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode, $parenthostprefix);
-        echo json_encode(array ("result" => $res));
+        echo json_encode(array("result" => $res));
         break;
     case "list":
         $installs = $master->getAllInstallations();
-        
-        foreach($installs as &$one) {
+
+        foreach ($installs as &$one) {
             $dbinfo = AppConfig::db(DB::dbhash($one["hostprefix"]));
             $one["db"] = $dbinfo[3];
+            $one["secret"] = "?";
         }
-        
+
         echo json_encode($installs);
         break;
+
+    case "deletePeopleAndAccountingrequest":
+        $master->deletePeopleAndAccountingRequest($id);
+        echo json_encode(array("status" => "ok"));
+        break;
+
+    case "deletePeoplerequest":
+        $master->deletePeopleRequest($id);
+        echo json_encode(array("status" => "ok"));
+        break;
+
+    case "deleteAccountingrequest":
+        $master->deleteAccountingRequest($id);
+        echo json_encode(array("status" => "ok"));
+        break;
+
     case "deleterequest":
         $master->deleteRequest($id);
-        echo json_encode(array("status"=> "ok"));        
+        echo json_encode(array("status" => "ok"));
         break;
+
+    case "deletePeople":
+        $master->deleteForm($id, $secret, "people", "doDeletePeople");
+        break;
+    case "deleteAccounting":
+        $master->deleteForm($id, $secret, "accounting", "doDeleteAccounting");
+        break;
+    case "deletePeopleAndAccounting":
+        $master->deleteForm($id, $secret, "people and accounting", "doDeletePeopleAndAccounting");
+        break;
+
     case "delete":
-        $master->deleteForm($id, $secret);
+        $master->deleteForm($id, $secret, "everything", "doDeleteEverything");
         break;
-    case "doDelete":
+
+    case "doDeleteEverything":
         $master->doDelete($id, $secret);
-        break;        
+        break;
+
+    case "doDeleteAccounting":
+        $master->doDeleteAccounting($id, $secret);
+        break;
+    case "doDeletePeople":
+        $master->doDeletePeople($id, $secret);
+        break;
+    case "doDeletePeopleAndAccounting":
+        $master->doDeletePeopleAndAccounting($id, $secret);
+        break;
+
     case "sendWelcomeLetter":
         $master->sendWelcomeLetter($id);
         break;
     case "sendPortalLetter":
         $master->sendPortalLetter($id);
         break;
-        
+
     case "installprep":
         $secret = $master->prepareAndAddSecret($wikilogin, $domain);
         echo json_encode(array("secret" => $secret));

@@ -15,6 +15,7 @@ class AppConfig {
 
 
 
+
     const DOMENESHOP_USER = "knutbo@ifi.uio.no";
     const DOMENESHOP_PASS = "";
 

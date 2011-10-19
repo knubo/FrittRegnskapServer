@@ -355,8 +355,11 @@ create table if not exists XXX_kid (
 create table if not exists XXX_event_schema (
     id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     form TEXT,
+    eventdesc varchar(255),
     active tinyint,
     start_date DATE,
-    end_date DATE
+    end_date DATE,
+    event_date DATE,
+    max_people int
 );
     

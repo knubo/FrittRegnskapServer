@@ -315,7 +315,7 @@ class AccountPerson {
         return $this->id;
     }
 
-    function search($incMemberInfo) {
+    function search($incMemberInfo, $debug = 0) {
         $cols = "*";
         if ($incMemberInfo) {
             $accStandard = new AccountStandard($this->db, $this->dbPrefix);
@@ -356,7 +356,7 @@ class AccountPerson {
         }
         $searchWrap->addAndQuery("s", $this->User, "exists (select null from " . $this->dbPrefix . "user where person=id and username=?)");
 
-        $res = $searchWrap->execute();
+        $res = $searchWrap->execute($debug);
 
         foreach($res as &$one) {
             if($one["secretaddress"]) {

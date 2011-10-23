@@ -401,9 +401,22 @@ class SearchWrapper {
 
     }
 
-    function execute() {
+    function execute($debug = 0) {
         if(sizeof($this->Params) == 0) {
             $sql = $this->Prequery. " ".$this->OuterJoin." ".$this->SqlWhere." ".$this->OrderBy;
+
+            if($debug) {
+                  $sqlLog = "insert into  ".AppConfig::pre() . "log (occured,username,category,action,message)  values (now(),?,?,?,?)";
+                  $mysqliLog = mysqli_prepare($this->Db->link(), $sqlLog);
+
+                  if($mysqliLog) {
+                      $u =  $_SESSION["username"];
+                      $d = "dbtrace";
+                      $mysqliLog->bind_param("ssss", $u, $d, $d, $sql);
+                      $mysqliLog->execute();
+                  }
+              }
+
             //die("SQL:$sql");
             $prep = $this->Db->prepare($sql);
 
@@ -411,9 +424,25 @@ class SearchWrapper {
         }
 
         $sql = $this->Prequery. " ".$this->OuterJoin." where ".$this->Query. " ".$this->SqlWhere." ".$this->OrderBy;
+
+        if($debug) {
+              $sqlLog = "insert into  ".AppConfig::pre() . "log (occured,username,category,action,message)  values (now(),?,?,?,?)";
+              $mysqliLog = mysqli_prepare($this->Db->link(), $sqlLog);
+
+              if($mysqliLog) {
+                  $u =  $_SESSION["username"];
+                  $d = "dbtrace";
+                  $mysqliLog->bind_param("ssss", $u, $d, $d, $sql);
+                  $mysqliLog->execute();
+              }
+          }
+
         //die("SQL2:$sql");
         $prep = $this->Db->prepare($sql);
         $prep->bind_array_params($this->Type, $this->Params);
+
+
+
 
         return $prep->execute();
     }

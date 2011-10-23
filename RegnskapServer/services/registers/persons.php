@@ -88,7 +88,7 @@ switch ($action) {
         $accPers->setCellphone($cellphone);
         $accPers->setHidden($hidden);
         $accPers->setGender($gender);
-        echo json_encode($accPers->search($queryMembership));
+        echo json_encode($accPers->search($queryMembership, $_REQUEST["debug"]));
         break;
     case "test":
         echo "Hum:" . $regnSession->getSuperDBPrefix();

@@ -15,9 +15,15 @@ $username = $regnSession->auth();
 
 $accEvent = new AccountEvent($db);
 
+header('Content-Type: application/json');
+
 switch ($action) {
     case "list":
         echo json_encode($accEvent->listAllActive());
+        break;
+    case "get":
+        $event = $accEvent->getIfActive($_REQUEST["id"]);
+        echo $event;
         break;
 }
 

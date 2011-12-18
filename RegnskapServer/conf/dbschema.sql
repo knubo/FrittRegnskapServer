@@ -362,4 +362,11 @@ create table if not exists XXX_event_schema (
     event_date DATE,
     max_people int
 );
-    
+
+create table if not exists XXX_event_partisipant (
+    event_id INTEGER(8) unsigned,
+    person_id INTEGER(11) unsigned,
+    group_key varchar(50),
+    group_value TEXT,
+    gender ENUM('male','female')
+);

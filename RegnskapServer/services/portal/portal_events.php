@@ -25,6 +25,13 @@ switch ($action) {
         $event = $accEvent->getIfActive($_REQUEST["id"]);
         echo $event;
         break;
+
+    case "register":
+        $personId = $regnSession->getPersonId();
+
+        $status = $accEvent->register($personId, json_decode($_REQUEST["data"]));
+        echo json_encode(array("status" => $status));
+        break;
 }
 
 

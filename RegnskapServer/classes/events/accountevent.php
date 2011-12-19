@@ -112,6 +112,17 @@ class AccountEvent {
 
     }
 
+    public function participants($id) {
+        $prep = $this->db->prepare("select E.*, firstname,lastname from " . AppConfig::pre() . "event_partisipant E," . AppConfig::pre() . "person where E.event_id = ? and E.person_id = id");
+        $prep->bind_params("i", $id);
+        return $prep->execute();
+
+    }
+
+    public function listParticipants() {
+        $prep = $this->db->prepare("select id,eventdesc, count(distinct(person_id)) as participants from regn_event_schema, regn_event_partisipant P");
+        return $prep->execute();
+    }
 
 }
 

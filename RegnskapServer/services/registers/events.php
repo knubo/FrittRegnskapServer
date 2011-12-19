@@ -34,6 +34,16 @@ switch ($action) {
     case "get":
         echo $accEvent->get($_REQUEST["id"]);
         break;
+
+    case "list_participants":
+        echo json_encode($accEvent->listParticipants());
+        break;
+
+    case "participants":
+        echo json_encode($accEvent->participants($_REQUEST["id"]));
+        break;
+
+
 }
 
 ?>

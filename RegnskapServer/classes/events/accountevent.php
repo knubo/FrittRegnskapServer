@@ -120,7 +120,7 @@ class AccountEvent {
     }
 
     public function listParticipants() {
-        $prep = $this->db->prepare("select id,eventdesc, count(distinct(person_id)) as participants from regn_event_schema, regn_event_partisipant P");
+        $prep = $this->db->prepare("select id,eventdesc, start_date as startDate, count(distinct(person_id)) as participants from regn_event_schema, regn_event_partisipant P");
         return $prep->execute();
     }
 

@@ -87,6 +87,7 @@ class AppConfig {
     #
     const TSO_FondKreditPost=3397;
     #
+    const EVENT_ENABLED = 1;
 }
 
 /* Disable magic quotes */

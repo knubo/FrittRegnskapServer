@@ -113,16 +113,22 @@ class AccountEvent {
     }
 
     public function participants($id) {
-        $prep = $this->db->prepare("select E.*, firstname,lastname from " . AppConfig::pre() . "event_partisipant E," . AppConfig::pre() . "person where E.event_id = ? and E.person_id = id");
+        $prep = $this->db->prepare("select id, firstname, lastname from  " . AppConfig::pre() . "person where id in (select person_id from " . AppConfig::pre() . "event_partisipant where event_id = ?)");
         $prep->bind_params("i", $id);
         return $prep->execute();
+    }
 
+    public function groupedBy($id) {
+        $prep = $this->db->prepare("select group_key, group_value, count(*) as k from " . AppConfig::pre() . "event_partisipant where event_id = ? group by group_key, group_value");
+        $prep->bind_params("i", $id);
+        return $prep->execute();
     }
 
     public function listParticipants() {
-        $prep = $this->db->prepare("select id,eventdesc, start_date as startDate, count(distinct(person_id)) as participants from regn_event_schema, regn_event_partisipant P");
+        $prep = $this->db->prepare("select id,eventdesc, start_date as startDate, count(distinct(person_id)) as participants from  " . AppConfig::pre() . "event_schema,  " . AppConfig::pre() . "event_partisipant P");
         return $prep->execute();
     }
+
 
 }
 

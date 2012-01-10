@@ -23,19 +23,21 @@ switch ($action) {
         $host = $_SERVER["SERVER_NAME"];
         $split = explode(".",$host);
         $db = new DB(0, DB::MASTER_DB);
-        
+
         $prep = $db->prepare("select portal_status, portal_title from installations where hostprefix = ?");
         $prep->bind_params("s", $split[0]);
-        
+
         $data = array_shift($prep->execute());
-        
+
         if(!$data["portal_status"]) {
             $data["portal_status"] = 0;
         }
-        
+
+        $data["eventEnabled"] = AppConfig::EVENT_ENABLED;
+
         echo json_encode($data);
         break;
-    
+
     case "hash":
         $host = $_SERVER["SERVER_NAME"];
         $split = explode(".",$host);
@@ -84,7 +86,7 @@ switch ($action) {
         } else {
             $person = $res[0];
             $secret = $accPerson->setSecret($person["id"],$masterRecord["dbprefix"]);
-            
+
             $standard = new AccountStandard($dbu, $masterRecord["dbprefix"]);
 
 
@@ -99,7 +101,7 @@ switch ($action) {
 
             echo json_encode(array("status"=> "ok"));
         }
-         
+
         break;
 
     case "password":
@@ -150,12 +152,12 @@ switch ($action) {
         if(!session_start()) {
             die("Failed to start session");
         }
-         
+
         $_SESSION["prefix"] = $masterRecord["dbprefix"];
         $_SESSION["username"] = "secret_id";
         $_SESSION["person_id"] = $id;
         $_SESSION["diskquota"] = $masterRecord["diskquota"];
-        
+
         session_write_close();
 
         header("Location: http://".$_SERVER["SERVER_NAME"]."/portal");
@@ -190,17 +192,17 @@ switch ($action) {
         $auth = new PortalUser($dbu);
 
         $status = $auth->authenticate($user, $password, $masterRecord["dbprefix"]);
-        
+
         if ($status == PortalUser :: AUTH_OK) {
             if(!session_start()) {
                 die("Failed to start session");
             }
-             
+
             $_SESSION["prefix"] = $masterRecord["dbprefix"];
             $_SESSION["username"] = $user;
             $_SESSION["person_id"] = $auth->getPersonId();
             $_SESSION["diskquota"] = $masterRecord["diskquota"];
-            
+
             $arr = array (
 				'result' => 'ok', 'person_id' => $auth->getPersonId()
             );
@@ -212,9 +214,9 @@ switch ($action) {
 				'error' => 'Din bruker er sperret.',
                 'dbprefix' => $masterRecord["dbprefix"]
             );
-            
-        } else { 
-            
+
+        } else {
+
             $arr = array (
 				'error' => 'Ugyldig brukernavn eller passord.',
                 'dbprefix' => $masterRecord["dbprefix"]

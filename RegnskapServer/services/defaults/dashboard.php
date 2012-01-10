@@ -133,6 +133,7 @@ foreach($accountstatus as &$one) {
 
 $arr = array();
 $arr["serverversion"] = Version::SERVER_VERSION;
+$arr["eventEnabled"] = AppConfig::EVENT_ENABLED;
 $arr["info"] = array_shift($info);
 $arr["accountstatus"] = $accountstatus;
 

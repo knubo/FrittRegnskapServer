@@ -40,18 +40,18 @@ class AccountSemester {
 
         $prep = $this->db->prepare($sql);
         $res = $prep->execute();
-         
+
         if(count($res) != 1) {
             header("HTTP/1.0 514 Illegal state");
             die("Could not find next semester. Missing data");
         }
 
         return $res[0]["semester"];
-        
+
     }
 
     function getAll() {
-        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "semester");
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "semester order by year,fall");
         return $prep->execute();
     }
 

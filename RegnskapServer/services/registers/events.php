@@ -40,7 +40,9 @@ switch ($action) {
         break;
 
     case "participants":
-        $data = array("participants" => $accEvent->participants($_REQUEST["id"]), "data" => $accEvent->groupedBy($_REQUEST["id"]) );
+        $data = array("event" => $accEvent->get($_REQUEST["id"]),
+                      "participants" => $accEvent->participants($_REQUEST["id"]),
+                      "data" => $accEvent->groupedBy($_REQUEST["id"]) );
         echo json_encode($data);
         break;
 

@@ -32,7 +32,13 @@ foreach ($users as $one) {
 	$birth = $one->getBirthdate();
 
 	if ($birth) {
-		$age = $thisYear -substr($birth, -4) - 1;
+        $parts = explode('.', $birth);
+
+        if(count($parts) == 3) {
+            $age = $thisYear - $parts[2] -1;
+        } else {
+            $age = null;
+        }
 	} else {
 		$age = null;
 	}

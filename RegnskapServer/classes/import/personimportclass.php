@@ -45,7 +45,7 @@ class PersonImportClass {
             }
         }
 
-        if($field == "gender" && $value != "M" && $value != "F" && $value != "K" && $value != "mann" && $value != "kvinne" && $value != "male" && $value != "female") {
+        if($field == "gender" && $value != "M" && $value != "F" && $value != "K" &&  $value != "mann" && $value != "kvinne" && $value != "mann" && $value != "kvinne" && $value != "male" && $value != "female") {
             $this->errorCount++;
             return "###ERROR###";
         }

@@ -91,6 +91,11 @@ class AccountEvent {
         }
 
         try {
+            $prep = $this->db->prepare("insert into " . AppConfig::pre() . "event_partisipant_meta (event_id, person_id, created_time, changed_time) values (?,?, now(), now()) ".
+                                   " on duplicate key update changed_time = now(), created_time=created_time");
+            $prep->bind_params("ii", $data->id, $personId);
+            $prep->execute();
+
             $prep = $this->db->prepare("delete from " . AppConfig::pre() . "event_partisipant where event_id = ? and person_id = ?");
             $prep->bind_params("ii", $data->id, $personId);
             $prep->execute();
@@ -113,7 +118,7 @@ class AccountEvent {
     }
 
     public function participants($id) {
-        $prep = $this->db->prepare("select id, firstname, lastname from  " . AppConfig::pre() . "person where id in (select person_id from " . AppConfig::pre() . "event_partisipant where event_id = ?)");
+        $prep = $this->db->prepare("select P.id, firstname, lastname, created_time, changed_time, EP.gender from  " . AppConfig::pre() . "event_partisipant EP ,  " . AppConfig::pre() . "person P," . AppConfig::pre() . "event_partisipant_meta M where EP.person_id = P.id and EP.event_id = ? and M.person_id = P.id and M.event_id = EP.event_id group by EP.person_id");
         $prep->bind_params("i", $id);
         return $prep->execute();
     }

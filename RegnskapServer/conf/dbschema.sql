@@ -363,10 +363,18 @@ create table if not exists XXX_event_schema (
     max_people int
 );
 
+create table if not exists XXX_event_partisipant_meta (
+    event_id INTEGER(8) unsigned,
+    person_id INTEGER(11) unsigned,
+    created_time TIMESTAMP,
+    changed_time TIMESTAMP,
+    PRIMARY KEY (event_id, person_id)
+);
+
 create table if not exists XXX_event_partisipant (
     event_id INTEGER(8) unsigned,
     person_id INTEGER(11) unsigned,
     group_key varchar(50),
     group_value TEXT,
-    gender ENUM('male','female')
+    gender ENUM('male','female'),
 );

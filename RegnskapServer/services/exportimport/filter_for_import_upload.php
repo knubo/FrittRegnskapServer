@@ -55,6 +55,7 @@ if ($handle) {
         $found = 0;
         foreach ($parts as $part) {
             if (strpos($part, "@") > 0) {
+                $part = str_replace("\"", "", $part);
                 if ($accPerson->emailExists($part)) {
                     echo "$buffer";
                     $found = 1;

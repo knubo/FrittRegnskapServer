@@ -2,7 +2,7 @@
 
 class AppConfig {
 
-    function db($dbselect = 0) {
+    static function db($dbselect = 0) {
 
         if($dbselect == 2) {
             return array("localhost","root","","knubo2");

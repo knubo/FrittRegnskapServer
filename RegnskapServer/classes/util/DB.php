@@ -9,6 +9,8 @@ class DB {
 
     const MASTER_DB = -2;
 
+    const DB_COUNT = 2;
+
     private $link;
 
     function link() {
@@ -44,7 +46,7 @@ class DB {
             $h = 31 * $h + ord(mb_substr($string, $i, 1));
             $h = $h & $h;
         }
-        return ($h % 2) + 1;
+        return ($h % DB_COUNT) + 1;
     }
 
     function close() {

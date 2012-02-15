@@ -29,6 +29,16 @@ switch ($action) {
 
         break;
 
+    case "init":
+
+        $dbInfo = array();
+        for ($i = 1; $i <= DB::DB_COUNT; $i++) {
+            $dbInfo[$i] = AppConfig::db($i);
+        }
+        $dbInfo[-1] = AppConfig::db(-1);
+
+        echo json_encode(array("db" => $dbInfo));
+        break;
     case "view":
         $prefix = $regnSession->getPrefix() . "/";
         echo BackupAdmin::viewFile($prefix, $viewFile);

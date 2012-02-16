@@ -11,7 +11,7 @@ class BackupAdmin {
         $this->db = $db;
     }
 
-    public static function upload($prefix, $_FILES) {
+    public function uploadAndAnalyze($prefix, $_FILES) {
 
         if (!is_dir("../../storage/$prefix")) {
             mkdir("../../storage/$prefix", 0700, true);
@@ -32,10 +32,10 @@ class BackupAdmin {
 
         $files = glob("../../storage/$prefix/admin_backup/*");
 
-        return BackupAdmin::analyze($files);
+        return $this->analyze($files);
     }
 
-    private static function deleteAllFiles($dir) {
+    private function deleteAllFiles($dir) {
         $files = glob($dir . "/*");
 
         foreach ($files as $one) {
@@ -47,7 +47,7 @@ class BackupAdmin {
         }
     }
 
-    private static function analyze($files) {
+    private function analyze($files) {
         $result = array();
 
         foreach ($files as $one) {
@@ -57,15 +57,19 @@ class BackupAdmin {
             $dropNotFound = stristr($data, "drop table") === FALSE;
             $truncateNotFound = stristr($data, "truncate") === FALSE;
 
-            $tableName = basename($one, ".sql");
+            $tableName = Strings::whitelist(basename($one, ".sql"));
 
             $lockFound = !(strstr($data, "LOCK TABLES `$tableName` WRITE;") === FALSE);
             $insertFound = !(strstr($data, "INSERT INTO `$tableName`") === FALSE);
             $unlockFound = !(strstr($data, "UNLOCK TABLES") === FALSE);
 
-            $result[] = array("table"=> $tableName, "deleteNotFound" => $deleteNotFound, "dropNotFound" => $dropNotFound,
+            $tableExist = $this->db->table_exists($tableName);
+            $backupExist = $this->db->table_exists($tableName."_backup");
+
+            $result[] = array("table" => $tableName, "deleteNotFound" => $deleteNotFound, "dropNotFound" => $dropNotFound,
                 "truncateNotFound" => $truncateNotFound, "lockFound" => $lockFound,
-                "insertFound" => $insertFound, "unlockFound" => $unlockFound);
+                "insertFound" => $insertFound, "unlockFound" => $unlockFound,
+                "tableExist" => $tableExist, "backupExist" => $backupExist);
         }
 
         return $result;

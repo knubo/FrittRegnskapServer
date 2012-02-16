@@ -1,12 +1,12 @@
 <?php
 class Strings {
 
-    function file_get_contents_utf8($fn) {
+    static function file_get_contents_utf8($fn) {
         $content = file_get_contents($fn);
         return mb_convert_encoding($content, 'ISO-8859-1', mb_detect_encoding($content, 'ISO-8859-1, UTF-8', true));
     }
 
-    function whitelist($dirty_data) {
+    static function whitelist($dirty_data) {
 
         $dirty_array = str_split($dirty_data);
         $clean_data = "";
@@ -18,7 +18,7 @@ class Strings {
         return $clean_data;
     }
 
-    function formatBytes($bytes, $precision = 2) {
+    static function formatBytes($bytes, $precision = 2) {
         $units = array('B', 'KB', 'MB', 'GB', 'TB');
 
         $bytes = max($bytes, 0);
@@ -30,7 +30,7 @@ class Strings {
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
-    function createSecret($length = 40) {
+    static function createSecret($length = 40) {
         $secret = "";
         for ($i=0; $i < $length; $i++) {
             $secret.= chr(mt_rand(97, 122));

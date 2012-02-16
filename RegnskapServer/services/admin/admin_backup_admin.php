@@ -4,12 +4,14 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/logger.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/admin/backup_admin.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "";
 $viewFile = array_key_exists("viewFile", $_REQUEST) ? $_REQUEST["viewFile"] : "";
+$dbSelect = array_key_exists("dbSelect", $_REQUEST) ? $_REQUEST["dbSelect"] : "";
 
 $db = new DB();
 $logger = new Logger($db);
@@ -25,7 +27,11 @@ switch ($action) {
     case "upload":
         $prefix = $regnSession->getPrefix() . "/";
 
-        echo json_encode(BackupAdmin::upload($prefix, $_FILES));
+        $db = new DB(0, $dbSelect);
+
+        $backupAdmin = new BackupAdmin($db);
+
+        echo json_encode($backupAdmin->uploadAndAnalyze($prefix, $_FILES));
 
         break;
 

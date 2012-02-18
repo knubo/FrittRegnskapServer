@@ -5,7 +5,7 @@ class BackupAdmin {
 
     function BackupAdmin($db) {
         if (!$db) {
-            $db = new DB();
+            $this->db = new DB();
         }
 
         $this->db = $db;
@@ -64,6 +64,7 @@ class BackupAdmin {
             $unlockFound = !(strstr($data, "UNLOCK TABLES") === FALSE);
 
             $tableExist = $this->db->table_exists($tableName);
+
             $backupExist = $this->db->table_exists($tableName."_backup");
 
             $result[] = array("table" => $tableName, "deleteNotFound" => $deleteNotFound, "dropNotFound" => $dropNotFound,
@@ -77,6 +78,10 @@ class BackupAdmin {
 
     public static function viewFile($prefix, $viewFile) {
         readfile("../../storage/$prefix/admin_backup/$viewFile.sql");
+    }
+
+    public function backupTable($table) {
+        $this->db->copyTable($table, $table."_backup");
     }
 
 }

@@ -41,12 +41,13 @@ class DB {
             return -1;
         }
 
+
         $len = count($string);
         for ($i = 0; $i < $len; $i++) {
             $h = 31 * $h + ord(mb_substr($string, $i, 1));
             $h = $h & $h;
         }
-        return ($h % DB_COUNT) + 1;
+        return ($h % DB::DB_COUNT) + 1;
     }
 
     function close() {
@@ -113,11 +114,11 @@ class DB {
         }
     }
 
-    function report_error() {
+    function report_error($query = 0) {
         $error = $this->link->error;
         header("HTTP/1.0 512 DB error");
         $this->rollback();
-        die("DB:".$error);
+        die("DB:".$error." Query:".$query);
     }
 
     function prepare($query) {
@@ -151,7 +152,7 @@ class DB {
 
     function action($query) {
         if(!mysqli_query($this->link, $query)) {
-            $this->report_error();
+            $this->report_error($query);
         }
 
     }
@@ -204,6 +205,19 @@ class DB {
     }
     function affected_rows() {
         return $this->link->affected_rows;
+    }
+
+    public function copyTable($from, $to) {
+        $prep = $this->prepare("select column_name from information_schema.columns where table_name='$to'");
+        $coldata = $prep->execute();
+
+        $colnames = array_map(function($d) { return $d["column_name"];}, $coldata);
+
+        $colstmt = join(",",$colnames);
+
+        $sql = "insert into $to ($colstmt) select $colstmt from $from";
+
+        $this->action($sql);
     }
 }
 

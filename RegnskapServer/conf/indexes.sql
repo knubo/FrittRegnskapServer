@@ -1,4 +1,3 @@
-
 CREATE INDEX XXX_Post_Type_coll_post on XXX_post_type(coll_post);
 CREATE INDEX XXX_Post_Type_detail_post on XXX_post_type(detail_post);
 

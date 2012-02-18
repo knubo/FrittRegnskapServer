@@ -376,5 +376,5 @@ create table if not exists XXX_event_partisipant (
     person_id INTEGER(11) unsigned,
     group_key varchar(50),
     group_value TEXT,
-    gender ENUM('male','female'),
+    gender ENUM('male','female')
 );

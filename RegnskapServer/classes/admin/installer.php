@@ -14,19 +14,28 @@ class Installer {
 
         $res = $prep->execute();
 
-        foreach($res as $one) {
-            foreach(array_values($one) as $st) {
+        foreach ($res as $one) {
+            foreach (array_values($one) as $st) {
                 $this->db->action("drop table $st");
             }
         }
     }
 
-   
+
     function createTables($prefix) {
         $dbschema = Strings::file_get_contents_utf8("../../conf/dbschema.sql");
 
         $this->execute($dbschema, $prefix);
     }
+
+    public function createBackupTables($prefix) {
+        $dbschema = Strings::file_get_contents_utf8("../../conf/dbschema.sql");
+
+        $dbschema = preg_replace("/XXX_(.+?)\s*\(/", "XXX_$1_backup (",$dbschema);
+
+        $this->execute($dbschema, $prefix);
+    }
+
 
     function createIndexes($prefix) {
         $indexes = Strings::file_get_contents_utf8("../../conf/indexes.sql");
@@ -40,16 +49,16 @@ class Installer {
 
         $this->execute($posts, $prefix);
 
-        $this->db->action("update ".$prefix."_post_type set in_use = 1");
+        $this->db->action("update " . $prefix . "_post_type set in_use = 1");
     }
 
     function execute($sqls, $prefix) {
-        $replaced = preg_replace("/XXX/",$prefix,$sqls);
+        $replaced = preg_replace("/XXX/", $prefix, $sqls);
 
         $statements = explode(";", $replaced);
 
         foreach ($statements as $one) {
-            if($one && strlen(chop($one)) > 0) {
+            if ($one && strlen(chop($one)) > 0) {
                 $this->db->action($one);
             }
         }
@@ -57,10 +66,10 @@ class Installer {
     }
 
     function createUniquePrefix($hostprefix, $retry = 0) {
-        $try = substr($hostprefix, 0, 3).substr($hostprefix, -3);
+        $try = substr($hostprefix, 0, 3) . substr($hostprefix, -3);
 
-        if($retry > 0) {
-            $try = substr($try, 0, -1)."$retry";
+        if ($retry > 0) {
+            $try = substr($try, 0, -1) . "$retry";
             $retry++;
         }
 
@@ -68,7 +77,7 @@ class Installer {
         $prep->bind_params("s", $try);
         $res = $prep->execute();
 
-        if(count($res) == 0) {
+        if (count($res) == 0) {
             return $try;
         }
 
@@ -87,23 +96,23 @@ class Installer {
     }
 
     function addStandardData($prefix) {
-        $prefix = $prefix."_";
+        $prefix = $prefix . "_";
 
 
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_SEMESTER','1')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_MONTH','1')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('STD_YEAR','$year')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('BDG_YEAR_POST','3920')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('BDG_COURSE_POST','3925')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('BDG_TRAIN_POST','3926')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('BDG_YOUTH_POST','3927')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_POST','9000')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_YEAR_POST','2050')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('FIRST_IB_POST','8960')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('FORDRINGER_POSTS','1370,1380,1390,1570')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('REGI_MEMB_POSTS','1920,1900')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('END_MONTH_TRPOSTS','1900,1920')");
-        $prep = $this->db->action("insert into ".$prefix."standard (id,value) values ('KID_BANK_ACCOUNT','1920')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('STD_SEMESTER','1')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('STD_MONTH','1')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('STD_YEAR','$year')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('BDG_YEAR_POST','3920')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('BDG_COURSE_POST','3925')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('BDG_TRAIN_POST','3926')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('BDG_YOUTH_POST','3927')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('END_MONTH_POST','9000')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('END_YEAR_POST','2050')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('FIRST_IB_POST','8960')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('FORDRINGER_POSTS','1370,1380,1390,1570')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('REGI_MEMB_POSTS','1920,1900')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('END_MONTH_TRPOSTS','1900,1920')");
+        $this->db->action("insert into " . $prefix . "standard (id,value) values ('KID_BANK_ACCOUNT','1920')");
 
     }
 
@@ -124,7 +133,7 @@ class Installer {
         $prep = $this->db->prepare("select * from installations where dbprefix = 'master'");
         $res = $prep->execute();
 
-        if(count($res) == 0) {
+        if (count($res) == 0) {
             $prep = $this->db->prepare("insert into installations (dbprefix, hostprefix, description, diskquota, wikilogin) values ('master_', 'master','Master',0,?)");
             $prep->bind_params("s", $wikilogin);
             $prep->execute();
@@ -134,12 +143,12 @@ class Installer {
     }
 
     function validate($parameters) {
-        $required = array("superuser","password", "domainname", "clubname", "contact", "email", "address", "city", "zipcode");
+        $required = array("superuser", "password", "domainname", "clubname", "contact", "email", "address", "city", "zipcode");
 
         $bad = array();
 
-        foreach($required as $one) {
-            if(!array_key_exists($one, $_REQUEST) || strlen(trim($_REQUEST[$one])) == 0) {
+        foreach ($required as $one) {
+            if (!array_key_exists($one, $_REQUEST) || strlen(trim($_REQUEST[$one])) == 0) {
                 $bad[] = $one;
             }
         }
@@ -149,20 +158,19 @@ class Installer {
 
         $res = $prep->execute();
 
-        if(count($res)) {
+        if (count($res)) {
             $bad[] = "domainname";
         }
 
-        if(count($bad) > 0) {
+        if (count($bad) > 0) {
             header("HTTP/1.0 513 Validation Error");
 
             die(json_encode($bad));
         }
 
     }
+
 }
-
-
 
 
 ?>

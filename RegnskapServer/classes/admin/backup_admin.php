@@ -81,7 +81,16 @@ class BackupAdmin {
     }
 
     public function backupTable($table) {
+
+        if(!$this->db->table_exists($table) || !$this->db->table_exists($table."_backup")) {
+            return -1;
+        }
         $this->db->copyTable($table, $table."_backup");
+
+        $prep = $this->db->prepare("select count(*) as c from $table"."_backup");
+        $res = $prep->execute();
+
+        return $res[0]["c"];
     }
 
 }

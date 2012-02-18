@@ -73,8 +73,8 @@ switch ($action) {
 
     case "backup_table":
         $backupAdmin = new BackupAdmin($db);
-        $backupAdmin->backupTable($table);
-        echo array("status" => 1);
+        $count = $backupAdmin->backupTable($table);
+        echo json_encode(array("count" => $count));
         break;
 }
 

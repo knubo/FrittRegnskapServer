@@ -25,14 +25,12 @@ if ($regnSession->getPrefix() != "master_") {
     die("Not authenticated for master database:" . $regnSession->getPrefix());
 }
 
+$dbBackup = new DB(0, $dbSelect);
 
 switch ($action) {
     case "upload":
         $prefix = $regnSession->getPrefix() . "/";
-
-        $db = new DB(0, $dbSelect);
-
-        $backupAdmin = new BackupAdmin($db);
+        $backupAdmin = new BackupAdmin($dbBackup);
 
         echo json_encode($backupAdmin->uploadAndAnalyze($prefix, $_FILES));
 
@@ -51,32 +49,43 @@ switch ($action) {
     case "view":
         $prefix = $regnSession->getPrefix() . "/";
         echo BackupAdmin::viewFile($prefix, $viewFile);
-
+        break;
     case "install_indexes":
-        $installer = new Installer($db);
+        $installer = new Installer($dbBackup);
         $installer->createIndexes($dbprefix);
         echo "ok";
         break;
 
     case "install_backup_tables":
-        $installer = new Installer($db);
+        $dbBackup->action("FLUSH TABLES");
+        $installer = new Installer($dbBackup);
         $installer->createTables($dbprefix);
         //TODO legge til indexer?
         $installer->createBackupTables($dbprefix);
-        echo array("status" => 1);
+        echo json_encode(array("status" => 1));
         break;
 
     case "drop_table":
-        $db->action("drop table if exists $table" . "_backup");
-        echo array("status" => 1);
+        $dbBackup->action("drop table if exists $table" . "_backup");
+        echo json_encode(array("status" => 1, "table" => "$table" . "_backup"));
         break;
 
     case "backup_table":
-        $backupAdmin = new BackupAdmin($db);
+        $backupAdmin = new BackupAdmin($dbBackup);
         $count = $backupAdmin->backupTable($table);
         echo json_encode(array("count" => $count));
         break;
+
+    case "install_from_backup":
+        $masterprefix = $regnSession->getPrefix() . "/";
+
+        $backupAdmin = new BackupAdmin($dbBackup);
+        $count = $backupAdmin->deleteAndinstallFromBackup($masterprefix, $table);
+        echo json_encode(array("count" => $count));
+        break;
+
 }
 
+$dbBackup->close();
 
 ?>

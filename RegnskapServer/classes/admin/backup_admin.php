@@ -51,7 +51,7 @@ class BackupAdmin {
         $result = array();
 
         foreach ($files as $one) {
-            $data = file_get_contents($one);
+            $data = Strings::file_get_contents_utf8($one);
 
             $deleteNotFound = stristr($data, "delete from") === FALSE;
             $dropNotFound = stristr($data, "drop table") === FALSE;
@@ -65,7 +65,7 @@ class BackupAdmin {
 
             $tableExist = $this->db->table_exists($tableName);
 
-            $backupExist = $this->db->table_exists($tableName."_backup");
+            $backupExist = $this->db->table_exists($tableName . "_backup");
 
             $result[] = array("table" => $tableName, "deleteNotFound" => $deleteNotFound, "dropNotFound" => $dropNotFound,
                 "truncateNotFound" => $truncateNotFound, "lockFound" => $lockFound,
@@ -82,15 +82,40 @@ class BackupAdmin {
 
     public function backupTable($table) {
 
-        if(!$this->db->table_exists($table) || !$this->db->table_exists($table."_backup")) {
+        if (!$this->db->table_exists($table) || !$this->db->table_exists($table . "_backup")) {
             return -1;
         }
-        $this->db->copyTable($table, $table."_backup");
+        $this->db->copyTable($table, $table . "_backup");
 
-        $prep = $this->db->prepare("select count(*) as c from $table"."_backup");
+        $prep = $this->db->prepare("select count(*) as c from $table" . "_backup");
         $res = $prep->execute();
 
         return $res[0]["c"];
+    }
+
+    public function deleteAndinstallFromBackup($masterprefix, $table) {
+
+        if(!$this->db->table_exists($table)) {
+            return -1;
+        }
+        $this->db->action("delete from $table");
+
+        $sqls = Strings::file_get_contents_utf8("../../storage/$masterprefix/admin_backup/$table.sql");
+
+        $statements = explode("\n", $sqls);
+
+        foreach ($statements as $one) {
+            if ($one && strlen(chop($one)) > 0 && strncmp($one, "/*", 2) != 0 && strncmp($one, "--",2 != 0)) {
+                $this->db->action($one);
+            }
+        }
+        $this->db->action("ALTER TABLE $table AUTO_INCREMENT = 1");
+
+        $prep = $this->db->prepare("select count(*) as c from $table");
+        $res = $prep->execute();
+
+        return $res[0]["c"];
+
     }
 
 }

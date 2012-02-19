@@ -44,15 +44,14 @@ switch ($action) {
 
         echo json_encode($data);
         break;
-    case "test":
-        $accSemester = new AccountSemester($db);
-        echo "Next semester is:". $accSemester->getSemesterName($accSemester->getNextSemester());
-        break;
+
     case "endyear" :
         $regnSession->checkWriteAccess();
 
         $acStandard = new AccountStandard($db);
         $accSemester = new AccountSemester($db);
+
+        $nextSemester = $accSemester->getNextYearSpringSemester();
 
         $res = $endYearHelper->insertParams();
 
@@ -63,7 +62,7 @@ switch ($action) {
 
         if($month != 12) {
             $db->rollback();
-            header("HTTP/1.0 514 Illegal state");
+            header("HTTP/1.0 512 Illegal state");
             die("Can only end year in last month of year.");
         }
 
@@ -73,7 +72,8 @@ switch ($action) {
 
         $endYearHelper->endYear($res);
 
-        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());
+
+        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $nextSemester);
 
         $acStandard->setValue(AccountStandard::CONST_YEAR, ($year + 1));
         $acStandard->setValue(AccountStandard::CONST_MONTH, 1);

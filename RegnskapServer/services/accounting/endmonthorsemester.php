@@ -59,6 +59,9 @@ switch ($action) {
 
         $accSemester = new AccountSemester($db);
         $acStandard = new AccountStandard($db);
+
+        $nextSemester = $accSemester->getFallSemester();
+
         $res = $endHelper->insertParams();
 
         if ($res["month"] == 12) {
@@ -76,7 +79,8 @@ switch ($action) {
 
         $res = $endHelper->endMonth($res, $regnSession->getPersonId());
 
-        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $accSemester->getNextSemester());
+
+        $acStandard->setValue(AccountStandard::CONST_SEMESTER, $nextSemester);
         $db->commit();
         echo json_encode("1");
         break;

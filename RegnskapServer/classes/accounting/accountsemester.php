@@ -32,6 +32,42 @@ class AccountSemester {
         return "";
     }
 
+    function getFallSemester() {
+        $pre = AppConfig::pre();
+
+        $sql = "select max(semester) as semester from ".$pre."semester where year = ((select value from ".$pre."standard where id = 'STD_YEAR')) and fall = 1";
+
+        $prep = $this->db->prepare($sql);
+        $res = $prep->execute();
+
+        if(count($res) != 1) {
+            $this->db->rollback();
+            header("HTTP/1.0 514 Missing data");
+            die("missing_semester");
+        }
+
+        return $res[0]["semester"];
+    }
+
+    function getNextYearSpringSemester() {
+        $pre = AppConfig::pre();
+
+        $sql = "select max(semester) as semester from ".$pre."semester where year = ((select value from ".$pre."standard where id = 'STD_YEAR')+1) and fall = 0";
+
+        $prep = $this->db->prepare($sql);
+        $res = $prep->execute();
+
+        if(count($res) != 1) {
+            $this->db->rollback();
+            header("HTTP/1.0 514 Missing data");
+            die("missing_semester");
+        }
+
+        return $res[0]["semester"];
+    }
+
+
+
     function getNextSemester() {
         $pre = AppConfig::pre();
         $sql = "select NS.semester as semester from ".$pre."semester S, ".$pre."semester NS, ".$pre."standard SS where ".
@@ -42,8 +78,9 @@ class AccountSemester {
         $res = $prep->execute();
 
         if(count($res) != 1) {
-            header("HTTP/1.0 514 Illegal state");
-            die("Could not find next semester. Missing data");
+            $this->db->rollback();
+            header("HTTP/1.0 514 Missing data");
+            die("missing_semester");
         }
 
         return $res[0]["semester"];

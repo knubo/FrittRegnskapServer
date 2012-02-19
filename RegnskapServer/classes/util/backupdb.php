@@ -6,7 +6,7 @@ class BackupDB {
     private $prefix;
     public $info;
 
-    function BackupDB($db,$prefix) {
+    function BackupDB($db, $prefix) {
         $this->db = $db;
         $this->prefix = $prefix;
         $this->logger = new Logger($db);
@@ -20,11 +20,11 @@ class BackupDB {
     }
 
     function tables() {
-        $tables = array ();
+        $tables = array();
 
         $this->addTables(AppConfig::pre(), &$tables);
 
-        if($this->prefix == "master_") {
+        if ($this->prefix == "master_") {
             $this->addTables("wikka_", &$tables);
             $tables[] = "sqllist";
             $tables[] = "to_install";
@@ -39,19 +39,23 @@ class BackupDB {
         $res = $prep->execute();
 
         foreach ($res as $value) {
-            $tables = array_merge($tables, array_values($value));
+            $one = array_shift(array_values($value));
+
+            if (strpos($one, "_backup") === FALSE) {
+                $tables[] = $one;
+            }
         }
-         
+
     }
 
     function zip() {
-        $cmd = "/usr/bin/zip ../backup/".$this->prefix."/backup.zip ../backup/".$this->prefix."/*.sql";
+        $cmd = "/usr/bin/zip ../backup/" . $this->prefix . "/backup.zip ../backup/" . $this->prefix . "/*.sql";
 
         $data = array();
         $res = exec($cmd, &$data);
 
-        if(count($data) == 0) {
-            $this->logger->log("error","command", "Failed to run command $cmd");
+        if (count($data) == 0) {
+            $this->logger->log("error", "command", "Failed to run command $cmd");
             return false;
         }
         return true;
@@ -60,50 +64,51 @@ class BackupDB {
     function dump_plain($table) {
         $dbinfo = AppConfig::db();
 
-        $cmd = AppConfig::MYSQLDUMP."  --skip-opt -cntq -u " . $dbinfo[1] . " -h " . $dbinfo[0];
+        $cmd = AppConfig::MYSQLDUMP . "  --skip-opt -cntq -u " . $dbinfo[1] . " -h " . $dbinfo[0];
 
-        if($dbinfo[2] && strlen($dbinfo[2]) > 0) {
-            $cmd.= " -p" . $dbinfo[2];
+        if ($dbinfo[2] && strlen($dbinfo[2]) > 0) {
+            $cmd .= " -p" . $dbinfo[2];
         }
 
-        $cmd.= " " . $dbinfo[3] . " $table";
+        $cmd .= " " . $dbinfo[3] . " $table";
         $data = array();
         $res = exec($cmd, &$data);
 
-        if(count($data) == 0) {
-            $this->logger->log("error","exec", "Failed to run command $cmd");
+        if (count($data) == 0) {
+            $this->logger->log("error", "exec", "Failed to run command $cmd");
             return 0;
         }
 
-        $patterns = array("/\/\*.*/", "/--.*/","/`/");
-        
-        return trim(preg_replace($patterns,"",implode("\n",$data)));
-        
+        $patterns = array("/\/\*.*/", "/--.*/", "/`/");
+
+        return trim(preg_replace($patterns, "", implode("\n", $data)));
+
     }
 
     function backup($table) {
-         
+
         $dbinfo = AppConfig::db();
 
-        $cmd = AppConfig::MYSQLDUMP." -cnt -u " . $dbinfo[1] . " -h " . $dbinfo[0];
+        $cmd = AppConfig::MYSQLDUMP . " -cnt -u " . $dbinfo[1] . " -h " . $dbinfo[0];
 
-        if($dbinfo[2] && strlen($dbinfo[2]) > 0) {
-            $cmd.= " -p" . $dbinfo[2];
+        if ($dbinfo[2] && strlen($dbinfo[2]) > 0) {
+            $cmd .= " -p" . $dbinfo[2];
         }
 
-        $cmd.= " " . $dbinfo[3] . " $table";
+        $cmd .= " " . $dbinfo[3] . " $table";
         $data = array();
         $res = exec($cmd, &$data);
 
-        if(count($data) == 0) {
-            $this->logger->log("error","exec", "Failed to run command $cmd");
+        if (count($data) == 0) {
+            $this->logger->log("error", "exec", "Failed to run command $cmd");
             return 0;
         }
-         
-        $this->info = array(count($data));
-         
 
-        return file_put_contents("../backup/".$this->prefix."/$table.sql", implode("\n",$data)) > 0;
+        $this->info = array(count($data));
+
+
+        return file_put_contents("../backup/" . $this->prefix . "/$table.sql", implode("\n", $data)) > 0;
     }
 }
+
 ?>

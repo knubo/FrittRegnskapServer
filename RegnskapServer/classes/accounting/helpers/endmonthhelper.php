@@ -44,16 +44,16 @@ class EndMonthHelper {
 
     function insertParams() {
         $acStandard = new AccountStandard($this->db);
-        $values = $acStandard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH));
+        $values = $acStandard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::LAST_SPRING_MONTH));
         $year = $values[AccountStandard::CONST_YEAR];
         $month = $values[AccountStandard::CONST_MONTH];
-         
+
         $lastDay = new eZDate();
         $lastDay->setDay(1);
         $lastDay->setMonth($active_month);
         $lastDay->setYear($active_year);
         $daysInMonth = $lastDay->daysInMonth();
-        return array("month" => $month, "year" => $year, "lastDay" => $daysInMonth);
+        return array("month" => $month, "year" => $year, "lastDay" => $daysInMonth, "lastSpringMonth" => $values[AccountStandard::LAST_SPRING_MONTH]);
     }
 
     function endMonth($params, $changePersonId) {

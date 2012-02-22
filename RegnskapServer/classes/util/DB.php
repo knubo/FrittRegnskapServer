@@ -207,11 +207,15 @@ class DB {
         return $this->link->affected_rows;
     }
 
-    public function copyTable($from, $to) {
+    function copyTable($from, $to) {
+        function colName($d) {
+            return $d["column_name"];
+        }
+
         $prep = $this->prepare("select column_name from information_schema.columns where table_name='$to'");
         $coldata = $prep->execute();
 
-        $colnames = array_map(function($d) { return $d["column_name"];}, $coldata);
+        $colnames = array_map(colName, $coldata);
 
         $colstmt = join(",",$colnames);
 

@@ -94,6 +94,18 @@ switch ($action) {
             die("Can't end last month in year - use end year");
         }
 
+        $lastSpringMonth = $res["lastSpringMonth"];
+        if($lastSpringMonth == 0) {
+            $lastSpringMonth = 6;
+        }
+
+        if($res["month"] >= $lastSpringMonth) {
+            header("HTTP/1.0 513 Validation Error");
+
+            die("last_month");
+        }
+
+
 
         $db->begin();
 

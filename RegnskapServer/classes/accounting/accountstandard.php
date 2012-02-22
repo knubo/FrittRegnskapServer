@@ -6,10 +6,10 @@ class AccountStandard {
 	const CONST_SEMESTER = "STD_SEMESTER";
 	const CONST_EMAIL_SENDER = "STD_EMAIL_SENDER";
 	const CONST_MASSLETTER_DUE_DATE = "MASSLETTER_DUE_DATE";
-    
+
     /* Post for kredit when register year memberships */
 	const CONST_BUDGET_YEAR_POST = "BDG_YEAR_POST";
-	
+
 	/* Post for kredit when register course memberships*/
 	const CONST_BUDGET_COURSE_POST = "BDG_COURSE_POST";
 	/* Post for kredit when register train memberships*/
@@ -30,18 +30,19 @@ class AccountStandard {
     const CONST_INTEGRATION_SECRET = "INTEGRATION_SEC";
     const CONST_INTEGRATION_EMAIL = "INTEGRATION_EMAIL";
     const CONST_KID_BANK_ACCOUNT = "KID_BANK_ACCOUNT";
-    
+    const LAST_SPRING_MONTH = "LAST_SPRING_MONTH";
+
 	private $db;
 
 	function AccountStandard($db, $prefix = 0) {
 		$this->db = $db;
-		
+
 		if($prefix) {
 		    $this->prefix = $prefix;
 		} else {
 		    $this->prefix = AppConfig :: pre();
-		} 
-		
+		}
+
 	}
 
 
@@ -122,5 +123,6 @@ class AccountStandard {
 
 		return explode(",", $res);
 	}
+
 }
 ?>

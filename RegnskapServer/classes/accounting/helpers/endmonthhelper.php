@@ -88,7 +88,8 @@ class EndMonthHelper {
 
     function transferPost($transfer_month, $active_month, $active_year, $post, $amount, $dayInMonth, $endTransferPost, $revFactor,$changePersonId) {
         $acAccountLine = new AccountLine($this->db);
-        $acAccountLine->setNewLatest("Overf&oslash;ring " . $this->endPosts[$post]->getDescription() . " " . eZDate :: monthNameNor($transfer_month), $dayInMonth, $active_year, $active_month);
+        $ezDate = new eZDate();
+        $acAccountLine->setNewLatest("Overf&oslash;ring " . $this->endPosts[$post]->getDescription() . " " . $ezDate->monthNameNor($transfer_month), $dayInMonth, $active_year, $active_month);
         $acAccountLine->store($active_month, $active_year);
 
         if ($amount > 0) {

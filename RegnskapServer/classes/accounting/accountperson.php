@@ -227,7 +227,7 @@ class AccountPerson {
     function getOnePortal($id) {
         $sql = "select deactivated, firstname,lastname,email,address,postnmb,city,country,phone,cellphone,birthdate, gender,".
         		"show_gender, show_birthdate, show_cellphone, show_phone, show_country, show_city, show_postnmb, show_address, show_email, show_lastname, show_firstname, show_image, ".
-                "homepage, twitter, facebook, linkedin, ifnull(newslettœer, 0) as newsletter ".
+                "homepage, twitter, facebook, linkedin, ifnull(newsletter, 0) as newsletter ".
         		"from " . $this->dbPrefix . "person," . $this->dbPrefix . "portal_user where id = ? and id=person";
         $prep = $this->db->prepare($sql);
         $prep->bind_params("i", $id);

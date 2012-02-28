@@ -60,7 +60,7 @@ switch($action) {
         if(!file_exists("../../../../../kopierFraBeta.sh")) {
             die("Script not found");
         }
-        system("../../../../../kopierFraBeta.sh");
+        passthru("../../../../../kopierFraBeta.sh");
         echo "</pre>";
         echo "<p id=\"focus\"><strong>Complete</strong></p>";
         break;

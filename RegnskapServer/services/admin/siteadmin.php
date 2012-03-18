@@ -54,10 +54,19 @@ switch($action) {
     case "save":
         echo json_encode(array());
         break;
+    case "predistribute":
+        $secret = Strings::createSecret();
+
+        $file = fopen ("../../conf/install_secret.txt", "w");
+        fwrite($file, $secret);
+        fclose ($file);
+        echo json_encode(array("secret" => $secret));
+        break;
+
     case "distribute":
         echo "<pre>";
         echo "Distributing";
-        if(!file_exists("../../../../../kopierFraBeta.sh")) {
+        if(!file_exists("../../../../script/kopierFraBeta.sh")) {
             die("Script not found");
         }
         passthru("../../../../../kopierFraBeta.sh");

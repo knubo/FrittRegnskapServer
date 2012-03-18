@@ -172,7 +172,9 @@ create table if not exists XXX_person (
    secret varchar(40),
    comment TEXT,
    secretaddress tinyint,
-   lastedit TIMESTAMP
+   lastedit TIMESTAMP,
+   year_membership_required tinyinit(1),
+   semester_membership_required tinyint(1)
 );
 
 create table if not exists XXX_person_backup (

@@ -22,7 +22,9 @@ class AccountPerson {
     /* Populated from outside */
     public $Memberships;
     public $BirthdateRequired;
-
+    public $YearMembershipRequired;
+    public $SemesterMembershipRequired;
+    
     /* Only for querying - not in result set */
     private $User;
     private $db;
@@ -265,7 +267,9 @@ class AccountPerson {
         $this->setNewsletter($fields["newsletter"]);
         $this->Secretaddress = $fields["secretaddress"];
         $this->Comment = $fields["comment"];
-
+        $this->SemesterMembershipRequired = $fields["semester_membership_required"];
+        $this->YearMembershipRequired = $fields["year_membership_required"];
+        
         if($fields["birthdate"]) {
             $tmpdate = new eZDate();
             $tmpdate->setMySQLDate($fields["birthdate"]);
@@ -315,14 +319,14 @@ class AccountPerson {
             $mysqlDate = $bdSave->mySQLDate();
         }
         if ($this->Id) {
-            $prep = $this->db->prepare("update " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=?,lastedit=now() where id = ?");
-            $prep->bind_params("sssssssssssiisisi", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Secretaddress, $this->Comment, $this->Id);
+            $prep = $this->db->prepare("update " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?, hidden=?, gender=?, secretaddress=?,comment=?,lastedit=now(), semester_membership_required=?, year_membership_required=? where id = ?");
+            $prep->bind_params("sssssssssssiisisiii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender, $this->Secretaddress, $this->Comment, $this->SemesterMembershipRequired, $this->YearMembershipRequired, $this->Id);
             $prep->execute();
             return $this->db->affected_rows();
         }
 
-        $prep = $this->db->prepare("insert into " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?,lastedit=now()");
-        $prep->bind_params("sssssssssssiisis", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender,$this->Secretaddress, $this->Comment);
+        $prep = $this->db->prepare("insert into " . $this->dbPrefix . "person set firstname=?,lastname=?,email=?,address=?,postnmb=?,city=?,country=?,phone=?,cellphone=?,employee=?,birthdate=?,newsletter=?,hidden=?,gender=?, secretaddress=?,comment=?,lastedit=now(),semester_membership_required=?, year_membership_required=?");
+        $prep->bind_params("sssssssssssiisisii", $this->FirstName, $this->LastName, $this->Email, $this->Address, $this->PostNmb, $this->City, $this->Country, $this->Phone, $this->Cellphone, $this->IsEmployee, $mysqlDate, $this->Newsletter, $this->Hidden, $this->Gender,$this->Secretaddress, $this->Comment,$this->SemesterMembershipRequired, $this->YearMembershipRequired);
         $prep->execute();
 
         $this->id = $this->db->insert_id();
@@ -469,6 +473,13 @@ class AccountPerson {
             } else {
                 $one["secretaddress"] = 0;
             }
+
+            if($one["birthdate"]) {
+                $date = new eZDate();
+                $date->setMySQLDate($one["birthdate"]);
+                $one["birthdate"] = $date->display();
+            }
+
             unset($one["hidden"]);
             unset($one["secret"]);
 

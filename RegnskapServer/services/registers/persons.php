@@ -36,6 +36,9 @@ $gender = array_key_exists("gender", $_REQUEST) ? trim($_REQUEST["gender"]) : ''
 $secretaddress = array_key_exists("secretaddress", $_REQUEST) ? trim($_REQUEST["secretaddress"]) : '';
 $comment = array_key_exists("comment", $_REQUEST) ? trim($_REQUEST["comment"]) : '';
 $date = array_key_exists("date", $_REQUEST) ? trim($_REQUEST["date"]) : "";
+$yearRequired = array_key_exists("yearRequired", $_REQUEST) ? trim($_REQUEST["yearRequired"]) : "0";
+$semesterRequired = array_key_exists("semesterRequired", $_REQUEST) ? trim($_REQUEST["semesterRequired"]) : "0";
+
 
 $regnSession = new RegnSession(new DB());
 $regnSession->auth();
@@ -129,7 +132,9 @@ switch ($action) {
         $accPers->setGender($gender);
         $accPers->setSecretaddress($secretaddress);
         $accPers->setComment($comment);
-
+        $accPers->SemesterMembershipRequired = $semesterRequired;
+        $accPers->YearMembershipRequired = $yearRequired;
+        
         $res = array();
         $res["result"] = $accPers->save();
 

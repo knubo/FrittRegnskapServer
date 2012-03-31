@@ -6,7 +6,11 @@ class AccountyearMembership {
     public $Youth;
     private $db;
 
+
     function AccountyearMembership($db, $user = 0, $year = 0, $regn_line = 0, $youth = 0) {
+        if(!$db) {
+            $db = new DB();
+        }
         $this->db = $db;
         $this->Year = $year;
         $this->User = $user;
@@ -165,5 +169,13 @@ class AccountyearMembership {
 
         return $years;
     }
+
+    public function missingMemberships($year) {
+        $prep = $this->db->prepare("select id, firstname, lastname from regn_person P where year_membership_required = 1 and P.id not in (select memberid from regn_year_membership M where M.year = ?) order by lastname, firstname");
+        $prep->bind_params("i", $year);
+        return $prep->execute();
+    }
+
 }
+
 ?>

@@ -2,6 +2,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountsemester.php");
+include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 
@@ -17,6 +18,14 @@ $spring = array_key_exists("spring", $_REQUEST) ? $_REQUEST["spring"] : "";
 $accSemester = new AccountSemester($db);
 
 switch ($action) {
+    case "allWithActive":
+        $accStandard = new AccountStandard($db);
+
+        $data = array();
+        $data["semesters"] = $accSemester->getAll();
+        $data["current"] = $accStandard->getOneValue(AccountStandard::CONST_SEMESTER);
+        echo json_encode($data);
+        break;
 	case "all" :
 		$all = $accSemester->getAll();
 		echo json_encode($all);

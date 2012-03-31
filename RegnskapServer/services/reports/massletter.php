@@ -16,7 +16,7 @@ include_once ("../../classes/reporting/massletterhelper.php");
 include_once ("../../pdf/class.ezpdf.php");
 include_once ("../../classes/auth/Master.php");
 
-$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 2007;
+$year = array_key_exists("year", $_REQUEST) ? $_REQUEST["year"] : 0;
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "list";
 $template = array_key_exists("template", $_REQUEST) ? $_REQUEST["template"] : 0;
 $data = array_key_exists("data", $_REQUEST) ? $_REQUEST["data"] : 0;

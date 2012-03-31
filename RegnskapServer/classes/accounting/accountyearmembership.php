@@ -171,7 +171,7 @@ class AccountyearMembership {
     }
 
     public function missingMemberships($year) {
-        $prep = $this->db->prepare("select id, firstname, lastname from regn_person P where year_membership_required = 1 and P.id not in (select memberid from regn_year_membership M where M.year = ?) order by lastname, firstname");
+        $prep = $this->db->prepare("select id, firstname, lastname from " . AppConfig::pre() . "person P where year_membership_required = 1 and P.id not in (select memberid from " . AppConfig::pre() . "year_membership M where M.year = ?) order by lastname, firstname");
         $prep->bind_params("i", $year);
         return $prep->execute();
     }

@@ -174,6 +174,18 @@ class AccountSemesterMembership {
 
         return $prep->execute();
     }
+
+    public function missingMemberships($semester) {
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "person P where semester_membership_required = 1 ".
+           "and P.id not in ".
+           "(select memberid from " . AppConfig::pre() . "course_membership M where M.semester = ? union all ".
+            "select memberid from " . AppConfig::pre() . "train_membership M where M.semester = ? union all ".
+            "select memberid from " . AppConfig::pre() . "youth_membership M where M.semester = ? ".
+           ")");
+
+        $prep->bind_params("iii", $semester,$semester,$semester);
+        return $prep->execute();
+    }
 }
 
 ?>

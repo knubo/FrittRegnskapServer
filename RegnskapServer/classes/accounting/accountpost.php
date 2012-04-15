@@ -13,7 +13,7 @@ class AccountPost {
     public $Cost;
 	public $Belonging;
     public $BelongingDesc;
-	
+
 	private $db;
 
 	function AccountPost($db, $line = 0, $debet = 0, $post_type = 0, $amount = 0, $id = 0, $project = 0, $person = 0, $edited_by_person = 0, $earning = 0,$cost = 0) {
@@ -33,11 +33,11 @@ class AccountPost {
 	function setBelonging($belonging) {
 	    $this->Belonging = $belonging;
 	}
-	
+
 	function setBelongingDesc($desc) {
 	    $this->BelongingDesc = $desc;
 	}
-	
+
 	function getProject() {
 		return $this->Project;
 	}
@@ -45,9 +45,9 @@ class AccountPost {
 	function getPerson() {
 		return $this->Person;
 	}
-	
+
 	function getEarning() {
-        return $this->Earning;	    
+        return $this->Earning;
 	}
 
 	function getId() {
@@ -101,7 +101,7 @@ class AccountPost {
 		    $post = new AccountPost($this->db, $one["line"], $one["debet"], $one["post_type"], $one["amount"], $one["id"], $one["project"], $one["person"], $one["edited_by_person"], $one["earning"], $one["cost"]);
 		    $return_array[] = $post;
 		    $post->setBelonging($one["belonging"]);
-		    
+
 		    if($one["belonging"]) {
 		        $post->setBelongingDesc($one["belonging"]. " ".$one["serial"]);
 		    }
@@ -115,18 +115,18 @@ class AccountPost {
 		$prep->execute();
     	return $this->db->affected_rows();
 	}
-    
+
     function sumForPostType($postType) {
         $prep = $this->db->prepare("select (select sum(amount) from " . AppConfig::pre() . "post where post_type=? and debet='1') - ".
                                            "(select sum(amount) from " . AppConfig::pre() . "post where post_type=? and debet='-1') as D");
     	$prep->bind_params("ii", $postType, $postType);
         $res = $prep->execute();
-        
+
         foreach($res as $one) {
         	return $one["D"];
         }
     }
-	
+
 	function sumForLine($lineId) {
 		$prep = $this->db->prepare("select sum(amount) as D from " . AppConfig::pre() . "post where line=? and debet='1'");
 		$prep->bind_params("d", $lineId);
@@ -136,15 +136,15 @@ class AccountPost {
 		$prep->bind_params("d", $lineId);
 		$prep->execute();
 		$kredit=$prep->execute();
-		
+
 		$result = 0;
-		
+
 		if(sizeof($debet)) {
 			foreach($debet as $one) {
 			    $result += $one["D"];
 			}
 		}
-		
+
 		if(sizeof($kredit)) {
 			foreach($kredit as $one) {
 			    $result -= $one["K"];
@@ -152,5 +152,14 @@ class AccountPost {
 		}
 		return $result;
 	}
+
+    public function updateProject($projects) {
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "post set project = ? where id = ?");
+
+        foreach($projects as $project) {
+            $prep->bind_params("ii", $project->project, $project->id);
+            $prep->execute();
+        }
+    }
 }
 ?>

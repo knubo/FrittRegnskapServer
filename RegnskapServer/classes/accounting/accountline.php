@@ -155,7 +155,7 @@ class AccountLine {
         $this->Attachment = $this->getNextAttachmentNmb($year);
         $this->EditedByPerson = $editByPerson;
     }
-    
+
     function setNewLatest($description, $day, $year, $month, $editByPerson = 0) {
         $this->Description = $description;
 
@@ -163,7 +163,7 @@ class AccountLine {
         $this->Occured->setDay($day);
         $this->Occured->setMonth($month);
         $this->Occured->setYear($year);
-   
+
         $this->Postnmb = $this->getNextPostnmb($year, $month);
         $this->Attachment = $this->getNextAttachmentNmb($year);
         $this->EditedByPerson = $editByPerson;
@@ -481,7 +481,7 @@ class AccountLine {
 
     function getNewLineData($year, $month) {
         $sql = "select (select max(attachnmb) as m from " . AppConfig::pre() . "line where year=?) as attachnmb,".
-	  		"(select max(postnmb) as m from " . AppConfig::pre() . "line where year=? and month=?) as postnmb,". 
+	  		"(select max(postnmb) as m from " . AppConfig::pre() . "line where year=? and month=?) as postnmb,".
             "(select max(id) from " . AppConfig::pre() . "line) as line,".
        		"(select sum(amount) from " . AppConfig::pre() . "post where debet = '1' and line = (select max(id) from " . AppConfig::pre() . "line) ) as debet,".
             "(select sum(amount) from " . AppConfig::pre() . "post where debet = '-1' and line = (select max(id) from " . AppConfig::pre() . "line) ) as kredit";
@@ -489,7 +489,7 @@ class AccountLine {
         $prep = $this->db->prepare($sql);
         $prep->bind_params("iii", $year, $year, $month);
         $result_array = $prep->execute();
-        
+
         return array_shift($result_array);
     }
 
@@ -529,7 +529,7 @@ class AccountLine {
             } else {
                 $sum -= $post->getAmount();
             }
-             
+
             /* Load edited by names */
             if($post->EditedByPerson > 0) {
                 if(array_key_exists($post->EditedByPerson, $idGivesName)) {
@@ -634,15 +634,20 @@ class AccountLine {
 
     function listUniqeYears() {
         $prep = $this->db->prepare("select distinct year from ". AppConfig::pre() . "line order by year desc");
-         
+
         $res = $prep->execute();
         $data = array();
 
         foreach ($res as $one) {
             $data[] = $one["year"];
         }
-         
+
         return $data;
     }
+
+    public function setId($line) {
+        $this->Id = $line;
+    }
+
 }
 ?>

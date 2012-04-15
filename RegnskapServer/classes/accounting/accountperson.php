@@ -24,7 +24,7 @@ class AccountPerson {
     public $BirthdateRequired;
     public $YearMembershipRequired;
     public $SemesterMembershipRequired;
-    
+
     /* Only for querying - not in result set */
     private $User;
     private $db;
@@ -269,7 +269,7 @@ class AccountPerson {
         $this->Comment = $fields["comment"];
         $this->SemesterMembershipRequired = $fields["semester_membership_required"];
         $this->YearMembershipRequired = $fields["year_membership_required"];
-        
+
         if($fields["birthdate"]) {
             $tmpdate = new eZDate();
             $tmpdate->setMySQLDate($fields["birthdate"]);
@@ -482,6 +482,8 @@ class AccountPerson {
 
             unset($one["hidden"]);
             unset($one["secret"]);
+            unset($one["semester_membership_required"]);
+            unset($one["year_membership_required"]);
 
             if(!$one["employee"] || strlen($one["employee"] == 0)) {
                 $one["employee"] = 0;

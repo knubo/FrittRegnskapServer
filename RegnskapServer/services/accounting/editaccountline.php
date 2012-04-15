@@ -34,44 +34,57 @@ $regnSession->auth();
 $accLine = new AccountLine($db);
 
 if ($day && $month && $year) {
-	$occured = new eZDate($year, $month, $day);
+    $occured = new eZDate($year, $month, $day);
 }
 switch ($action) {
-	case "query" :
-        if($navigate) {
-        	$line = $accLine->findLine($navigate, $line);
+    case "query" :
+        if ($navigate) {
+            $line = $accLine->findLine($navigate, $line);
         }
-		$accLine->read($line);
-		$accLine->fetchAllPosts();
-		echo json_encode($accLine);
-		break;
-	case "insert" :
+        $accLine->read($line);
+        $accLine->fetchAllPosts();
+        echo json_encode($accLine);
+        break;
+    case "posts":
+        $accLine->setId($line);
+        $accLine->fetchAllPosts();
+        echo json_encode($accLine);
+        break;
+    case "update_projects":
         $regnSession->checkWriteAccess();
 
-		if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
-			die("Missing params for insert of accountline.");
-		}
-		$insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
-		$insertAC->store();
+        $accPost = new AccountPost($db);
+        $accPost->updateProject(json_decode($_REQUEST["projects"]));
+        echo json_encode(array("status"=> "1"));
+        break;
+
+    case "insert" :
+        $regnSession->checkWriteAccess();
+
+        if (!$postnmb || !$day || !$desc || !$occured || !$line || !$attachment) {
+            die("Missing params for insert of accountline.");
+        }
+        $insertAC = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
+        $insertAC->store();
 
         $res = array();
-		$res["result"] = $insertAC->getId();
+        $res["result"] = $insertAC->getId();
         echo json_encode($res);
-		break;
+        break;
 
-	case "update" :
+    case "update" :
         $regnSession->checkWriteAccess();
-		if (!$postnmb || !$day ||  !$desc || !$line || !$occured || !$attachment) {
-			die("Missing params for update of accountline.");
-		}
-		$updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
+        if (!$postnmb || !$day || !$desc || !$line || !$occured || !$attachment) {
+            die("Missing params for update of accountline.");
+        }
+        $updateAcc = new AccountLine($db, $postnmb, $attachment, $desc, $day, $line, $occured, $regnSession->getPersonId());
 
         $res = array();
         $res["result"] = $updateAcc->update();
         echo json_encode($res);
-		break;
-	default:
-		die("Missing action");
+        break;
+    default:
+        die("Missing action");
 }
 ?>
 

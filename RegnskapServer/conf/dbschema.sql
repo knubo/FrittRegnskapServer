@@ -173,8 +173,8 @@ create table if not exists XXX_person (
    comment TEXT,
    secretaddress tinyint,
    lastedit TIMESTAMP,
-   year_membership_required tinyinit(1),
-   semester_membership_required tinyint(1),
+   year_membership_required tinyint,
+   semester_membership_required tinyint
 );
 
 create table if not exists XXX_person_backup (
@@ -379,4 +379,19 @@ create table if not exists XXX_event_partisipant (
     group_key varchar(50),
     group_value TEXT,
     gender ENUM('male','female')
+);
+
+create table if not exists XXX_invoice_type (
+  id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  description varchar(255), 
+  invoice_type int,
+  split_type int,
+  reoccurance_interval varchar(10),
+  default_amount NUMERIC(8,2) UNSIGNED,
+  email_subject text,
+  email_body text,
+  email_format varchar(5),
+  email_footer int,
+  email_header int,
+  email_from varchar(255)
 );

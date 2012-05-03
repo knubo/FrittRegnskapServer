@@ -23,5 +23,13 @@ switch($action) {
         break;
     case "all":
         echo json_encode($accInvoice->getAll());
+        break;
+    case "save":
+        $result = array();
+        $result["result"] = $accInvoice->save($_REQUEST);
+
+        echo json_encode($result);
+        break;
+
 }
 ?>

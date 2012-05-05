@@ -30,6 +30,9 @@ switch($action) {
 
         echo json_encode($result);
         break;
+    case "emailtemplate":
+        echo json_encode($accInvoice->getEmailTemplate($_REQUEST[id]));
+        break;
 
 }
 ?>

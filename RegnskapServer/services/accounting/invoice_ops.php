@@ -31,7 +31,10 @@ switch($action) {
         echo json_encode($result);
         break;
     case "emailtemplate":
-        echo json_encode($accInvoice->getEmailTemplate($_REQUEST[id]));
+        echo json_encode($accInvoice->getEmailTemplate($_REQUEST["id"]));
+        break;
+    case "saveEmailTemplate":
+        echo json_encode($accInvoice->saveEmailTemplate(json_decode($_REQUEST["emailTemplate"])));
         break;
 
 }

@@ -5,6 +5,7 @@ include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountinvoice.php");
+include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/auth/RegnSession.php");
 include_once ("../../classes/auth/Master.php");
 include_once ("../../classes/reporting/emailer.php");
@@ -22,7 +23,15 @@ switch($action) {
         echo json_encode(array("status" => 1));
         break;
     case "all":
-        echo json_encode($accInvoice->getAll());
+        $accPrices = new AccountMemberPrice($db);
+
+        $data = array();
+        $data["invoices"] = $accInvoice->getAll();
+        $data["prices"] = $accPrices->getCurrentPrices();
+        echo json_encode($data);
+        break;
+    case "get":
+        echo json_encode($accInvoice->getOne($_REQUEST["id"]));
         break;
     case "save":
         $result = array();

@@ -383,10 +383,10 @@ create table if not exists XXX_event_partisipant (
 
 create table if not exists XXX_invoice_type (
   id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  description varchar(255), 
+  description varchar(255),
   invoice_type int,
   split_type int,
-  reoccurance_interval varchar(10),
+  invoice_due_day int,
   default_amount NUMERIC(8,2) UNSIGNED,
   email_subject text,
   email_body text,

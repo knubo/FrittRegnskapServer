@@ -34,44 +34,39 @@ if(count($res) == 0) {
 
 $installer->validate($_REQUEST);
 
+$domainname = strtolower($domainname);
+
 $dbprefix = $installer->createUniquePrefix($domainname);
 
 if(!$dbprefix) {
     die("Failed to calculate DB-prefix");
 }
 
-/* The installer should from this point on work on the database hashed by the host name. */
-$dbUser = new DB(0, DB::dbhash($domainname));
-$installer = new Installer($dbUser);
-
-$installer->createTables($dbprefix);
-$installer->createIndexes($dbprefix);
-$installer->addAccountPlan($dbprefix);
-$installer->addStandardData($dbprefix);
-
-$domainname = strtolower($domainname);
-
 try {
     $db->begin();
-    $dbUser->begin();
-    
+
     $prep = $db->prepare("insert into installations (wikilogin, diskquota, description, hostprefix, dbprefix) values (?,?,?,?,?)");
     $prep->bind_params("sisss", $wikilogin, 5, $clubname, $domainname, $dbprefix."_");
     $prep->execute();
 
-    $prep = $db->prepare("insert into master_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
-    $prep->bind_params("sssssss", "Klubb:$clubname", $contact, $email, $address, $zipcode, $city, $phone);
-    $prep->execute();
-
-    $prep = $dbUser->prepare("insert into ".$dbprefix."_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
-    $prep->bind_params("sssssss", "Superbruker", $contact, $email, $address, $zipcode, $city, $phone);
-    $prep->execute();
-
-    $user = new User(0);
+    $installId = $db->insert_id();
     $crypted = crypt($password, $user->makesalt());
-    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required, see_secret) values (?,?,1,0,0,0, 1)");
-    $prep->bind_params("ss", $superuser, $crypted);
-    $prep->execute();
+    $prep = $db->prepare("insert into install_info (id, username, password, clubname, contact, firstname, lastname, email, address, postnmb, city,phone) values (?,?,?,?,?,?,?,?,?,?,?)");
+
+
+//    $prep = $db->prepare("insert into master_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
+//    $prep->bind_params("sssssss", "Klubb:$clubname", $contact, $email, $address, $zipcode, $city, $phone);
+//    $prep->execute();
+//
+//    $prep = $dbUser->prepare("insert into ".$dbprefix."_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
+//    $prep->bind_params("sssssss", "Superbruker", $contact, $email, $address, $zipcode, $city, $phone);
+//    $prep->execute();
+//
+//    $user = new User(0);
+//    $crypted = crypt($password, $user->makesalt());
+//    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required, see_secret) values (?,?,1,0,0,0, 1)");
+//    $prep->bind_params("ss", $superuser, $crypted);
+//    $prep->execute();
 
     $installer->sendEmailRequestDomain($wikilogin, $address, $email, $contact, $clubname, $domainname);
 
@@ -84,7 +79,7 @@ try {
 } catch(Exception $e) {
     $db->rollback();
     $dbUser->rollback();
-    
+
     $prep = $db->prepare("delete from to_install where secret = ? and wikilogin = ?");
     $prep->bind_params("ss", $secret, $wikilogin);
     $prep->execute();

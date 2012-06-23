@@ -24,10 +24,12 @@ switch($action) {
         break;
     case "all":
         $accPrices = new AccountMemberPrice($db);
+        $accStd = new AccountStandard($db);
 
         $data = array();
         $data["invoices"] = $accInvoice->getAll();
         $data["prices"] = $accPrices->getCurrentPrices();
+        $data["month"] = $accStd->getOneValue(AccountStandard::CONST_MONTH);
         echo json_encode($data);
         break;
     case "get":

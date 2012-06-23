@@ -18,6 +18,21 @@ create table if not exists installations (
     integration varchar(80),
     );
 
+create table if not exists install_info (
+    id INTEGER(6) UNSIGNED PRIMARY KEY,
+    username varchar(25),
+    password varchar(15),
+    clubname varchar(80),
+    contact varchar(80),
+    firstname varchar(50),
+    lastname varchar(50),
+    email varchar(100),
+    address varchar(80),
+    postnmb varchar(4),
+    city varchar(20),
+    phone varchar(13),
+    completed tinyint default false
+);
 
 create table if not exists change_request (
   id INTEGER(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,

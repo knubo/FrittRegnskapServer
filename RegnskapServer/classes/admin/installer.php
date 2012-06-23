@@ -158,9 +158,11 @@ class Installer {
 
         $res = $prep->execute();
 
-        if (count($res)) {
+        if (count($res) || $this->badDomainName($_REQUEST["domainname"])) {
             $bad[] = "domainname";
         }
+
+
 
         if (count($bad) > 0) {
             header("HTTP/1.0 513 Validation Error");
@@ -168,6 +170,10 @@ class Installer {
             die(json_encode($bad));
         }
 
+    }
+
+    private function badDomainName($domainname) {
+        return !preg_match('/[^A-Za-z]/', $domainname);
     }
 
 }

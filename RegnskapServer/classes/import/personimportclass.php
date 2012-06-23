@@ -55,6 +55,16 @@ class PersonImportClass {
             return "###ERROR###";
         }
 
+        if($field == "membership_required_year" && value != 1 && value != 0) {
+            $this->errorCount++;
+            return "###ERROR###";
+        }
+
+        if($field == "membership_required_semester" && value != 1 && value != 0) {
+            $this->errorCount++;
+            return "###ERROR###";
+        }
+
         return $value;
     }
 

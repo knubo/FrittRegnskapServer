@@ -38,6 +38,14 @@ if ($regnSession->getPrefix() != "master_") {
 $master = new Master($db);
 
 switch ($action) {
+    case "install_details":
+        $data = $master->getInstallDetails($id);
+        echo json_encode($data);
+        break;
+    case "update_info":
+        $master->updateInstallDetail($id, json_decode($_REQUEST["data"]));
+        echo json_encode(array("status"=> 1));
+        break;
     case "adminlogin":
         $secret = $master->updateSecret($id);
         $one = $master->getOneInstallation($id);

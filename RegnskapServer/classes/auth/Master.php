@@ -10,7 +10,7 @@
     }
 
     function getOneInstallation($id) {
-        $prep = $this->db->prepare("select * from installations where id = ?");
+        $prep = $this->db->prepare("select *,(select completed from install_info II where II.id =I.id) as completed from installations I where id = ?");
         $prep->bind_params("i", $id);
 
 
@@ -25,7 +25,7 @@
     }
 
     function getAllInstallations($sort = "") {
-        $prep = $this->db->prepare("select *, (select count(*) FROM change_request where installation_id = I.id) as cr from installations I $sort");
+        $prep = $this->db->prepare("select *, (select count(*) FROM change_request where installation_id = I.id) as cr, (select completed from install_info II where II.id =I.id) as completed from installations I $sort");
 
         return $prep->execute();
     }
@@ -308,7 +308,7 @@
 
     function sendPortalLetter($id) {
 
-        $data = $this->getOneInstallation($id);
+        //$data = $this->getOneInstallation($id);
         $prep = $this->db->prepare("select dbprefix,hostprefix from installations where id = ?");
         $prep->bind_params("i", $id);
 
@@ -404,6 +404,19 @@
         $prep->execute();
 
         return $secret;
+    }
+
+    public function getInstallDetails($id) {
+        $prep = $this->db->prepare("select * from install_info where id = ?");
+        $prep->bind_params("i", $id);
+
+        return array_shift($prep->execute());
+    }
+
+    public function updateInstallDetail($id, $data) {
+        $prep = $this->db->prepare("update install_info set username=?, password=?, clubname=?, contact=?, firstname=?, lastname=?, email=?, address=?, postnmb=?, city=?,phone=? where id = ?");
+        $prep->bind_params("sssssssssssi",  $data->username, $data->password, $data->clubname, $data->contact, $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city,$data->phone, $id);
+        $prep->execute();
     }
 
 

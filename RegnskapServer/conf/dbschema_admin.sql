@@ -24,8 +24,6 @@ create table if not exists install_info (
     password varchar(15),
     clubname varchar(80),
     contact varchar(80),
-    firstname varchar(50),
-    lastname varchar(50),
     email varchar(100),
     address varchar(80),
     postnmb varchar(4),

@@ -6,7 +6,11 @@ class Installer {
 
 
     function Installer($db) {
+        if (!$db) {
+            $db = new DB();
+        }
         $this->db = $db;
+
     }
 
     function dropTables($prefix) {
@@ -31,7 +35,7 @@ class Installer {
     public function createBackupTables($prefix) {
         $dbschema = Strings::file_get_contents_utf8("../../conf/dbschema.sql");
 
-        $dbschema = preg_replace("/XXX_(.+?)\s*\(/", "XXX_$1_backup (",$dbschema);
+        $dbschema = preg_replace("/XXX_(.+?)\s*\(/", "XXX_$1_backup (", $dbschema);
 
         $this->execute($dbschema, $prefix);
     }
@@ -158,22 +162,61 @@ class Installer {
 
         $res = $prep->execute();
 
-        if (count($res) || $this->badDomainName($_REQUEST["domainname"])) {
+        if (count($res)) {
             $bad[] = "domainname";
         }
 
 
-
         if (count($bad) > 0) {
             header("HTTP/1.0 513 Validation Error");
-
             die(json_encode($bad));
         }
 
     }
 
-    private function badDomainName($domainname) {
-        return !preg_match('/[^A-Za-z]/', $domainname);
+    public function completeInstall($id) {
+        $prep = $this->db->prepare("select * from installations I,install_info II where I.id = ? and I.id = II.id");
+        $prep->bind_params("i", $id);
+        $data = array_shift($prep->execute());
+
+        $domainname = $data["hostprefix"];
+        $dbprefix = $data["dbprefix"];
+        $clubname = $data["clubname"];
+        $superuser = $data["username"];
+        $contact = $data["contact"];
+        $email = $data["email"];
+        $address = $data["address"];
+        $zipcode = $data["postnmb"];
+        $city = $data["city"];
+        $phone = $data["phone"];
+        $password = $data["password"];
+        $db = $this->db;
+
+        $dbUser = new DB(0, DB::dbhash($domainname));
+        $installer = new Installer($dbUser);
+
+        $installer->createTables($dbprefix);
+        $installer->createIndexes($dbprefix);
+        $installer->addAccountPlan($dbprefix);
+        $installer->addStandardData($dbprefix);
+
+
+        $prep = $db->prepare("insert into master_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
+        $prep->bind_params("sssssss", "Klubb:$clubname", $contact, $email, $address, $zipcode, $city, $phone);
+        $prep->execute();
+
+        $prep = $dbUser->prepare("insert into " . $dbprefix . "_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
+        $prep->bind_params("sssssss", "Superbruker", $contact, $email, $address, $zipcode, $city, $phone);
+        $prep->execute();
+
+        $prep = $dbUser->prepare("insert into " . $dbprefix . "_user (username, pass, person, readonly, reducedwrite, project_required, see_secret) values (?,?,1,0,0,0, 1)");
+        $prep->bind_params("ss", $superuser, $password);
+        $prep->execute();
+
+        $prep = $db->prepare("update install_info set completed = 1 where id = ?");
+        $prep->bind_params("i",$id);
+        $prep->execute();
+
     }
 
 }

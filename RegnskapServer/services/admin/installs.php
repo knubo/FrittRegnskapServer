@@ -46,6 +46,15 @@ switch ($action) {
         $master->updateInstallDetail($id, json_decode($_REQUEST["data"]));
         echo json_encode(array("status"=> 1));
         break;
+
+    case "complete_install":
+        $master->updateInstallDetail($id, json_decode($_REQUEST["data"]));
+
+        $installer = new Installer($db);
+        $installer->completeInstall($id);
+        echo json_encode(array("status"=> 1));
+        break;
+
     case "adminlogin":
         $secret = $master->updateSecret($id);
         $one = $master->getOneInstallation($id);
@@ -70,7 +79,7 @@ switch ($action) {
         echo json_encode(array("result" => $res));
         break;
     case "list":
-        $installs = $master->getAllInstallations();
+        $installs = $master->getAllInstallations("order by id");
 
         foreach ($installs as &$one) {
             $dbinfo = AppConfig::db(DB::dbhash($one["hostprefix"]));

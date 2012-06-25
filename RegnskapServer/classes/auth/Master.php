@@ -24,6 +24,9 @@
         return $insObj;
     }
 
+
+
+
     function getAllInstallations($sort = "") {
         $prep = $this->db->prepare("select *, (select count(*) FROM change_request where installation_id = I.id) as cr, (select completed from install_info II where II.id =I.id) as completed from installations I $sort");
 
@@ -414,8 +417,8 @@
     }
 
     public function updateInstallDetail($id, $data) {
-        $prep = $this->db->prepare("update install_info set username=?, password=?, clubname=?, contact=?, firstname=?, lastname=?, email=?, address=?, postnmb=?, city=?,phone=? where id = ?");
-        $prep->bind_params("sssssssssssi",  $data->username, $data->password, $data->clubname, $data->contact, $data->firstname, $data->lastname, $data->email, $data->address, $data->postnmb, $data->city,$data->phone, $id);
+        $prep = $this->db->prepare("update install_info set username=?, password=?, clubname=?, contact=?, email=?, address=?, postnmb=?, city=?,phone=? where id = ?");
+        $prep->bind_params("sssssssssi",  $data->username, $data->password, $data->clubname, $data->contact, $data->email, $data->address, $data->postnmb, $data->city,$data->phone, $id);
         $prep->execute();
     }
 

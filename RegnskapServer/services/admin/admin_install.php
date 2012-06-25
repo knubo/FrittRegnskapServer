@@ -50,23 +50,12 @@ try {
     $prep->execute();
 
     $installId = $db->insert_id();
+
+    $user = new User(0);
     $crypted = crypt($password, $user->makesalt());
-    $prep = $db->prepare("insert into install_info (id, username, password, clubname, contact, firstname, lastname, email, address, postnmb, city,phone) values (?,?,?,?,?,?,?,?,?,?,?)");
-
-
-//    $prep = $db->prepare("insert into master_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
-//    $prep->bind_params("sssssss", "Klubb:$clubname", $contact, $email, $address, $zipcode, $city, $phone);
-//    $prep->execute();
-//
-//    $prep = $dbUser->prepare("insert into ".$dbprefix."_person  (firstname, lastname, email, address,postnmb, city,phone) values (?,?,?,?,?,?,?)");
-//    $prep->bind_params("sssssss", "Superbruker", $contact, $email, $address, $zipcode, $city, $phone);
-//    $prep->execute();
-//
-//    $user = new User(0);
-//    $crypted = crypt($password, $user->makesalt());
-//    $prep = $dbUser->prepare("insert into ".$dbprefix."_user (username, pass, person, readonly, reducedwrite, project_required, see_secret) values (?,?,1,0,0,0, 1)");
-//    $prep->bind_params("ss", $superuser, $crypted);
-//    $prep->execute();
+    $prep = $db->prepare("insert into install_info (id, username, password, clubname, contact, email, address, postnmb, city,phone) values (?,?,?,?,?,?,?,?,?,?)");
+    $prep->bind_params("isssssssss", $installId, $superuser, $crypted, $clubname, $contact, $email, $address, $zipcode, $city, $phone);
+    $prep->execute();
 
     $installer->sendEmailRequestDomain($wikilogin, $address, $email, $contact, $clubname, $domainname);
 
@@ -74,11 +63,9 @@ try {
     $prep->bind_params("ss", $secret, $wikilogin);
     $prep->execute();
 
-    $dbUser->commit();
     $db->commit();
 } catch(Exception $e) {
     $db->rollback();
-    $dbUser->rollback();
 
     $prep = $db->prepare("delete from to_install where secret = ? and wikilogin = ?");
     $prep->bind_params("ss", $secret, $wikilogin);

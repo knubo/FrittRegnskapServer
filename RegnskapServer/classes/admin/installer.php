@@ -195,6 +195,8 @@ class Installer {
         $dbUser = new DB(0, DB::dbhash($domainname));
         $installer = new Installer($dbUser);
 
+        $dbprefix = substr($dbprefix, 0, -1);
+
         $installer->createTables($dbprefix);
         $installer->createIndexes($dbprefix);
         $installer->addAccountPlan($dbprefix);

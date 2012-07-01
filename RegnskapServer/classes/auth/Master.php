@@ -34,11 +34,29 @@
     }
 
     function updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode, $parenthostprefix) {
+        $prep = $this->db->prepare("select hostprefix from installations where id = ?");
+        $prep->bind_params("i", $id);
+        $data = array_shift($prep->execute());
+        $existingHostPrefix = $data["hostprefix"];
+
         $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=?,wikilogin=?, portal_status=?,portal_title=?, archive_limit=?, parentdbprefix=?, reduced_mode=?, parenthostprefix=? where id = ?");
         $prep->bind_params("sisssisisisi", $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode, $parenthostprefix, $id);
         $prep->execute();
 
-        return $this->db->affected_rows();
+        $updated = $this->db->affected_rows();
+
+
+        if(strcmp($existingHostPrefix, $hostprefix) != -1) {
+            $installer = new Installer($this->db);
+            $dbprefix = $installer->createUniquePrefix($hostprefix);
+
+            $prep = $this->db->prepare("update installations set dbprefix = ? where id = ?");
+            $prep->bind_params("si", $dbprefix."_", $id);
+            $prep->execute();
+            return 1;
+        }
+
+        return $updated;
 
     }
 

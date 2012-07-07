@@ -29,7 +29,10 @@ switch($action) {
         $data = array();
         $data["invoices"] = $accInvoice->getAll();
         $data["prices"] = $accPrices->getCurrentPrices();
-        $data["month"] = $accStd->getOneValue(AccountStandard::CONST_MONTH);
+
+        $std = $accStd->getValues(array(AccountStandard::CONST_MONTH, AccountStandard::CONST_YEAR));
+        $data["month"] = $std[AccountStandard::CONST_MONTH];
+        $data["year"] = $std[AccountStandard::CONST_YEAR];
         echo json_encode($data);
         break;
     case "get":

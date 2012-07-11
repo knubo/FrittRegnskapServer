@@ -121,9 +121,9 @@ class AccountSemesterMembership {
 
     function getFirstSemester($default) {
         $prep = $this->db->prepare("select min(C.semester) as c, min(T.semester) as t, min(Y.semester) as y from " .
-                                   AppConfig::pre() . $this->course() . "_membership C," .
-                                   AppConfig::pre() . $this->train() . "_membership T," .
-                                   AppConfig::pre() . $this->youth() . "_membership Y");
+                AppConfig::pre() . $this->course() . "_membership C," .
+                AppConfig::pre() . $this->train() . "_membership T," .
+                AppConfig::pre() . $this->youth() . "_membership Y");
         $res = $prep->execute();
 
         foreach ($res as $one) {
@@ -165,26 +165,46 @@ class AccountSemesterMembership {
     }
 
     public function getAllSemestersWithYears() {
-        $prep = $this->db->prepare("select * from ". AppConfig::pre() ."semester where semester IN (" .
-                                   "select semester from ". AppConfig::pre() ."train_membership union " .
-                                   "select semester from ". AppConfig::pre() ."youth_membership union " .
-                                   "select semester from ". AppConfig::pre() ."course_membership course_membership) ".
-                                   "or year in (select year from ". AppConfig::pre() ."year_membership) order by year, fall");
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "semester where semester IN (" .
+                "select semester from " . AppConfig::pre() . "train_membership union " .
+                "select semester from " . AppConfig::pre() . "youth_membership union " .
+                "select semester from " . AppConfig::pre() . "course_membership course_membership) " .
+                "or year in (select year from " . AppConfig::pre() . "year_membership) order by year, fall");
 
 
         return $prep->execute();
     }
 
     public function missingMemberships($semester) {
-        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "person P where semester_membership_required = 1 ".
-           "and P.id not in ".
-           "(select memberid from " . AppConfig::pre() . "course_membership M where M.semester = ? union all ".
-            "select memberid from " . AppConfig::pre() . "train_membership M where M.semester = ? union all ".
-            "select memberid from " . AppConfig::pre() . "youth_membership M where M.semester = ? ".
-           ")");
+        $prep = $this->db->prepare("select id,firstname,lastname from " . AppConfig::pre() . "person P where semester_membership_required = 1 " .
+                "and P.id not in " .
+                "(select memberid from " . AppConfig::pre() . "course_membership M where M.semester = ? union all " .
+                "select memberid from " . AppConfig::pre() . "train_membership M where M.semester = ? union all " .
+                "select memberid from " . AppConfig::pre() . "youth_membership M where M.semester = ? " .
+                ")");
 
-        $prep->bind_params("iii", $semester,$semester,$semester);
+        $prep->bind_params("iii", $semester, $semester, $semester);
         return $prep->execute();
+    }
+
+    public function missingMembershipsComparedToPrevious($semester) {
+
+        $sql = "select ID, firstname, lastname from " . AppConfig::pre() . "person where id IN(" .
+                " select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "course_membership M " .
+                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
+                " M.semester = RP.semester union all " .
+                "select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "train_membership M " .
+                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
+                " M.semester = RP.semester union all " .
+                " select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "youth_membership M " .
+                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
+                " M.semester = RP.semester)";
+
+        $prep = $this->db->prepare($sql);
+        $prep->bind_params("iii", $semester, $semester,  $semester);
+
+        return $prep->execute();
+
     }
 }
 

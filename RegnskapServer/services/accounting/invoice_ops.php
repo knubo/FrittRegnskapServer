@@ -4,6 +4,8 @@ include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/accounting/accountstandard.php");
+include_once ("../../classes/accounting/accountyearmembership.php");
+include_once ("../../classes/accounting/accountsemestermembership.php");
 include_once ("../../classes/accounting/accountinvoice.php");
 include_once ("../../classes/accounting/accountmemberprice.php");
 include_once ("../../classes/auth/RegnSession.php");
@@ -18,7 +20,7 @@ $currentUser = $regnSession->auth();
 
 $accInvoice = new AccountInvoice($db);
 
-switch($action) {
+switch ($action) {
     case "keepalive":
         echo json_encode(array("status" => 1));
         break;
@@ -50,6 +52,44 @@ switch($action) {
     case "saveEmailTemplate":
         echo json_encode($accInvoice->saveEmailTemplate(json_decode($_REQUEST["emailTemplate"])));
         break;
+
+    case "members_must_have_year":
+        $accStd = new AccountStandard($db);
+        $year = $accStd->getOneValue(AccountStandard::CONST_YEAR);
+
+        $accYear = new AccountyearMembership($db);
+        $data = $accYear->missingMemberships($year);
+
+        echo json_encode($data);
+        break;
+    case "members_must_have_semester":
+        $accStd = new AccountStandard($db);
+        $semester = $accStd->getOneValue(AccountStandard::CONST_SEMESTER);
+
+        $accSemester = new AccountSemesterMembership($db);
+        $data = $accSemester->missingMemberships($semester);
+
+        echo json_encode($data);
+        break;
+    case "members_previous_year":
+        $accStd = new AccountStandard($db);
+        $year = $accStd->getOneValue(AccountStandard::CONST_YEAR);
+
+        $accYear = new AccountyearMembership($db);
+        $data = $accYear->missingMembershipsComparedToPrevious($year);
+
+        echo json_encode($data);
+        break;
+    case "members_previous_semester":
+        $accStd = new AccountStandard($db);
+        $semester = $accStd->getOneValue(AccountStandard::CONST_SEMESTER);
+
+        $accSemester = new AccountSemesterMembership($db);
+        $data = $accSemester->missingMembershipsComparedToPrevious($semester);
+
+        echo json_encode($data);
+        break;
+
 
 }
 ?>

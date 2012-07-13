@@ -179,10 +179,12 @@ class AccountyearMembership {
 
     public function missingMembershipsComparedToPrevious($year) {
         $sql = "select id, firstname, lastname from regn_person where id in (".
-          " select memberid from regn_year_membership M where M.year = ?)";
+          " select memberid from regn_year_membership M where M.year = ?)".
+          " and id not in (".
+                "select memberid from regn_year_membership M where M.year = ?)";
 
         $prep = $this->db->prepare($sql);
-        $prep->bind_params("i", $year - 1);
+        $prep->bind_params("ii", $year - 1, $year);
 
         return $prep->execute();
 

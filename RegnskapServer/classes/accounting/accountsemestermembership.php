@@ -189,19 +189,33 @@ class AccountSemesterMembership {
 
     public function missingMembershipsComparedToPrevious($semester) {
 
-        $sql = "select ID, firstname, lastname from " . AppConfig::pre() . "person where id IN(" .
-                " select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "course_membership M " .
-                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
-                " M.semester = RP.semester union all " .
-                "select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "train_membership M " .
-                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
-                " M.semester = RP.semester union all " .
-                " select M.memberid from " . AppConfig::pre() . "semester RN, " . AppConfig::pre() . "semester RP, " . AppConfig::pre() . "youth_membership M " .
-                " where RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) and " .
-                " M.semester = RP.semester)";
+        $sql = "select ID, firstname, lastname from regn_person, regn_semester RN, regn_semester RP where ".
+          " RN.semester = ? and RP.fall = if (RN.fall = 1, 0, 1) and RP.year = if(RN.fall = 1, RN.year, RN.year-1) ".
+        " and id IN ( ".
+        " select M.memberid from regn_course_membership M ".
+        " where ".
+        " M.semester = RP.semester union all ".
+        " select M.memberid from regn_train_membership M ".
+        " where ".
+        " M.semester = RP.semester union all ".
+        " select M.memberid from regn_youth_membership M ".
+        " where ".
+        " M.semester = RP.semester ".
+        " ) ".
+        " and id not in ( ".
+        " select M.memberid from regn_course_membership M ".
+        "   where ".
+        "    M.semester = ? union all ".
+        " select M.memberid from regn_train_membership M ".
+        "    where ".
+        "    M.semester = ? union all ".
+        " select M.memberid from regn_youth_membership M ".
+        "    where ".
+        "    M.semester = ? ".
+        ")";
 
         $prep = $this->db->prepare($sql);
-        $prep->bind_params("iii", $semester, $semester,  $semester);
+        $prep->bind_params("iiii", $semester, $semester,  $semester, $semester);
 
         return $prep->execute();
 

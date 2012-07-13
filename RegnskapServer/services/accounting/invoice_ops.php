@@ -90,6 +90,9 @@ switch ($action) {
         echo json_encode($data);
         break;
 
+    case "create_invoices":
+
+        break;
 
 }
 ?>

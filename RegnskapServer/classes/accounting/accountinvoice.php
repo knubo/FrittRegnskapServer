@@ -50,12 +50,43 @@ class AccountInvoice {
     }
 
     public function getOne($id) {
-        $prep = $this->db->prepare("select invoice_type, split_type, invoice_due_day, default_amount from " . AppConfig::pre() . "invoice_type where id = ?");
+        $prep = $this->db->prepare("select id, invoice_type, split_type, invoice_due_day, default_amount from " . AppConfig::pre() . "invoice_type where id = ?");
         $prep->bind_params("i", $id);
 
         $data = array_shift($prep->execute());
 
         return $data;
+    }
+
+    public function create_invoices($userId, $invoices, $receivers, $invoiceType) {
+        $prep = $this->db->prepare("insert into  " . AppConfig::pre() . "invoice_top (created_by_person, created_date,invoice_type) values (?, now(),?)");
+        $prep->bind_params("ii", $userId, $invoiceType);
+        $prep->execute();
+        $invoiceTopId = $this->db->insert_id();
+
+        $ezDate = new eZDate();
+
+        $prep = $this->db->prepare("insert into  " . AppConfig::pre() . "invoice (invoice_top, amount, due_date) values (?,?,?)");
+        $prepRec = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_recepiant (person_id, invoice_status, invoice_id , changed_by_person_id) values (?,?,?,?)");
+
+        foreach($invoices as $invoice) {
+            $ezDate->setTimeStamp($invoice->date / 1000);
+            $prep->bind_params("ids", $invoiceTopId, Strings::money($invoice->amount), $ezDate->mySQLDate());
+            $prep->execute();
+
+            $invoiceId = $this->db->insert_id();
+
+            foreach($receivers as $receiver) {
+                $prepRec->bind_params("iiii", $receiver->id, 1, $invoiceId, $userId);
+                $prepRec->execute();
+            }
+        }
+
+    }
+
+    public function invoicesNotSent() {
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "invoice where id in (select invoice_id from " . AppConfig::pre() . "invoice_recepiant where invoice_status = 1)");
+        return $prep->execute();
     }
 
 }

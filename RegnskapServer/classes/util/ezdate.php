@@ -106,7 +106,7 @@ class eZDate
         if($this->Day < 10) {
             return "0".$this->Day;
         }
-        
+
         return $this->Day;
     }
 
@@ -147,7 +147,7 @@ class eZDate
         } else {
             print("Expected dd.mm.yyyy got $value.");
         }
-         
+
     }
 
     /*!
@@ -592,8 +592,6 @@ class eZDate
     private $Year;
     private $Month;
     private $Day;
-
-
 }
 
 

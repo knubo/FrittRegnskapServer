@@ -3,6 +3,7 @@
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
 include_once ("../../classes/util/DB.php");
+include_once ("../../classes/util/strings.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
@@ -90,8 +91,16 @@ switch ($action) {
         echo json_encode($data);
         break;
 
-    case "create_invoices":
+    case "invoices_not_sent":
+        echo json_encode($accInvoice->invoicesNotSent());
+        break;
 
+    case "create_invoices":
+        $userId = $regnSession->getPersonId();
+        $accInvoice->create_invoices($userId, json_decode($_REQUEST["invoices"]),
+                                     json_decode($_REQUEST["receivers"]), $_REQUEST["invoice_type"]);
+
+        echo json_encode(array("status" => 1));
         break;
 
 }

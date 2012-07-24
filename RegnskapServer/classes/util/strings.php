@@ -39,5 +39,9 @@ class Strings {
         return $secret;
     }
 
+    public static function money($clientMoney) {
+        return preg_replace("/,/", "", $clientMoney);
+    }
+
 }
 ?>

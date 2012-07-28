@@ -69,14 +69,14 @@ class AccountInvoice {
         $prep = $this->db->prepare("insert into  " . AppConfig::pre() . "invoice (invoice_top, amount, due_date) values (?,?,?)");
         $prepRec = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_recepiant (person_id, invoice_status, invoice_id , changed_by_person_id) values (?,?,?,?)");
 
-        foreach($invoices as $invoice) {
+        foreach ($invoices as $invoice) {
             $ezDate->setTimeStamp($invoice->date / 1000);
             $prep->bind_params("ids", $invoiceTopId, Strings::money($invoice->amount), $ezDate->mySQLDate());
             $prep->execute();
 
             $invoiceId = $this->db->insert_id();
 
-            foreach($receivers as $receiver) {
+            foreach ($receivers as $receiver) {
                 $prepRec->bind_params("iiii", $receiver->id, 1, $invoiceId, $userId);
                 $prepRec->execute();
             }
@@ -89,9 +89,24 @@ class AccountInvoice {
         return $prep->execute();
     }
 
-    public function invoices() {
-        $prep = $this->db->prepare("select TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY ".
-          " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id order by due_date limit 201");
+    public function invoices($invoice, $dueDate) {
+
+        if ($invoice) {
+            $prep = $this->db->prepare("select TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY " .
+                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and R.invoice_id = ? order by due_date limit 201");
+            $prep->bind_params("i", $invoice);
+
+        } else if ($dueDate) {
+            $ezDate = new eZDate();
+            $ezDate->setDate($dueDate);
+
+            $prep = $this->db->prepare("select TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY " .
+                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and due_date < ? order by due_date limit 201");
+            $prep->bind_params("s", $ezDate->mySQLDate());
+        } else {
+            $prep = $this->db->prepare("select TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY " .
+                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id order by due_date limit 201");
+        }
         return $prep->execute();
     }
 

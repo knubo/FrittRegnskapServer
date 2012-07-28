@@ -104,7 +104,7 @@ switch ($action) {
         break;
 
     case "invoices":
-        echo json_encode($accInvoice->invoices());
+        echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
         break;
 
 }

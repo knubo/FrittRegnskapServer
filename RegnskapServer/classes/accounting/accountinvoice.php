@@ -89,6 +89,12 @@ class AccountInvoice {
         return $prep->execute();
     }
 
+    public function invoices() {
+        $prep = $this->db->prepare("select TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY ".
+          " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id order by due_date limit 201");
+        return $prep->execute();
+    }
+
 }
 
 ?>

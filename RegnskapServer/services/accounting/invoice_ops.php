@@ -103,5 +103,9 @@ switch ($action) {
         echo json_encode(array("status" => 1));
         break;
 
+    case "invoices":
+        echo json_encode($accInvoice->invoices());
+        break;
+
 }
 ?>

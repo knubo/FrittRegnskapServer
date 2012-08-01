@@ -29,6 +29,7 @@ class BackupDB {
             $tables[] = "sqllist";
             $tables[] = "to_install";
             $tables[] = "installations";
+            $tables[] = "install_info";
         }
 
         return $tables;

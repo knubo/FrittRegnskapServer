@@ -106,12 +106,6 @@ switch ($action) {
         $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
         $body = $emailContent->replaceCommonVariables($body);
 
-        if($invoice) {
-            $body = $emailContent->replaceInvoiceVariables($body, $invoice);
-        }
-
-
-
         $html = 0;
         if ($format == "HTML") {
             $html = $body;
@@ -168,7 +162,7 @@ switch ($action) {
             $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
 
             if($status) {
-                $prep = $db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = 2 where id = ?");
+                $prep = $db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = 2, sent_date = now() where id = ?");
                 $prep->bind_params("i", $invoice);
                 $prep->execute();
 

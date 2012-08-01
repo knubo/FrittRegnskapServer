@@ -33,12 +33,11 @@ class AccountInvoice {
     }
 
     public function getEmailTemplate($id) {
-        $prep = $this->db->prepare("select email_subject,email_body,email_header, email_footer, email_format from  " . AppConfig::pre() . "invoice_type where id = ?");
+        $prep = $this->db->prepare("select email_subject,email_body,email_header, email_footer, email_format,(case when char_length(email_subject) > 5 and char_length(email_body) > 15 then 'true' else 'false' end) as emailOK from  " . AppConfig::pre() . "invoice_type where id = ?");
         $prep->bind_params("i", $id);
         $res = $prep->execute();
 
         return array_shift($res);
-
     }
 
     public function saveEmailTemplate($emailTemplate) {

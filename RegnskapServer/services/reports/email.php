@@ -30,6 +30,7 @@ $footer = array_key_exists("footer", $_REQUEST) ? $_REQUEST["footer"] : 0;
 $personid = array_key_exists("personid", $_REQUEST) ? $_REQUEST["personid"] : 0;
 $emailSettings = array_key_exists("emailSettings", $_REQUEST) ? $_REQUEST["emailSettings"] : 0;
 $id = array_key_exists("id", $_REQUEST) ? $_REQUEST["id"] : 0;
+$invoice = array_key_exists("invoice", $_REQUEST) ? $_REQUEST["invoice"] : 0;
 
 $db = new DB();
 $regnSession = new RegnSession($db);
@@ -38,6 +39,10 @@ $currentUser = $regnSession->auth();
 $_REQUEST["username"] = $currentUser;
 
 $standard = new AccountStandard($db);
+
+if($invoice) {
+
+}
 
 switch ($action) {
     case "list" :
@@ -101,6 +106,12 @@ switch ($action) {
         $body = $emailContent->fillInUnsubscribeURL($body, $secret, $personid);
         $body = $emailContent->replaceCommonVariables($body);
 
+        if($invoice) {
+            $body = $emailContent->replaceInvoiceVariables($body, $invoice);
+        }
+
+
+
         $html = 0;
         if ($format == "HTML") {
             $html = $body;
@@ -155,6 +166,15 @@ switch ($action) {
                 }
 
             $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
+
+            if($status) {
+                $prep = $db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = 2 where id = ?");
+                $prep->bind_params("i", $invoice);
+                $prep->execute();
+
+                $status = $db->affected_rows() == 1;
+            }
+
         } else {
             $status = true;
         }

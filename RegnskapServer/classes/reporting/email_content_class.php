@@ -17,7 +17,7 @@ class EmailContent {
 
     function save($id, $name, $text, $header) {
         $res = 0;
-        if($id) {
+        if ($id) {
             $prep = $this->db->prepare("update " . AppConfig::pre() . "email_content set name = ?, content=? where id = ?");
             $prep->bind_params("ssi", $name, $text, $id);
             $prep->execute();
@@ -38,8 +38,8 @@ class EmailContent {
         $headers = array();
         $footers = array();
 
-        foreach($data as $one) {
-            if($one["header"]) {
+        foreach ($data as $one) {
+            if ($one["header"]) {
                 $headers[] = $one;
             } else {
                 $footers[] = $one;
@@ -50,20 +50,20 @@ class EmailContent {
     }
 
     function attachFooterHeader($body, $footer, $header) {
-        if($header) {
+        if ($header) {
             $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
             $prep->bind_params("i", $header);
             $res = $prep->execute();
 
-            $body = $res[0]["content"].$body;
+            $body = $res[0]["content"] . $body;
         }
 
-        if($footer) {
+        if ($footer) {
             $prep = $this->db->prepare("select content from " . AppConfig::pre() . "email_content where id = ?");
             $prep->bind_params("i", $footer);
             $res = $prep->execute();
 
-            $body = $body.$res[0]["content"];
+            $body = $body . $res[0]["content"];
         }
 
         return $body;
@@ -86,24 +86,24 @@ class EmailContent {
         reset($lines);
 
         $res = "";
-        foreach($lines as $one) {
-            if(strncasecmp("h1.", $one, 3) == 0) {
-                $res.="<h1>".trim(substr($one, 3))."</h1>\n";
-            } else if(strncasecmp("h2.", $one, 3) == 0) {
-                $res.="<h2>".trim(substr($one, 3))."</h2>\n";
-            } else if(strncasecmp("h3.", $one, 3) == 0) {
-                $res.="<h3>".trim(substr($one, 3))."</h3>\n";
-            } else if(strncasecmp("h4.", $one, 3) == 0) {
-                $res.="<h4>".trim(substr($one, 3))."</h4>\n";
-            } else if(strncasecmp("hr.", $one, 3) == 0) {
-                $res.="<hr>\n";
-            } else if(strlen($one) == 0) {
-                $res.="<p>\n";
+        foreach ($lines as $one) {
+            if (strncasecmp("h1.", $one, 3) == 0) {
+                $res .= "<h1>" . trim(substr($one, 3)) . "</h1>\n";
+            } else if (strncasecmp("h2.", $one, 3) == 0) {
+                $res .= "<h2>" . trim(substr($one, 3)) . "</h2>\n";
+            } else if (strncasecmp("h3.", $one, 3) == 0) {
+                $res .= "<h3>" . trim(substr($one, 3)) . "</h3>\n";
+            } else if (strncasecmp("h4.", $one, 3) == 0) {
+                $res .= "<h4>" . trim(substr($one, 3)) . "</h4>\n";
+            } else if (strncasecmp("hr.", $one, 3) == 0) {
+                $res .= "<hr>\n";
+            } else if (strlen($one) == 0) {
+                $res .= "<p>\n";
             } else {
-                $one = preg_replace("/\*(.+?)\*/","<strong>$1</strong>", $one);
-                $one = preg_replace("/\_(.+?)\_/","<u>$1</u>", $one);
-                $one = preg_replace("/\|(.+?)\|(.+?)\|/","<a href=\"$1\">$2</a>", $one);
-                $res.="$one\n";
+                $one = preg_replace("/\*(.+?)\*/", "<strong>$1</strong>", $one);
+                $one = preg_replace("/\_(.+?)\_/", "<u>$1</u>", $one);
+                $one = preg_replace("/\|(.+?)\|(.+?)\|/", "<a href=\"$1\">$2</a>", $one);
+                $res .= "$one\n";
             }
         }
 
@@ -112,7 +112,7 @@ class EmailContent {
 
     function fillInUnsubscribeURL($body, $secret, $personId) {
         $protocol = $_SERVER["https"] ? "https://" : "http://";
-        $url = $protocol.$_SERVER["SERVER_NAME"].AppConfig::ABSOLUTE_URL_TO_SERVICES."newsletter/unsubscribe.php?secret=".$personId.$secret;
+        $url = $protocol . $_SERVER["SERVER_NAME"] . AppConfig::ABSOLUTE_URL_TO_SERVICES . "newsletter/unsubscribe.php?secret=" . $personId . $secret;
         return preg_replace("/\{unsubscribeurl\}/", $url, $body);
     }
 
@@ -127,6 +127,7 @@ class EmailContent {
 
         return $body;
     }
+
 }
 
 ?>

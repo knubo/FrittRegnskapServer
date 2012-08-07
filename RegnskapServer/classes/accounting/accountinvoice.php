@@ -13,19 +13,19 @@ class AccountInvoice {
     }
 
     public function getAll() {
-        $prep = $this->db->prepare("select id, description, invoice_type, split_type, email_from, invoice_due_day, default_amount, (case when char_length(email_subject) > 5 and char_length(email_body) > 15 then 'true' else 'false' end) as emailOK from  " . AppConfig::pre() . "invoice_type");
+        $prep = $this->db->prepare("select id, description, invoice_type, split_type, email_from, invoice_due_day, default_amount, (case when char_length(email_subject) > 5 and char_length(email_body) > 15 then 'true' else 'false' end) as emailOK, credit_post_type from  " . AppConfig::pre() . "invoice_type");
         return $prep->execute();
     }
 
     public function save($req) {
         if (!$req["id"]) {
-            $prep = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_type (description, invoice_type, split_type, email_from, invoice_due_day, default_amount) values (?,?,?,?,?,?)");
-            $prep->bind_params("siissd", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"]);
+            $prep = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_type (description, invoice_type, split_type, email_from, invoice_due_day, default_amount, credit_post_type) values (?,?,?,?,?,?,?)");
+            $prep->bind_params("siissdi", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $req["credit_post_type"]);
             $prep->execute();
             return 1;
         } else {
-            $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_type set description=?, invoice_type=?, split_type=?, email_from=?, invoice_due_day=?, default_amount=? where id = ?");
-            $prep->bind_params("siissdi", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $req["id"]);
+            $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_type set description=?, invoice_type=?, split_type=?, email_from=?, invoice_due_day=?, default_amount=?, credit_post_type=? where id = ?");
+            $prep->bind_params("siissdii", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $req["credit_post_type"], $req["id"]);
             $prep->execute();
             return 1;
         }

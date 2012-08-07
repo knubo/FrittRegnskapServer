@@ -21,6 +21,7 @@ $currentUser = $regnSession->auth();
 
 $accInvoice = new AccountInvoice($db);
 
+
 switch ($action) {
     case "keepalive":
         echo json_encode(array("status" => 1));
@@ -42,6 +43,7 @@ switch ($action) {
         echo json_encode($accInvoice->getOne($_REQUEST["id"]));
         break;
     case "save":
+        $regnSession->checkWriteAccess();
         $result = array();
         $result["result"] = $accInvoice->save($_REQUEST);
 
@@ -51,6 +53,7 @@ switch ($action) {
         echo json_encode($accInvoice->getEmailTemplate($_REQUEST["id"]));
         break;
     case "saveEmailTemplate":
+        $regnSession->checkWriteAccess();
         echo json_encode($accInvoice->saveEmailTemplate(json_decode($_REQUEST["emailTemplate"])));
         break;
 
@@ -96,6 +99,8 @@ switch ($action) {
         break;
 
     case "create_invoices":
+        $regnSession->checkWriteAccess();
+
         $userId = $regnSession->getPersonId();
         $accInvoice->create_invoices($userId, json_decode($_REQUEST["invoices"]),
                                      json_decode($_REQUEST["receivers"]), $_REQUEST["invoice_type"]);
@@ -106,6 +111,12 @@ switch ($action) {
     case "invoices":
         echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
         break;
+    case "invoice_paid":
+        $regnSession->checkWriteAccess();
 
+        $status = $accInvoice->invoicePaid($_REQUEST["invoice_recepiant "], $_REQUEST["paid_date"]);
+
+		echo json_encode(array("status" => $status));
+		break;
 }
 ?>

@@ -58,6 +58,9 @@ class RegnSession {
     }
 
     function getReducedMode() {
+    	if(!$_SESSION)
+	    return 0;
+
         if(!array_key_exists("reduced_mode", $_SESSION)) {
             return 0;
         }

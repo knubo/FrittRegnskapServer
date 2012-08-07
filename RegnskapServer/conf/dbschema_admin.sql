@@ -15,7 +15,7 @@ create table if not exists installations (
     archive_limit int,
     parentdbprefix varchar(20),
     parenthostprefix varchar(40),
-    integration varchar(80),
+    integration varchar(80)
     );
 
 create table if not exists install_info (
@@ -53,7 +53,7 @@ create table if not exists sqllist (
     runinbeta tinyint,
 	runbetawhen timestamp,
 	runinother tinyint,
-	runotherwhen timestamp,
+	runotherwhen timestamp
 );
 
 create table if not exists to_install (

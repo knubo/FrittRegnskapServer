@@ -18,14 +18,19 @@ class AccountInvoice {
     }
 
     public function save($req) {
+    	$credPost = $req["credit_post_type"];
+    	if(!$credPost) {
+    		$credPost = null;
+    	}
+    
         if (!$req["id"]) {
             $prep = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_type (description, invoice_type, split_type, email_from, invoice_due_day, default_amount, credit_post_type) values (?,?,?,?,?,?,?)");
-            $prep->bind_params("siissdi", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $req["credit_post_type"]);
+            $prep->bind_params("siissdi", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $credPost);
             $prep->execute();
             return 1;
         } else {
             $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_type set description=?, invoice_type=?, split_type=?, email_from=?, invoice_due_day=?, default_amount=?, credit_post_type=? where id = ?");
-            $prep->bind_params("siissdii", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $req["credit_post_type"], $req["id"]);
+            $prep->bind_params("siissdii", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $credPost, $req["id"]);
             $prep->execute();
             return 1;
         }

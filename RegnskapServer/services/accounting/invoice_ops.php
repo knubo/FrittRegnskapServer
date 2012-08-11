@@ -108,9 +108,15 @@ switch ($action) {
         echo json_encode(array("status" => 1));
         break;
 
+
+    case "invoice":
+    	echo json_encode($accInvoice->invoice($_REQUEST["receiver_id"]);
+    	break;
+
     case "invoices":
         echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
         break;
+        
     case "invoice_paid":
         $regnSession->checkWriteAccess();
 

@@ -93,6 +93,17 @@ class AccountInvoice {
         return $prep->execute();
     }
 
+    public function invoice($recevierId) {
+        $prep = $this->db->prepare("select firstname, lastname, email, TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and R.invoice_id = ? and person_id = P.id and R.id = ?");
+		$prep->bind_params("i", $recevierId);
+		
+		$res = array_shift($prep->execute());
+		
+		return $res;
+
+    }
+
     public function invoices($invoice, $dueDate) {
 
         if ($invoice) {
@@ -141,8 +152,24 @@ class AccountInvoice {
 	       $sql[] = "invoice_status = ?";
 	       $types .= "i";
 	       $values[] = $params["status"];
-	    
 	    }
+
+	    if($params["firstname"] && $params["lastname"]) {
+	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ? and M.lastname like ?)";
+	        $types .= "ss";
+	        $values[] = $params["firstname"];
+	        $values[] = $params["lastname"];
+	    } else if($params["firstname"]) {
+	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ?)";
+	        $types .= "s";
+	        $values[] = $params["firstname"];
+	    } else if($params["lastname"]) {
+	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.lastname like ?)";
+	        $types .= "s";
+	        $values[] = $params["lastname"];
+	    }
+	    
+
 	    
 	    if(count($values) > 0) {
 	    	$pre .= " and ".implode($sql, " and ");

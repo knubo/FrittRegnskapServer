@@ -118,5 +118,9 @@ switch ($action) {
 
 		echo json_encode(array("status" => $status));
 		break;
+	case "search":
+	    $res = $accInvoice->search($_REQUEST);
+  	    echo json_encode($res);
+	    break;	
 }
 ?>

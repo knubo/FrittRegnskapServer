@@ -114,6 +114,48 @@ class AccountInvoice {
         return $prep->execute();
     }
 
+    public function search($params) {
+    	$pre = "select firstname, lastname, email,  TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P ";
+		$pre.= " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id ";
+		$sql = array();
+		$values = array();
+		$types = "";
+
+	    if($params["from_date"]) {
+	       $sql[] = "due_date >= ?";
+	       $types .= "s";
+	       $md = new eZDate();
+	       $md->setDate($params["from_date"]);
+	       $values[] = $md->mysqlDate();
+	    }
+	    
+	    if($params["to_date"]) {
+	       $sql[] = "due_date <= ?";
+	       $types .= "s";
+	       $md = new eZDate();
+	       $md->setDate($params["to_date"]);
+	       $values[] = $md->mysqlDate();
+	    }
+	    
+	    if($params["status"]) {
+	       $sql[] = "invoice_status = ?";
+	       $types .= "i";
+	       $values[] = $params["status"];
+	    
+	    }
+	    
+	    if(count($values) > 0) {
+	    	$pre .= " and ".implode($sql, " and ");
+	    }
+	    
+	    $prep = $this->db->prepare($pre. " order by due_date limit 201");
+	    
+	    if(count($values)) {
+	    	$prep->bind_array_params($types, $values);
+	    }
+	    
+	    return $prep->execute();
+    }
 }
 
 ?>

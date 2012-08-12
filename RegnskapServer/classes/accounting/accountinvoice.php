@@ -22,7 +22,7 @@ class AccountInvoice {
     	if(!$credPost) {
     		$credPost = null;
     	}
-    
+
         if (!$req["id"]) {
             $prep = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_type (description, invoice_type, split_type, email_from, invoice_due_day, default_amount, credit_post_type) values (?,?,?,?,?,?,?)");
             $prep->bind_params("siissdi", $req["description"], $req["invoice_type"], $req["split_type"], $req["email_from"], $req["invoice_due_day"], $req["default_amount"], $credPost);
@@ -95,11 +95,11 @@ class AccountInvoice {
 
     public function invoice($recevierId) {
         $prep = $this->db->prepare("select firstname, lastname, email, TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
-                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and R.invoice_id = ? and person_id = P.id and R.id = ?");
+                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id and R.id = ?");
 		$prep->bind_params("i", $recevierId);
-		
+
 		$res = array_shift($prep->execute());
-		
+
 		return $res;
 
     }
@@ -139,7 +139,7 @@ class AccountInvoice {
 	       $md->setDate($params["from_date"]);
 	       $values[] = $md->mysqlDate();
 	    }
-	    
+
 	    if($params["to_date"]) {
 	       $sql[] = "due_date <= ?";
 	       $types .= "s";
@@ -147,7 +147,7 @@ class AccountInvoice {
 	       $md->setDate($params["to_date"]);
 	       $values[] = $md->mysqlDate();
 	    }
-	    
+
 	    if($params["status"]) {
 	       $sql[] = "invoice_status = ?";
 	       $types .= "i";
@@ -168,20 +168,28 @@ class AccountInvoice {
 	        $types .= "s";
 	        $values[] = $params["lastname"];
 	    }
-	    
 
-	    
+
+
 	    if(count($values) > 0) {
 	    	$pre .= " and ".implode($sql, " and ");
 	    }
-	    
+
 	    $prep = $this->db->prepare($pre. " order by due_date limit 201");
-	    
+
 	    if(count($values)) {
 	    	$prep->bind_array_params($types, $values);
 	    }
-	    
+
 	    return $prep->execute();
+    }
+
+    public function changeInvoiceStatus($receiverId, $status) {
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = ? where id = ?");
+        $prep->bind_params("ii", $status, $receiverId);
+        $prep->execute();
+
+        return $this->db->affected_rows() == 1;
     }
 }
 

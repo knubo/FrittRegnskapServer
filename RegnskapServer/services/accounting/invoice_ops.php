@@ -116,7 +116,7 @@ switch ($action) {
     case "invoices":
         echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
         break;
-        
+
     case "invoice_paid":
         $regnSession->checkWriteAccess();
 
@@ -127,6 +127,10 @@ switch ($action) {
 	case "search":
 	    $res = $accInvoice->search($_REQUEST);
   	    echo json_encode($res);
-	    break;	
+	    break;
+    case "change_invoice_status":
+        $res = $accInvoice->changeInvoiceStatus($_REQUEST["receiver_id"], $_REQUEST["status"]);
+        echo json_encode(array("status" => $res ? 1 : 0));
+        break;
 }
 ?>

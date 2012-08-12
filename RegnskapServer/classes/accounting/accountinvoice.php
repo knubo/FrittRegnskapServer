@@ -148,11 +148,26 @@ class AccountInvoice {
 	       $values[] = $md->mysqlDate();
 	    }
 
+	    if($params["due_date"]) {
+	       $sql[] = "due_date = ?";
+	       $types .= "s";
+	       $md = new eZDate();
+	       $md->setDate($params["due_date"]);
+	       $values[] = $md->mysqlDate();
+	    }
+
 	    if($params["status"]) {
 	       $sql[] = "invoice_status = ?";
 	       $types .= "i";
 	       $values[] = $params["status"];
 	    }
+
+        if($params["amount"]) {
+            $sql[] = "amount = ?";
+            $money = Strings::money($_REQUEST["amount"]);
+            $types .= "d";
+            $values[] = $money;
+        }
 
 	    if($params["firstname"] && $params["lastname"]) {
 	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ? and M.lastname like ?)";

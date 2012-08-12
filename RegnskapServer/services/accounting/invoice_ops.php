@@ -110,7 +110,7 @@ switch ($action) {
 
 
     case "invoice":
-    	echo json_encode($accInvoice->invoice($_REQUEST["receiver_id"]);
+    	echo json_encode($accInvoice->invoice($_REQUEST["receiver_id"]));
     	break;
 
     case "invoices":

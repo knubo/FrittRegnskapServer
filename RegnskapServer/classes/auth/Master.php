@@ -435,6 +435,10 @@
     }
 
     public function updateInstallDetail($id, $data) {
+        if(!$data->username) {
+            die("Did not get required parameters for update install: ".$data." Request:".$_REQUEST);
+        } 
+
         $prep = $this->db->prepare("update install_info set username=?, password=?, clubname=?, contact=?, email=?, address=?, postnmb=?, city=?,phone=? where id = ?");
         $prep->bind_params("sssssssssi",  $data->username, $data->password, $data->clubname, $data->contact, $data->email, $data->address, $data->postnmb, $data->city,$data->phone, $id);
         $prep->execute();

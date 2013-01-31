@@ -99,7 +99,9 @@ switch ($action) {
             $lastSpringMonth = 6;
         }
 
-        if($res["month"] >= $lastSpringMonth) {
+
+
+        if($res["month"] == $lastSpringMonth) {
             header("HTTP/1.0 513 Validation Error");
 
             die(json_encode(array("last_month")));

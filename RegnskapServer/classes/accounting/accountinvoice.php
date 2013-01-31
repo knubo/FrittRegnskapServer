@@ -18,10 +18,10 @@ class AccountInvoice {
     }
 
     public function save($req) {
-    	$credPost = $req["credit_post_type"];
-    	if(!$credPost) {
-    		$credPost = null;
-    	}
+        $credPost = $req["credit_post_type"];
+        if (!$credPost) {
+            $credPost = null;
+        }
 
         if (!$req["id"]) {
             $prep = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_type (description, invoice_type, split_type, email_from, invoice_due_day, default_amount, credit_post_type) values (?,?,?,?,?,?,?)");
@@ -95,12 +95,12 @@ class AccountInvoice {
 
     public function invoice($recevierId) {
         $prep = $this->db->prepare("select firstname, lastname, email, TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
-                    " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id and R.id = ?");
-		$prep->bind_params("i", $recevierId);
+                " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id and R.id = ?");
+        $prep->bind_params("i", $recevierId);
 
-		$res = array_shift($prep->execute());
+        $res = array_shift($prep->execute());
 
-		return $res;
+        return $res;
 
     }
 
@@ -126,77 +126,76 @@ class AccountInvoice {
     }
 
     public function search($params) {
-    	$pre = "select firstname, lastname, email,  TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P ";
-		$pre.= " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id ";
-		$sql = array();
-		$values = array();
-		$types = "";
+        $pre = "select firstname, lastname, email,  TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P ";
+        $pre .= " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id ";
+        $sql = array();
+        $values = array();
+        $types = "";
 
-	    if($params["from_date"]) {
-	       $sql[] = "due_date >= ?";
-	       $types .= "s";
-	       $md = new eZDate();
-	       $md->setDate($params["from_date"]);
-	       $values[] = $md->mysqlDate();
-	    }
+        if ($params["from_date"]) {
+            $sql[] = "due_date >= ?";
+            $types .= "s";
+            $md = new eZDate();
+            $md->setDate($params["from_date"]);
+            $values[] = $md->mysqlDate();
+        }
 
-	    if($params["to_date"]) {
-	       $sql[] = "due_date <= ?";
-	       $types .= "s";
-	       $md = new eZDate();
-	       $md->setDate($params["to_date"]);
-	       $values[] = $md->mysqlDate();
-	    }
+        if ($params["to_date"]) {
+            $sql[] = "due_date <= ?";
+            $types .= "s";
+            $md = new eZDate();
+            $md->setDate($params["to_date"]);
+            $values[] = $md->mysqlDate();
+        }
 
-	    if($params["due_date"]) {
-	       $sql[] = "due_date = ?";
-	       $types .= "s";
-	       $md = new eZDate();
-	       $md->setDate($params["due_date"]);
-	       $values[] = $md->mysqlDate();
-	    }
+        if ($params["due_date"]) {
+            $sql[] = "due_date = ?";
+            $types .= "s";
+            $md = new eZDate();
+            $md->setDate($params["due_date"]);
+            $values[] = $md->mysqlDate();
+        }
 
-	    if($params["status"]) {
-	       $sql[] = "invoice_status = ?";
-	       $types .= "i";
-	       $values[] = $params["status"];
-	    }
+        if ($params["status"]) {
+            $sql[] = "invoice_status = ?";
+            $types .= "i";
+            $values[] = $params["status"];
+        }
 
-        if($params["amount"]) {
+        if ($params["amount"]) {
             $sql[] = "amount = ?";
             $money = Strings::money($_REQUEST["amount"]);
             $types .= "d";
             $values[] = $money;
         }
 
-	    if($params["firstname"] && $params["lastname"]) {
-	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ? and M.lastname like ?)";
-	        $types .= "ss";
-	        $values[] = $params["firstname"];
-	        $values[] = $params["lastname"];
-	    } else if($params["firstname"]) {
-	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ?)";
-	        $types .= "s";
-	        $values[] = $params["firstname"];
-	    } else if($params["lastname"]) {
-	    	$sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.lastname like ?)";
-	        $types .= "s";
-	        $values[] = $params["lastname"];
-	    }
+        if ($params["firstname"] && $params["lastname"]) {
+            $sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ? and M.lastname like ?)";
+            $types .= "ss";
+            $values[] = $params["firstname"];
+            $values[] = $params["lastname"];
+        } else if ($params["firstname"]) {
+            $sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ?)";
+            $types .= "s";
+            $values[] = $params["firstname"];
+        } else if ($params["lastname"]) {
+            $sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.lastname like ?)";
+            $types .= "s";
+            $values[] = $params["lastname"];
+        }
 
 
+        if (count($values) > 0) {
+            $pre .= " and " . implode($sql, " and ");
+        }
 
-	    if(count($values) > 0) {
-	    	$pre .= " and ".implode($sql, " and ");
-	    }
+        $prep = $this->db->prepare($pre . " order by due_date limit 201");
 
-	    $prep = $this->db->prepare($pre. " order by due_date limit 201");
+        if (count($values)) {
+            $prep->bind_array_params($types, $values);
+        }
 
-	    if(count($values)) {
-	    	$prep->bind_array_params($types, $values);
-	    }
-
-	    return $prep->execute();
+        return $prep->execute();
     }
 
     public function changeInvoiceStatus($receiverId, $status) {
@@ -205,6 +204,63 @@ class AccountInvoice {
         $prep->execute();
 
         return $this->db->affected_rows() == 1;
+    }
+
+    public function invoicePaidInTransaction($recepiant, $day, $amount) {
+        $this->db->begin();
+        try {
+            $this->invoicePaid($recepiant, $day, $amount);
+            $this->db->commit();
+
+            return 1;
+        } catch (Exception $e) {
+            $this->db->rollback();
+        }
+        return 0;
+    }
+
+    private function invoicePaid($recepiant, $day, $amount, $debetPost) {
+        $prep = $this->db->prepare("select description, amount,credit_post_type, TY.invoice_type from " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_recepiant IR, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY," . AppConfig::pre() . "person P where IR.id = ? and IR.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and P.id = person_id");
+        $prep->bind_params("i", $recepiant);
+        $res = $prep->execute();
+
+        $invoiceInfo = array_shift($res);
+
+        if (!$amount) {
+            $accountingAmount = $invoiceInfo["amount"];
+        } else {
+            $accountingAmount = $amount;
+        }
+
+        switch ($invoiceInfo["invoice_type"]) {
+            case 1:
+                //return SEMESTER;
+            case 2:
+                //return SEMESTER_YOUTH;
+            case 3:
+                //return YEAR;
+            case 4:
+                //return YEAR_YOUTH;
+            case 5:
+                //return OTHER;
+        }
+
+        $standard = new AccountStandard($this->db);
+        $const = $standard->getValues(array(AccountStandard::CONST_YEAR, AccountStandard::CONST_MONTH, AccountStandard::CONST_SEMESTER));
+        $active_year = $const[AccountStandard::CONST_YEAR];
+        $active_month = $const[AccountStandard::CONST_MONTH];
+
+
+        $line = new AccountLine($this->db);
+        $line->setNewLatest($invoiceInfo["description"].": " . $invoiceInfo["firstname"]." ".$invoiceInfo["lastname"],
+             $day, $active_year, $active_month);
+        $line->store();
+
+
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recepiant set status = 4 where id = ?");
+        $prep->bind_params("i", $recepiant);
+        $prep->execute();
+
     }
 }
 

@@ -15,210 +15,191 @@ include_once ("../classes/reporting/emailer.php");
 $action = array_key_exists("action", $_REQUEST) ? $_REQUEST["action"] : "login";
 
 switch ($action) {
-    case "hash":
-        $host = $_SERVER["SERVER_NAME"];
-        $split = explode(".",$host);
-        $dbn = DB::dbhash($split[0]);
-        echo "Hash is: $dbn for ".$split[0];
-        break;
+	case "hash":
+		$host = $_SERVER["SERVER_NAME"];
+		$split = explode(".",$host);
+		$dbn = DB::dbhash($split[0]);
+		echo "Hash is: $dbn for ".$split[0];
+		break;
 
-    case "secret":
-        $db = new DB(0, DB::MASTER_DB);
-        $master = new Master($db);
-        $masterRecord = $master->get_master_record();
+	case "secret":
+		$db = new DB(0, DB::MASTER_DB);
+		$master = new Master($db);
+		$masterRecord = $master->get_master_record();
 
-        if(!$masterRecord) {
-            $arr = array (
-				'error' => 'Ikke identifisert database.'
-				);
-				die(json_encode($arr));
-        }
+		if(!$masterRecord) {
+			$arr = array (
+					'error' => 'Ikke identifisert database.'
+			);
+			die(json_encode($arr));
+		}
 
-        $secret =  array_key_exists("secret", $_REQUEST) ? $_REQUEST["secret"] : 0;
-        $username =  array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : 0;
+		$secret =  array_key_exists("secret", $_REQUEST) ? $_REQUEST["secret"] : 0;
+		$username =  array_key_exists("username", $_REQUEST) ? $_REQUEST["username"] : 0;
 
-        if(!$secret || !$username) {
-            die("Lenken du har fulgt er ikke gyldig.");
-        }
+		if(!$secret || !$username) {
+			die("Lenken du har fulgt er ikke gyldig.");
+		}
 
-        $timepos = substr($secret, 0, strpos($secret, "-"));
+		$timepos = substr($secret, 0, strpos($secret, "-"));
 
-        if(time() > $timepos) {
-            die("Glemt passord lenken er ikke lengre gyldig.");
-        }
+		if(time() > $timepos) {
+			die("Glemt passord lenken er ikke lengre gyldig.");
+		}
 
-        $dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
-        $dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
-         
-        $accUser = new User($dbu);
-        $ok =  $accUser->authenticateBySecret($secret, $username, $dbp);
+		$dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
+		$dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
+		 
+		$accUser = new User($dbu);
+		$ok =  $accUser->authenticateBySecret($secret, $username, $dbp);
 
-        $emailer = new Emailer();
+		$emailer = new Emailer();
 
-        if(!$ok) {
-            $emailer->sendEmail("Mulig hackefors¿k", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
+		if(!$ok) {
+			$emailer->sendEmail("Mulig hackefors¿k", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
 
-            die("Lenken du har fulgt er en engangslenke og er ikke lengre gyldig.");
-        }
+			die("Lenken du har fulgt er en engangslenke og er ikke lengre gyldig.");
+		}
 
-        $emailer->sendEmail("Glemt passord innlogging", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
+		$emailer->sendEmail("Glemt passord innlogging", "admin@frittregnskap.no", "Detaljer er: $username $secret ".json_encode($_SERVER),"admin@frittregnskap.no",0);
 
-        $sess = new RegnSession(new DB(), $masterRecord["dbprefix"]);
+		$sess = new RegnSession(new DB(), $masterRecord["dbprefix"]);
 
-        if(!session_start()) {
-            die("Failed to start session");
-        }
+		if(!session_start()) {
+			die("Failed to start session");
+		}
 
-        $sess->setSessionVarialbesForUser($username, $accUser, $masterRecord);
+		$sess->setSessionVarialbesForUser($username, $accUser, $masterRecord);
 
-        $accPerson = new AccountPerson($dbu, $dbp);
-        $accPerson->setSecret($accUser->getPersonId());
+		$accPerson = new AccountPerson($dbu, $dbp);
+		$accPerson->setSecret($accUser->getPersonId());
 
-        session_write_close();
+		session_write_close();
 
-        header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
+		header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
 
-        break;
+		break;
 
-    case "adminlogin":
-        $db = new DB(0, DB::MASTER_DB);
-        $master = new Master($db);
-        $masterRecord = $master->get_master_record();
+	case "adminlogin":
+		$db = new DB(0, DB::MASTER_DB);
+		$master = new Master($db);
+		$masterRecord = $master->get_master_record();
 
-        if(!$masterRecord) {
-            $arr = array (
-				'error' => 'Ikke identifisert database.'
-				);
-				die(json_encode($arr));
-        }
+		if(!$masterRecord) {
+			$arr = array (
+					'error' => 'Ikke identifisert database.'
+			);
+			die(json_encode($arr));
+		}
 
-        if($masterRecord["secret"] != $_REQUEST["secret"]) {
-            die("Bad bad bad!");
-        }
+		if($masterRecord["secret"] != $_REQUEST["secret"]) {
+			die("Bad bad bad!");
+		}
 
-        /* Update so it only works once */
-        $master->updateSecret($masterRecord["id"]);
+		/* Update so it only works once */
+		$master->updateSecret($masterRecord["id"]);
 
-        $dbu = new DB();
-        $sess = new RegnSession($dbu, $masterRecord["dbprefix"]);
+		$dbu = new DB();
+		$sess = new RegnSession($dbu, $masterRecord["dbprefix"]);
 
-        if(!session_start()) {
-            die("Failed to start session");
-        }
-         
-        $sess->setSessionVariablesForAdmin($masterRecord);
+		if(!session_start()) {
+			die("Failed to start session");
+		}
+		 
+		$sess->setSessionVariablesForAdmin($masterRecord);
 
-        session_write_close();
+		session_write_close();
 
-        header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
+		header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
 
-        break;
+		break;
 
-    case "test":
-        $user = $_REQUEST["user"];
-        $password = $_REQUEST["password"];
+	case "test":
+		$sess = new RegnSession(new DB());
+		echo $sess->auth();
 
-        if (!$user || !$password) {
-            die("Must supply user and password.");
-        }
+		break;
 
-        $db = new DB(0, DB::MASTER_DB);
-        $master = new Master($db);
-        $masterRecord = $master->get_master_record();
+	case "forward":
+		$forward = 1;
+	case "login" :
+		$user = $_REQUEST["user"];
+		$password = $_REQUEST["password"];
 
-        if(!$masterRecord) {
-            $arr = array (
-				'error' => 'Ikke identifisert database.'
-				);
-				echo json_encode($arr);
-				break;
-        }
+		if (!$user || !$password) {
+			die("Must supply user and password.");
+		}
 
-        $sess = new RegnSession(new DB());
+		$db = new DB(0, DB::MASTER_DB);
+		$master = new Master($db);
+		$masterRecord = $master->get_master_record();
 
-        echo json_encode($masterRecord);
-        break;      
+		if(!$masterRecord) {
+			$arr = array (
+					'error' => 'Ikke identifisert database.'
+			);
+			echo json_encode($arr);
+			break;
+		}
 
-    case "forward":
-        $forward = 1;
-    case "login" :
-        $user = $_REQUEST["user"];
-        $password = $_REQUEST["password"];
+		$sess = new RegnSession(new DB());
 
-        if (!$user || !$password) {
-            die("Must supply user and password.");
-        }
+		$dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
+		$dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
 
-        $db = new DB(0, DB::MASTER_DB);
-        $master = new Master($db);
-        $masterRecord = $master->get_master_record();
+		$auth = new User($dbu);
+		if ($auth->authenticate($user, $password, $dbp) == User :: AUTH_OK) {
 
-        if(!$masterRecord) {
-            $arr = array (
-				'error' => 'Ikke identifisert database.'
-				);
-				echo json_encode($arr);
-				break;
-        }
+			if(!session_start()) {
+				die("Failed to start session");
+			}
+			 
+			$sess->setSessionVarialbesForUser($user, $auth, $masterRecord);
 
-        $sess = new RegnSession(new DB());
+			$arr = array (
+					'result' => 'ok',
+			);
 
-        $dbp = $masterRecord["parentdbprefix"] ? $masterRecord["parentdbprefix"] : $masterRecord["dbprefix"];
-        $dbu = new DB(0, $masterRecord["parenthostprefix"] ? DB::dbhash($masterRecord["parenthostprefix"]) : 0);
+			session_write_close();
 
-        $auth = new User($dbu);
-        if ($auth->authenticate($user, $password, $dbp) == User :: AUTH_OK) {
+		} else {
+			$arr = array (
+					'result ' => 'failed',
+					'error' => 'Ugyldig brukernavn eller passord.',
+					'dbprefix' => $masterRecord["dbprefix"]
+			);
+		}
 
-            if(!session_start()) {
-                die("Failed to start session");
-            }
-             
-            $sess->setSessionVarialbesForUser($user, $auth, $masterRecord);
+		if($forward) {
+			header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
+		}
 
-            $arr = array (
-				'result' => 'ok', 
-            );
+		echo json_encode($arr);
+		break;
+	case "installations":
+		$db = new DB(0, DB::MASTER_DB);
+		$master = new Master($db);
+		echo json_encode($master->getAllInstallations());
+		break;
 
-            session_write_close();
+	case "logout" :
+		$db = new DB();
+		$sess = new RegnSession($db);
 
-        } else {
-            $arr = array (
-            	'result ' => 'failed',
-				'error' => 'Ugyldig brukernavn eller passord.',
-                'dbprefix' => $masterRecord["dbprefix"]
-            );
-        }
+		$sessionName = session_name();
+		$CookieInfo = session_get_cookie_params();
+		if ((empty ($CookieInfo['domain'])) && (empty ($CookieInfo['secure']))) {
+			setcookie(session_name(), '', time() - 3600, $CookieInfo['path']);
+		}
+		elseif (empty ($CookieInfo['secure'])) {
+			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain']);
+		} else {
+			setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
+		}
+		unset ($_COOKIE[$sessionName]);
 
-        if($forward) {
-            header("Location: http://".$_SERVER["SERVER_NAME"]."/prg/AccountingGWT.html");
-        }
-
-        echo json_encode($arr);
-        break;
-    case "installations":
-        $db = new DB(0, DB::MASTER_DB);
-        $master = new Master($db);
-        echo json_encode($master->getAllInstallations());
-        break;
-
-    case "logout" :
-        $db = new DB();
-        $sess = new RegnSession($db);
-
-        $sessionName = session_name();
-        $CookieInfo = session_get_cookie_params();
-        if ((empty ($CookieInfo['domain'])) && (empty ($CookieInfo['secure']))) {
-            setcookie(session_name(), '', time() - 3600, $CookieInfo['path']);
-        }
-        elseif (empty ($CookieInfo['secure'])) {
-            setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain']);
-        } else {
-            setcookie(session_name(), '', time() - 3600, $CookieInfo['path'], $CookieInfo['domain'], $CookieInfo['secure']);
-        }
-        unset ($_COOKIE[$sessionName]);
-
-        $arr = array('result' => 1);
-        echo json_encode($arr);
-        break;
+		$arr = array('result' => 1);
+		echo json_encode($arr);
+		break;
 }
 ?>

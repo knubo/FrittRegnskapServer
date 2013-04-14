@@ -394,7 +394,7 @@ create table if not exists XXX_invoice_type (
   email_footer int,
   email_header int,
   email_from varchar(255),
-  credit_post_type INTEGER(5) UNSIGNED NULL 
+  credit_post_type INTEGER(5) UNSIGNED NULL
 );
 
 create table if not exists XXX_invoice_top (

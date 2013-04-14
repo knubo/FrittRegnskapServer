@@ -140,7 +140,7 @@ class DB {
         $mysqli = mysqli_prepare($this->link, $query);
 
         if (!$mysqli) {
-            $this->report_error();
+            $this->report_error($query);
         }
 
         return new PrepWrapper($mysqli, $this);

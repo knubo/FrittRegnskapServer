@@ -52,11 +52,11 @@ class SQLS {
         $this->db->commit();
 
         $subject = "New SQL for Fritt Regnskap ";
-        $body="A new SQL has been queued for verification:\n$sql\nConfirm by using link: ".
+        $body = "A new SQL has been queued for verification:\n$sql\nConfirm by using link: " .
                 "http://master.frittregnskap.no/RegnskapServer/services/admin/admin_sql.php?action=verify&id=$id&secret=$secret";
 
         $emailer = new Emailer();
-        $emailer->sendEmail($subject, "admin@frittregnskap.no",$body,"admin@frittregnskap.no", null);
+        $emailer->sendEmail($subject, "admin@frittregnskap.no", $body, "admin@frittregnskap.no", null);
     }
 
     function updateSecret($id) {
@@ -72,7 +72,7 @@ class SQLS {
     function confirmVerify($id, $secret) {
         $data = $this->getOneSQL($id);
 
-        if($data["secret"] != $secret) {
+        if ($data["secret"] != $secret) {
             die("Secret mismatch!");
         }
 
@@ -86,24 +86,24 @@ class SQLS {
     function verifyForm($id, $secret) {
         $data = $this->getOneSQL($id);
 
-        if($data["secret"] != $secret) {
+        if ($data["secret"] != $secret) {
             die("Secret mismatch!");
         }
 
         $newSecret = $this->updateSecret($id);
 
-        echo "<html><body><form action=\"admin_sql.php\">".
-            "Verify SQL id:$id, sql=".$data["sqltorun"]."?<br/>".
-            "<input type=\"hidden\" name=\"action\" value=\"confirmVerify\"/>".
-            "<input type=\"hidden\" name=\"secret\" value=\"$newSecret\"/>".
-            "<input type=\"hidden\" name=\"id\" value=\"$id\"/>".
-            "<input type=\"submit\" value=\"Verify SQL\"/>".
-            "</form></body></html>";
+        echo "<html><body><form action=\"admin_sql.php\">" .
+                "Verify SQL id:$id, sql=" . $data["sqltorun"] . "?<br/>" .
+                "<input type=\"hidden\" name=\"action\" value=\"confirmVerify\"/>" .
+                "<input type=\"hidden\" name=\"secret\" value=\"$newSecret\"/>" .
+                "<input type=\"hidden\" name=\"id\" value=\"$id\"/>" .
+                "<input type=\"submit\" value=\"Verify SQL\"/>" .
+                "</form></body></html>";
     }
 
     function run($id, $install) {
         $sql = $this->getOneSQL($id);
-        if(!$sql["verified"]) {
+        if (!$sql["verified"]) {
             header("HTTP/1.0 515 DB error");
             die("The given sql id is not verified!");
         }
@@ -115,20 +115,38 @@ class SQLS {
 
         $replaced_sql = preg_replace("/XXX\_?/", $dbprefix, $sql["sqltorun"]);
 
-        $res = array();
-        /* The bsc database runs on an old mysql instance, hence the "fix". */
-        if($dbprefix == "regn_") {
-            $targetDB->action($replaced_sql);
-        } else {
-            $prep = $targetDB->prepare($replaced_sql);
-            $res["data"] = $prep->execute();
+        $replaced_sql = preg_replace("/\\n/", " ", $replaced_sql);
+
+        $sqlToRun = explode(");", $replaced_sql);
+
+        foreach ($sqlToRun as $sql) {
+            try {
+                $sql = trim($sql);
+
+                if (strlen($sql) == 0) {
+                    continue;
+                }
+
+                $sql = $sql . ");";
+
+                $res = array();
+                /* The bsc database runs on an old mysql instance, hence the "fix". */
+                if ($dbprefix == "regn_") {
+                    $targetDB->action($sql);
+                } else {
+                    $prep = $targetDB->prepare($sql);
+                    $res["data"] = $prep->execute();
+                }
+
+                $res["rows"] = $targetDB->affected_rows();
+
+                $iPrep = $this->db->prepare("update installations set sqlIdToRun = null where id = ?");
+                $iPrep->bind_params("i", $install["id"]);
+                $iPrep->execute();
+            } catch (exception $e) {
+                throw new Exception("SQL was $sql", $e);
+            }
         }
-
-        $res["rows"] = $targetDB->affected_rows();
-
-        $iPrep = $this->db->prepare("update installations set sqlIdToRun = null where id = ?");
-        $iPrep->bind_params("i", $install["id"]);
-        $iPrep->execute();
 
         return $res;
     }

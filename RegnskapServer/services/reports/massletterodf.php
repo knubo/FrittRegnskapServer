@@ -24,7 +24,6 @@ if($file[0] == '.') {
     die("Bad file name");
 }
 
-
 $db = new DB(0);
 $regnSession = new RegnSession($db);
 $regnSession->auth();
@@ -53,7 +52,6 @@ if(!file_exists($openfile)) {
 if(substr($openfile, -4) != ".odt") {
     die("Not an open office file");
 }
-
 $odf = new odf($openfile);
 
 if($preview) {
@@ -92,7 +90,7 @@ foreach($users as $one) {
     $article->setVarsSilent("mobil", $one["cellphone"], 0, $charset);
     $article->setVarsSilent("medlemsnr", $one["id"], 0, $charset);
     $article->setVarsSilent("kid", $kid->generateKIDmod10($masterRecord[id], 4, $one["id"],5), 0, $charset);
-    
+
     if ($one["birthdate"] && $one["birthdate"] != "0000-00-00") {
         $date->setMySQLDate($one["birthdate"]);
         $article->fodselsdato($date->display());

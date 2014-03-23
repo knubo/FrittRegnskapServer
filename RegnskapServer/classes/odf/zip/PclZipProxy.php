@@ -47,10 +47,13 @@ class PclZipProxy implements ZipInterface
 			$this->close();
 		}
 		if (!file_exists(self::TMP_DIR)) {
-			mkdir(self::TMP_DIR);
+			if(!mkdir(self::TMP_DIR)) {
+                echo "failed to create in ".realpath(".");
+            }
 		}
 		$this->filename = $filename;
 		$this->pclzip = new PclZip($this->filename);
+
 		$this->openned = true;
 		return true;
 	}
@@ -63,14 +66,21 @@ class PclZipProxy implements ZipInterface
 	public function getFromName($name)
 	{
 		if (false === $this->openned) {
+            echo "Get from file failed not opened";
 			return false;
 		}
-		$name = preg_replace("/(?:\.|\/)*(.*)/", "\\1", $name);
+
+        $name = preg_replace("/(?:\.|\/)*(.*)/", "\\1", $name);
+
 		$extraction = $this->pclzip->extract(PCLZIP_OPT_BY_NAME, $name,
 			PCLZIP_OPT_EXTRACT_AS_STRING);
-		if (!empty($extraction)) {
+
+        if (!empty($extraction)) {
 			return $extraction[0]['content'];
 		}
+
+        echo "Failed extraction in getFromName $name";
+
 		return false;
 	}
 	/**
@@ -83,26 +93,41 @@ class PclZipProxy implements ZipInterface
 	public function addFromString($localname, $contents)
 	{
 		if (false === $this->openned) {
+            echo "Not opened";
 			return false;
 		}
 		if (file_exists($this->filename) && !is_writable($this->filename)) {
+            echo "File not exists ".$this->filename;
 			return false;
 		}
 		$localname = preg_replace("/(?:\.|\/)*(.*)/", "\\1", $localname);
 		$localpath = dirname($localname);
 		$tmpfilename = self::TMP_DIR . '/' . basename($localname);
+
 		if (false !== file_put_contents($tmpfilename, $contents)) {
-			$this->pclzip->delete(PCLZIP_OPT_BY_NAME, $localname);
+
+            $this->pclzip->delete(PCLZIP_OPT_BY_NAME, $localname);
 			$add = $this->pclzip->add($tmpfilename,
 				PCLZIP_OPT_REMOVE_PATH, self::TMP_DIR,
 				PCLZIP_OPT_ADD_PATH, $localpath);
+
 			unlink($tmpfilename);
 			if (!empty($add)) {
-				return true;
-			}
-		}
+    				return true;
+			} else {
+                echo "Failed to add $localname: ".$this->pclzip->errorInfo(true). " $tmpfilename <br/>";
+            }
+		} else {
+            echo "Failed to put contents ".$tmpfilename;
+        }
+        echo "Failed in end addFromString";
 		return false;
 	}
+
+    public function errorInfo($flag) {
+        return $this->pclzip->errorInfo($flag);
+    }
+
 	/**
 	 * Add a file within the archive from a file
 	 *

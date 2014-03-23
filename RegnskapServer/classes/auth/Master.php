@@ -14,7 +14,8 @@
         $prep->bind_params("i", $id);
 
 
-        $insObj = array_shift($prep->execute());
+        $result = $prep->execute();
+        $insObj = array_shift($result);
 
         $prepc = $this->db->prepare("select * from change_request where installation_id = ?");
         $prepc->bind_params("i", $id);
@@ -36,7 +37,8 @@
     function updateInstall($id, $hostprefix, $beta, $quota, $description, $wikilogin, $portal_status, $portal_title, $archive_limit, $parentdbprefix, $reduced_mode, $parenthostprefix) {
         $prep = $this->db->prepare("select hostprefix from installations where id = ?");
         $prep->bind_params("i", $id);
-        $data = array_shift($prep->execute());
+        $result = $prep->execute();
+        $data = array_shift($result);
         $existingHostPrefix = $data["hostprefix"];
 
         $prep = $this->db->prepare("update installations set hostprefix=?, beta=?, diskquota=?,description=?,wikilogin=?, portal_status=?,portal_title=?, archive_limit=?, parentdbprefix=?, reduced_mode=?, parenthostprefix=? where id = ?");
@@ -431,13 +433,14 @@
         $prep = $this->db->prepare("select * from install_info where id = ?");
         $prep->bind_params("i", $id);
 
-        return array_shift($prep->execute());
+        $result = $prep->execute();
+        return array_shift($result);
     }
 
     public function updateInstallDetail($id, $data) {
         if(!$data->username) {
             die("Did not get required parameters for update install: ".$data." Request:".$_REQUEST);
-        } 
+        }
 
         $prep = $this->db->prepare("update install_info set username=?, password=?, clubname=?, contact=?, email=?, address=?, postnmb=?, city=?,phone=? where id = ?");
         $prep->bind_params("sssssssssi",  $data->username, $data->password, $data->clubname, $data->contact, $data->email, $data->address, $data->postnmb, $data->city,$data->phone, $id);

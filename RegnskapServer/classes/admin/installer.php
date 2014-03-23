@@ -177,7 +177,8 @@ class Installer {
     public function completeInstall($id) {
         $prep = $this->db->prepare("select * from installations I,install_info II where I.id = ? and I.id = II.id");
         $prep->bind_params("i", $id);
-        $data = array_shift($prep->execute());
+        $result = $prep->execute();
+        $data = array_shift($result);
 
         $domainname = $data["hostprefix"];
         $dbprefix = $data["dbprefix"];

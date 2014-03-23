@@ -15,7 +15,8 @@ class SQLS {
     function getOneSQL($id) {
         $prep = $this->db->prepare("select * from sqllist where id = ?");
         $prep->bind_params("i", $id);
-        return array_shift($prep->execute());
+        $result = $prep->execute();
+        return array_shift($result);
 
     }
 

@@ -267,7 +267,7 @@ class AccountLine {
         $lines = $this->getLines($prep->execute());
 
         if ($fillGrouped) {
-            $groupArray = $this->fill_grouped(&$lines);
+            $groupArray = $this->fill_grouped($lines);
 
             return array("lines"=>$lines, "debetsums"=>$groupArray["debetsums"], "creditsums"=>$groupArray["creditsums"]);
         }

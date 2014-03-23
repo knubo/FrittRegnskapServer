@@ -54,7 +54,8 @@ class AccountEvent {
         $prep = $this->db->prepare("select form from " . AppConfig::pre() . "event_schema where id=?");
         $prep->bind_params("i", $id);
 
-        $res = array_shift($prep->execute());
+        $result = $prep->execute();
+        $res = array_shift($result);
 
         return $res["form"];
     }

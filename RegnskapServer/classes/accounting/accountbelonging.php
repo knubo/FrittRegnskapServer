@@ -17,8 +17,9 @@ class AccountBelonging {
         	"where B.id = ?");
 
         $prep->bind_params("i", $id);
-         
-        return array_shift($prep->execute());
+
+        $result = $prep->execute();
+        return array_shift($result);
     }
 
     function listItemsToDeprecate() {
@@ -36,40 +37,40 @@ class AccountBelonging {
         $lineId = $accLine->getId();
 
         $prep = $this->db->prepare("insert into ".AppConfig::pre() ."post(line, debet, post_type, amount, belonging_id, edited_by_person) ".
-			"select ?, '1', deprecation_account, deprecation_amount,id, ? ". 
+			"select ?, '1', deprecation_account, deprecation_amount,id, ? ".
      		"from ".AppConfig::pre() ."belonging where current_price > deprecation_amount ".
  			"union ".
-  			"select ?, '1',deprecation_account , current_price,id, ? ". 
-            "from ".AppConfig::pre() ."belonging where current_price > 0 ". 
+  			"select ?, '1',deprecation_account , current_price,id, ? ".
+            "from ".AppConfig::pre() ."belonging where current_price > 0 ".
      		"and deprecation_amount > 0 and deprecation_amount > current_price ".
  			"union ".
- 			"select ?, '-1', owning_account, deprecation_amount,id, ? ". 
+ 			"select ?, '-1', owning_account, deprecation_amount,id, ? ".
      		"from ".AppConfig::pre() ."belonging where current_price > deprecation_amount ".
  			"union ".
-  			"select ?, '-1',owning_account , current_price,id, ? ". 
-     		"from ".AppConfig::pre() ."belonging where current_price > 0 ". 
+  			"select ?, '-1',owning_account , current_price,id, ? ".
+     		"from ".AppConfig::pre() ."belonging where current_price > 0 ".
      		"and deprecation_amount > 0 and deprecation_amount > current_price");
 
         $changeId = $params["changed_by_id"];
-        
+
         $prep->bind_params("iiiiiiii", $lineId,$changeId, $lineId,$changeId, $lineId,$changeId, $lineId,$changeId);
         $prep->execute();
-        
-        $prep = $this->db->prepare("update ".AppConfig::pre() ."belonging set ". 
-				"current_price = current_price - deprecation_amount ". 
+
+        $prep = $this->db->prepare("update ".AppConfig::pre() ."belonging set ".
+				"current_price = current_price - deprecation_amount ".
 	    		"where deprecation_amount > 0 and current_price > deprecation_amount");
         $prep->execute();
 
         $prep = $this->db->prepare("update ".AppConfig::pre() ."belonging set current_price = 0 where ".
-	            "current_price > 0 and deprecation_amount > 0 and ". 
+	            "current_price > 0 and deprecation_amount > 0 and ".
 		        "deprecation_amount > current_price");
         $prep->execute();
-        
+
     }
 
     function listAllByResponsible() {
         $prep = $this->db->prepare("select P.firstname,P.lastname,B.* from " . AppConfig::pre() . "belonging B left join " . AppConfig::pre() . "person P on (B.person = P.id) order by P.firstname desc, P.lastname desc");
-        
+
         return $prep->execute();
     }
 
@@ -226,11 +227,11 @@ class AccountBelonging {
             $diff = $req["currentAmount"] - $data["current_price"];
 
             if($diff < 0) {
-                $this->addToResult(&$result, $req["accountOwning"], $diff);
-                $this->addToResult(&$result, $req["accountDeprecation"], 0 - $diff);
+                $this->addToResult($result, $req["accountOwning"], $diff);
+                $this->addToResult($result, $req["accountDeprecation"], 0 - $diff);
             } else {
-                $this->addToResult(&$result, $req["accountDeprecation"], $diff);
-                $this->addToResult(&$result, $req["accountOwning"], 0 - $diff);
+                $this->addToResult($result, $req["accountDeprecation"], $diff);
+                $this->addToResult($result, $req["accountOwning"], 0 - $diff);
             }
         }
 

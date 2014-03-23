@@ -12,7 +12,8 @@ class EmailContent {
         $prep = $this->db->prepare("select * from " . AppConfig::pre() . "email_content where id = ?");
         $prep->bind_params("i", $id);
 
-        return array_shift($prep->execute());
+        $result = $prep->execute();
+        return array_shift($result);
     }
 
     function save($id, $name, $text, $header) {

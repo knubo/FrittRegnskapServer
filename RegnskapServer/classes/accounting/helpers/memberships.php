@@ -17,7 +17,7 @@ class Memberships {
     private $Memberid;
     private $Post;
 
-    function starts_with($string, $match) {
+    static function starts_with($string, $match) {
         if (strlen($string) < strlen($match)) {
             return false;
         }
@@ -25,7 +25,7 @@ class Memberships {
         return substr($string, 0, strlen($match)) == $match;
     }
 
-    function find(&$perMemberid, $id) {
+    static function find($perMemberid, $id) {
         if (!array_key_exists($id, $perMemberid)) {
             $perMemberid[$id] = new Memberships();
             $perMemberid[$id]->Memberid = $id;
@@ -33,7 +33,7 @@ class Memberships {
         return $perMemberid[$id];
     }
 
-    function parseParams($requestparams) {
+    static function parseParams($requestparams) {
 
         $perMemberId = array ();
 
@@ -58,7 +58,7 @@ class Memberships {
         return array_values($perMemberId);
     }
 
-    function store($db, $objects) {
+    static function store($db, $objects) {
         $standard = new AccountStandard($db);
         $active_month = $standard->getOneValue(AccountStandard::CONST_MONTH);
         $active_year = $standard->getOneValue(AccountStandard::CONST_YEAR);
@@ -96,7 +96,7 @@ class Memberships {
             header("HTTP/1.0 514 Missing data");
             die("missing_youth_price");
         }
-        
+
         foreach($objects as $one) {
 
             $line = 0;
@@ -133,7 +133,7 @@ class Memberships {
                     $yearMY->addDebetPost($lineId, $one->post(), $memberYouthPrice);
                 }
             }
-             
+
             if($one->train()) {
                 $trainM = new AccountSemesterMembership($db, AccountSemesterMembership::train(), $one->memberid(), $active_semester, $lineId);
                 $trainM->store();

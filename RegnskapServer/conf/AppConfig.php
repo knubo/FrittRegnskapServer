@@ -50,7 +50,7 @@ class AppConfig {
 
     const WIKKA_PREFIX = "wikka2_";
 
-    function pre() {
+    static function pre() {
         if (!$_SESSION) {
             return "regn_";
         }

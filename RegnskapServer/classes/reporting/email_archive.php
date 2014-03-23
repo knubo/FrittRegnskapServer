@@ -19,7 +19,8 @@ class EmailArchive {
         $prep = $this->db->prepare("select * from " . AppConfig::pre() . "email_archive where id = ?");
         $prep->bind_params("i", $id);
 
-        return array_shift($prep->execute());
+        $result = $prep->execute();
+        return array_shift($result);
     }
 
     function delete($id) {
@@ -34,21 +35,21 @@ class EmailArchive {
         $prep = $this->db->prepare("select count(*) as c from " . AppConfig::pre() . "email_archive");
         $data = $prep->execute();
         $count = $data[0]["c"];
-        
+
         if($count <= $max) {
             return;
         }
-        
+
         for($i = $max; $i < $count; $i++) {
             $prep = $this->db->prepare("select id from " . AppConfig::pre() . "email_archive where edit_time = (select min(edit_time) from " . AppConfig::pre() . "email_archive)");
             $res = $prep->execute();
             $id = $res[0]["id"];
-            
+
             if(!$id) {
                 /* Paranoia safeguard */
                 return;
             }
-            
+
             $prep = $this->db->prepare("delete from " . AppConfig::pre() . "email_archive where id = ?");
             $prep->bind_params("i", $id);
             $prep->execute();
@@ -69,13 +70,13 @@ class EmailArchive {
         $prep->bind_params("sissiis", $params["username"], $params["sent"], urldecode($params["subject"]), urldecode($params["body"]),$params["footer"], $params["header"], $params["format"]);
         $prep->execute();
 
-        $insertId = $this->db->insert_id(); 
-        
+        $insertId = $this->db->insert_id();
+
         $this->checkIfNeedToDelete($max);
 
         return $insertId;
 
-         
+
     }
 
 }

@@ -57,7 +57,8 @@ class AccountInvoice {
         $prep = $this->db->prepare("select id, invoice_type, split_type, invoice_due_day, default_amount from " . AppConfig::pre() . "invoice_type where id = ?");
         $prep->bind_params("i", $id);
 
-        $data = array_shift($prep->execute());
+        $result = $prep->execute();
+        $data = array_shift($result);
 
         return $data;
     }
@@ -98,7 +99,8 @@ class AccountInvoice {
                 " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id and R.id = ?");
         $prep->bind_params("i", $recevierId);
 
-        $res = array_shift($prep->execute());
+        $result = $prep->execute();
+        $res = array_shift($result);
 
         return $res;
 

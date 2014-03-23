@@ -20,11 +20,11 @@ class MembersFormatter {
             }
 
             if(array_key_exists("youth", $one) && $one["youth"]) {
-                $prev["yearyouth"] = $one["C"]; 
+                $prev["yearyouth"] = $one["C"];
             } else {
-                $prev[$type] = $one["C"];                
+                $prev[$type] = $one["C"];
             }
-            
+
             $prev["semester"] = $one["semester"];
             $grouped["$year-$fall"] = $prev;
         }
@@ -33,15 +33,15 @@ class MembersFormatter {
     function group($yearData, $courseData, $trainData, $youthData) {
         $grouped = array();
 
-        MembersFormatter::loop(&$grouped, $yearData, "year");
-        MembersFormatter::loop(&$grouped, $courseData, "course");
-        MembersFormatter::loop(&$grouped, $trainData, "train");
-        MembersFormatter::loop(&$grouped, $youthData, "youth");
+        MembersFormatter::loop($grouped, $yearData, "year");
+        MembersFormatter::loop($grouped, $courseData, "course");
+        MembersFormatter::loop($grouped, $trainData, "train");
+        MembersFormatter::loop($grouped, $youthData, "youth");
 
         return $grouped;
     }
 
-    function addForUser($grouped, $info, $type) {
+    static function addForUser($grouped, $info, $type) {
         if(array_key_exists($info[2], $grouped)) {
         	$userobj = $grouped[$info[2]];
         } else {
@@ -68,19 +68,19 @@ class MembersFormatter {
         $grouped = array();
 
         foreach($yearData as $one) {
-            MembersFormatter::addForUser(&$grouped, $one, "year");
+            MembersFormatter::addForUser($grouped, $one, "year");
         }
 
         foreach($courseData as $one) {
-        	Membersformatter::addForuser(&$grouped, $one, "course");
+        	Membersformatter::addForuser($grouped, $one, "course");
         }
 
         foreach($trainData as $one) {
-        	Membersformatter::addForuser(&$grouped, $one, "train");
+        	Membersformatter::addForuser($grouped, $one, "train");
         }
 
         foreach($youthData as $one) {
-            Membersformatter::addForuser(&$grouped, $one, "youth");
+            Membersformatter::addForuser($grouped, $one, "youth");
         }
 
         $arr = array_values($grouped);

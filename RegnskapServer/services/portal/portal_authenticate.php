@@ -27,7 +27,8 @@ switch ($action) {
         $prep = $db->prepare("select portal_status, portal_title from installations where hostprefix = ?");
         $prep->bind_params("s", $split[0]);
 
-        $data = array_shift($prep->execute());
+        $result = $prep->execute();
+        $data = array_shift($result);
 
         if(!$data["portal_status"]) {
             $data["portal_status"] = 0;

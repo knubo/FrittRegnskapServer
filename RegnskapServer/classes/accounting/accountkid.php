@@ -150,7 +150,8 @@ class AccountKID {
         $prep = $this->db->prepare("select count(*) as kids from " . AppConfig::pre() ."kid where settlement_date >= ? and settlement_date <=? and kid_status = 0");
         $prep->bind_params("ss", $startDate->mySQLDate(), $endDate->mySQLDate());
 
-        return array_shift($prep->execute());
+        $result = $prep->execute();
+        return array_shift($result);
     }
 
 }

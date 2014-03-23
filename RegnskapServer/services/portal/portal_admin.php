@@ -54,7 +54,7 @@ switch($action) {
             /* This is the correct way to loop over the directory. */
             while (false !== ($file = readdir($handle))) {
                 $matches = array();
-                if(preg_match("/_(\d+).jpg/", $file, &$matches)) {
+                if(preg_match("/_(\d+).jpg/", $file, $matches)) {
                     $ids[] = $matches[1];
                 }
             }

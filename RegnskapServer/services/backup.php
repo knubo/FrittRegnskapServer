@@ -22,7 +22,7 @@ $backup = new BackupDB($db, $prefix);
 
 date_default_timezone_set(AppConfig::TIMEZONE);
 
-if(!$regnSession->canSeeSecret()) {
+if(!($regnSession->canSeeSecret())) {
     header("HTTP/1.0 513 Validation Error");
     die(json_encode(array("NO_ACCESS_SECRET_ADDRESSES")));
 }
@@ -44,11 +44,11 @@ switch ($action) {
     case "dump_plain":
     	echo "#Data $table;\n";
 
-		/* Don't send out other people sessions */    	
+		/* Don't send out other people sessions */
     	if($table == "sessions") {
     		break;
     	}
-    	
+
         echo preg_replace("/$prefix/","", $backup->dump_plain($prefix.$table));
         break;
 

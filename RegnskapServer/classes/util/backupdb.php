@@ -22,10 +22,10 @@ class BackupDB {
     function tables() {
         $tables = array();
 
-        $this->addTables(AppConfig::pre(), &$tables);
+        $tables = $this->addTables(AppConfig::pre(), $tables);
 
         if ($this->prefix == "master_") {
-            $this->addTables("wikka_", &$tables);
+            $tables = $this->addTables("wikka_", $tables);
             $tables[] = "sqllist";
             $tables[] = "to_install";
             $tables[] = "installations";
@@ -40,20 +40,21 @@ class BackupDB {
         $res = $prep->execute();
 
         foreach ($res as $value) {
-            $one = array_shift(array_values($value));
+            $arrayValues = array_values($value);
+            $one = array_shift($arrayValues);
 
             if (strpos($one, "_backup") === FALSE) {
                 $tables[] = $one;
             }
         }
-
+        return $tables;
     }
 
     function zip() {
         $cmd = "/usr/bin/zip ../backup/" . $this->prefix . "/backup.zip ../backup/" . $this->prefix . "/*.sql";
 
         $data = array();
-        $res = exec($cmd, &$data);
+        $res = exec($cmd, $data);
 
         if (count($data) == 0) {
             $this->logger->log("error", "command", "Failed to run command $cmd");
@@ -73,7 +74,7 @@ class BackupDB {
 
         $cmd .= " " . $dbinfo[3] . " $table";
         $data = array();
-        $res = exec($cmd, &$data);
+        $res = exec($cmd, $data);
 
         if (count($data) == 0) {
             $this->logger->log("error", "exec", "Failed to run command $cmd");
@@ -98,7 +99,7 @@ class BackupDB {
 
         $cmd .= " " . $dbinfo[3] . " $table";
         $data = array();
-        $res = exec($cmd, &$data);
+        $res = exec($cmd, $data);
 
         if (count($data) == 0) {
             $this->logger->log("error", "exec", "Failed to run command $cmd");

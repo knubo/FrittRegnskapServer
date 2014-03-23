@@ -5,7 +5,7 @@
  */
 
 class MembersFormatter {
-    function loop($grouped, $info, $type) {
+    static function loop($grouped, $info, $type) {
 
         foreach($info as $one) {
             $year = $one["year"];
@@ -30,7 +30,7 @@ class MembersFormatter {
         }
     }
 
-    function group($yearData, $courseData, $trainData, $youthData) {
+    static function group($yearData, $courseData, $trainData, $youthData) {
         $grouped = array();
 
         MembersFormatter::loop($grouped, $yearData, "year");
@@ -44,7 +44,7 @@ class MembersFormatter {
     static function addForUser($grouped, $info, $type) {
         if(array_key_exists($info[2], $grouped)) {
         	$userobj = $grouped[$info[2]];
-        } else {
+            } else {
         	$userobj = array();
             $userobj["first"] = $info[0];
             $userobj["last"] = $info[1];

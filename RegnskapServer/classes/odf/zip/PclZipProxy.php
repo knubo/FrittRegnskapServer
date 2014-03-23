@@ -19,7 +19,7 @@ class PclZipProxyException extends Exception
  */
 class PclZipProxy implements ZipInterface
 {
-	const TMP_DIR = './tmp';
+	const TMP_DIR = '/tmp/fr';
 	protected $openned = false;
 	protected $filename;
 	protected $pclzip;
@@ -34,18 +34,18 @@ class PclZipProxy implements ZipInterface
 			throw new PclZipProxyException('PclZip class not loaded - PclZip library
 			 is required for using PclZipProxy'); ;
 		}
-	}	
+	}
 	/**
 	 * Open a Zip archive
-	 * 
+	 *
 	 * @param string $filename the name of the archive to open
 	 * @return true if openning has succeeded
-	 */	
+	 */
 	public function open($filename)
 	{
 		if (true === $this->openned) {
 			$this->close();
-		}		
+		}
 		if (!file_exists(self::TMP_DIR)) {
 			mkdir(self::TMP_DIR);
 		}
@@ -56,30 +56,30 @@ class PclZipProxy implements ZipInterface
 	}
 	/**
 	 * Retrieve the content of a file within the archive from its name
-	 * 
+	 *
 	 * @param string $name the name of the file to extract
 	 * @return the content of the file in a string
-	 */	
+	 */
 	public function getFromName($name)
 	{
 		if (false === $this->openned) {
 			return false;
 		}
 		$name = preg_replace("/(?:\.|\/)*(.*)/", "\\1", $name);
-		$extraction = $this->pclzip->extract(PCLZIP_OPT_BY_NAME, $name, 
+		$extraction = $this->pclzip->extract(PCLZIP_OPT_BY_NAME, $name,
 			PCLZIP_OPT_EXTRACT_AS_STRING);
 		if (!empty($extraction)) {
 			return $extraction[0]['content'];
-		} 
+		}
 		return false;
 	}
 	/**
 	 * Add a file within the archive from a string
-	 * 
+	 *
 	 * @param string $localname the local path to the file in the archive
 	 * @param string $contents the content of the file
 	 * @return true if the file has been successful added
-	 */	
+	 */
 	public function addFromString($localname, $contents)
 	{
 		if (false === $this->openned) {
@@ -99,17 +99,17 @@ class PclZipProxy implements ZipInterface
 			unlink($tmpfilename);
 			if (!empty($add)) {
 				return true;
-			} 
+			}
 		}
 		return false;
 	}
 	/**
 	 * Add a file within the archive from a file
-	 * 
+	 *
 	 * @param string $filename the path to the file we want to add
 	 * @param string $localname the local path to the file in the archive
 	 * @return true if the file has been successful added
-	 */	
+	 */
 	public function addFile($filename, $localname = null)
 	{
 		if (false === $this->openned) {
@@ -118,7 +118,7 @@ class PclZipProxy implements ZipInterface
 		if ((file_exists($this->filename) && !is_writable($this->filename))
 			|| !file_exists($filename)) {
 			return false;
-		}		
+		}
 		if (isSet($localname)) {
 			$localname = preg_replace("/(?:\.|\/)*(.*)/", "\\1", $localname);
 			$localpath = dirname($localname);
@@ -142,12 +142,12 @@ class PclZipProxy implements ZipInterface
 	/**
 	 * Close the Zip archive
 	 * @return true
-	 */	
+	 */
 	public function close()
 	{
 		if (false === $this->openned) {
 			return false;
-		}		
+		}
 		$this->pclzip = $this->filename = null;
 		$this->openned = false;
 		if (file_exists(self::TMP_DIR)) {
@@ -163,8 +163,8 @@ class PclZipProxy implements ZipInterface
 	 */
 	private function _rrmdir($dir)
 	{
-		if ($handle = opendir($dir)) { 
-			while (false !== ($file = readdir($handle))) { 
+		if ($handle = opendir($dir)) {
+			while (false !== ($file = readdir($handle))) {
 				if ($file != '.' && $file != '..') {
 					if (is_dir($dir . '/' . $file)) {
 						$this->_rrmdir($dir . '/' . $file);
@@ -172,11 +172,11 @@ class PclZipProxy implements ZipInterface
 					} else {
 						unlink($dir . '/' . $file);
 					}
-				} 
-			} 
-			closedir($handle); 
-		} 
-	}		
+				}
+			}
+			closedir($handle);
+		}
+	}
 }
 
 ?>

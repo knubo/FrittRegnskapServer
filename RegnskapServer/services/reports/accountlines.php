@@ -23,7 +23,8 @@ $person = array_key_exists("employee", $_REQUEST) ? $_REQUEST["employee"] : 0;
 $description =  array_key_exists("description", $_REQUEST) ? $_REQUEST["description"] : 0;
 
 if (!$fromdate && !$todate && !$account && !$project && !$person && !$description) {
-	die("Did not get arguments.");
+	echo "[]";
+    return;
 }
 $db = new DB();
 $regnSession = new RegnSession($db);

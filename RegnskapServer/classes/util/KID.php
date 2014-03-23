@@ -18,7 +18,7 @@ class KID {
     const DEBET_ACCOUNT = "debet_account";
     const FORM_NUMBER = "form_number";
     const FREE_TEXT_MESSAGE = "free_text_message";
-    const ITEM_NO = "item_no"; 
+    const ITEM_NO = "item_no";
     const KID = "kid";
     const PART_PAYMENT_NUMBER = "part_payment_number";
     const RECORD_COUNT = "record_count";
@@ -29,7 +29,7 @@ class KID {
     const TRANSACTION_COUNT = "transaction_count";
     const TRANSACTION_TYPE = "transaction_type";
     const TRANSACTION_NUMBER = "transaction_number";
-    
+
     function generateKIDmod10($pre, $prelen, $post, $postlen) {
         $calc = sprintf("%0".$prelen."d%0".$postlen."d", $pre, $post);
 
@@ -90,7 +90,7 @@ class KID {
             }
 
             $trans = &$result[$transnr];
-             
+
             if($recordType == "30") {
                 $this->fillAmountPost1($trans, $one);
             } else if($recordType == "31") {
@@ -131,7 +131,7 @@ class KID {
 
     function parseDataFile($fileinfo) {
         $matches = array();
-        preg_match_all("/(NY.{78})/", $fileinfo, &$matches);
+        preg_match_all("/(NY.{78})/", $fileinfo, $matches);
 
         $records = $matches[0];
 
@@ -139,7 +139,7 @@ class KID {
 
         $res["header"] = $this->readHeader(array_shift($records));
 
-        $this->readEndRecord(&$res["header"], array_pop($records));
+        $this->readEndRecord($res["header"], array_pop($records));
 
         $res["transactions"] = $this->makeTransactions($records);
 

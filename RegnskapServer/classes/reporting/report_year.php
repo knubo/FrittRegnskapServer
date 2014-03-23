@@ -7,7 +7,7 @@ class ReportYear {
         $this->db = $db;
     }
 
-    function fixNum($num) {
+    static function fixNum($num) {
         if($num == 0) {
             return "0.00";
         }
@@ -27,11 +27,11 @@ class ReportYear {
     function list_sums_earnings($year, $month = 12) {
         return $this->list_sums_int($year, "((RP.post_type >= 3000 and RP.post_type < 4000) or RP.post_type=8400 or RP.post_type=8040)", -1.0, $month);
     }
-    
+
     function list_sums_fond($year, $post, $month = 12) {
         return $this->list_sums_int($year, "RP.post_type = $post", 1.0, $month);
     }
-    
+
     function list_sums_2000_excluded_fond($year, $month = 12) {
         return $this->list_sums_int($year, "RP.post_type >= 1000 and RP.post_type < 2000 and RP.post_type NOT IN (1926, 1927)", 1.0, $month);
     }
@@ -84,12 +84,12 @@ class ReportYear {
     function sumDebetAndKreditValues($resDebet, $resKredit, $sign) {
         $sums = array();
         foreach(array_keys($resDebet) as $debKey) {
-            
+
             $sums[$debKey] = array("value" => $resDebet[$debKey]["sumpost"], "description" => $resDebet[$debKey]["description"]);
         }
 
         foreach(array_keys($resKredit) as $kredKey) {
-            
+
             if(array_key_exists($kredKey, $sums)) {
                 $sums[$kredKey]["value"] -= ($resKredit[$kredKey]["sumpost"] );
             } else {
@@ -97,11 +97,11 @@ class ReportYear {
             }
             $sums[$kredKey]["description"] = $resKredit[$kredKey]["description"];
         }
-        
+
         foreach(array_keys($sums) as $key) {
-            $sums[$key]["value"] = $sums[$key]["value"] * $sign; 
+            $sums[$key]["value"] = $sums[$key]["value"] * $sign;
         }
-        
+
         return $sums;
     }
 
@@ -116,17 +116,17 @@ class ReportYear {
     function list_sums_int($year, $ignore, $sign, $month) {
         $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig::pre() . "post RP, " . AppConfig::pre() . "line RL," . AppConfig::pre() . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
         $prep->bind_params("ii", $year, $month);
-        
+
         $debRes = $prep->execute();
-        
+
         $resDebet = $this->makeSumPerPostType($debRes);
 
         $prep = $this->db->prepare("select RP.post_type,sum(amount) as sumpost, RPT.description from " . AppConfig::pre() . "post RP, " . AppConfig::pre() . "line RL," . AppConfig::pre() . "post_type RPT where RL.id=RP.line and RL.year=? and RP.debet = '-1' and $ignore and RPT.post_type = RP.post_type and RL.month <= ? group by post_type order by post_type");
-       
+
         $prep->bind_params("ii", $year, $month);
 
         $kredLines = $prep->execute();
-        
+
         $resKredit = $this->makeSumPerPostType($kredLines);
 
         $sums = $this->sumDebetAndKreditValues($resDebet, $resKredit, $sign);

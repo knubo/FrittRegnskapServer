@@ -132,5 +132,10 @@ switch ($action) {
         $res = $accInvoice->changeInvoiceStatus($_REQUEST["receiver_id"], $_REQUEST["status"]);
         echo json_encode(array("status" => $res ? 1 : 0));
         break;
+
+    case "invoice_paper":
+        $ids = $_REQUEST["invoices"];
+
+
 }
 ?>

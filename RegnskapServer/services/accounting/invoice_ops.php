@@ -2,8 +2,10 @@
 
 include_once ("../../conf/AppConfig.php");
 include_once ("../../classes/util/ezdate.php");
+include_once ("../../classes/odf/odf.php");
 include_once ("../../classes/util/DB.php");
 include_once ("../../classes/util/strings.php");
+include_once ("../../classes/accounting/helpers/Luhn.php");
 include_once ("../../classes/accounting/accountstandard.php");
 include_once ("../../classes/accounting/accountyearmembership.php");
 include_once ("../../classes/accounting/accountsemestermembership.php");
@@ -103,15 +105,15 @@ switch ($action) {
 
         $userId = $regnSession->getPersonId();
         $accInvoice->create_invoices($userId, json_decode($_REQUEST["invoices"]),
-                                     json_decode($_REQUEST["receivers"]), $_REQUEST["invoice_type"]);
+            json_decode($_REQUEST["receivers"]), $_REQUEST["invoice_type"]);
 
         echo json_encode(array("status" => 1));
         break;
 
 
     case "invoice":
-    	echo json_encode($accInvoice->invoice($_REQUEST["receiver_id"]));
-    	break;
+        echo json_encode($accInvoice->invoice($_REQUEST["receiver_id"]));
+        break;
 
     case "invoices":
         echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
@@ -122,20 +124,61 @@ switch ($action) {
 
         $status = $accInvoice->invoicePaidInTransaction($_REQUEST["invoice_recepiant "], $_REQUEST["paid_day"], $_REQUEST["amount"], $_REQUEST["debet_post"]);
 
-		echo json_encode(array("status" => $status));
-		break;
-	case "search":
-	    $res = $accInvoice->search($_REQUEST);
-  	    echo json_encode($res);
-	    break;
+        echo json_encode(array("status" => $status));
+        break;
+    case "search":
+        $res = $accInvoice->search($_REQUEST);
+        echo json_encode($res);
+        break;
     case "change_invoice_status":
         $res = $accInvoice->changeInvoiceStatus($_REQUEST["receiver_id"], $_REQUEST["status"]);
         echo json_encode(array("status" => $res ? 1 : 0));
         break;
 
     case "invoice_paper":
-        $ids = $_REQUEST["invoices"];
+        $ids = json_decode($_REQUEST["invoices"]);
+        $invoice_template = $_REQUEST["invoice_template"];
+        $possibleInvoices = $accInvoice->invoicesForODF($invoice_template);
 
 
+        $prefix = "";
+        if (AppConfig::USE_QUOTA) {
+            $prefix = $regnSession->getPrefix() . "/";
+        }
+
+        $openfile = "../../storage/" . $prefix . "/" . $invoice_template;
+
+
+        if (substr($openfile, -4) != ".odt") {
+            die("Not an open office file");
+        }
+
+        $odf = new odf($openfile);
+
+        $article = $odf->setSegment('page');
+
+        $date = new eZDate();
+        $charset = 'UTF-8';
+
+        foreach ($possibleInvoices as $one) {
+            if (in_array($one["id"], $ids)) {
+                $article->setVarsSilent("firstname", $one["firstname"], 0, $charset);
+                $article->setVarsSilent("lastname", $one["lastname"], 0, $charset);
+                $article->setVarsSilent("address", $one["address"], 0, $charset);
+                $article->setVarsSilent("city", $one["city"], 0, $charset);
+                $article->setVarsSilent("zipcode", $one["postnmb"], 0, $charset);
+
+                $invoice = $one["template_id"]. Luhn::generateDigit($one["template_id"]) . "-" . $one["id"] . Luhn::generateDigit($one["id"]);
+                $article->setVarsSilent("invoice", $invoice, 0, $charset);
+                $article->setVarsSilent("amount", $one["amount"], 0, $charset);
+
+                $article->merge();
+            }
+        }
+
+        $odf->mergeSegment($article);
+
+        // We export the file
+        $odf->exportAsAttachedFile();
 }
 ?>

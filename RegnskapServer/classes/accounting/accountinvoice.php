@@ -106,6 +106,16 @@ class AccountInvoice {
 
     }
 
+    /* From one invoice, find template and return all that can match */
+    public function invoicesForODF($invoice_template) {
+        $prep = $this->db->prepare("select firstname, lastname, address, postnmb, city, country, R.id, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+                " where R.invoice_id = I.id and I.invoice_top = T.id and TY.invoice_template = ? and T.invoice_type = TY.id and R.invoice_status = 1 and person_id = P.id order by due_date limit 201");
+
+        $prep->bind_params("s", $invoice_template);
+
+        return $prep->execute();
+    }
+
     public function invoices($invoice, $dueDate) {
 
         if ($invoice) {
@@ -254,8 +264,8 @@ class AccountInvoice {
 
 
         $line = new AccountLine($this->db);
-        $line->setNewLatest($invoiceInfo["description"].": " . $invoiceInfo["firstname"]." ".$invoiceInfo["lastname"],
-             $day, $active_year, $active_month);
+        $line->setNewLatest($invoiceInfo["description"] . ": " . $invoiceInfo["firstname"] . " " . $invoiceInfo["lastname"],
+            $day, $active_year, $active_month);
         $line->store();
 
 
@@ -264,6 +274,7 @@ class AccountInvoice {
         $prep->execute();
 
     }
+
 }
 
 ?>

@@ -168,7 +168,7 @@ class eZDate {
      Sets the data according to the UNIX timestamp given as argument.
      */
     function setTimeStamp($value) {
-        $formattedTime =& date('Ymd', $value);
+        $formattedTime = date('Ymd', $value);
 
         $valueArray = array();
 
@@ -454,7 +454,7 @@ class eZDate {
 
      Returns false is the object is not a eZDate object.
      */
-    function isGreater(&$date, $equal = false) {
+    function isGreater($date, $equal = false) {
         $ret = false;
 
         if (get_class($date) == "eZDate") {

@@ -122,7 +122,7 @@ switch ($action) {
     case "invoice_paid":
         $regnSession->checkWriteAccess();
 
-        $status = $accInvoice->invoicePaidInTransaction($_REQUEST["invoice_recepiant "], $_REQUEST["paid_day"], $_REQUEST["amount"], $_REQUEST["debet_post"]);
+        $status = $accInvoice->invoicePaidInTransaction($_REQUEST["id"], $_REQUEST["paid_day"], $_REQUEST["amount"], $_REQUEST["debet_post"]);
 
         echo json_encode(array("status" => $status));
         break;

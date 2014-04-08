@@ -234,10 +234,10 @@ class AccountInvoice {
         return $this->db->affected_rows() == 1;
     }
 
-    public function invoicePaidInTransaction($recepiant, $day, $amount) {
+    public function invoicePaidInTransaction($recipient, $day, $amount, $debetPost) {
         $this->db->begin();
         try {
-            $this->invoicePaid($recepiant, $day, $amount);
+            $this->invoicePaid($recipient, $day, $amount, $debetPost);
             $this->db->commit();
 
             return 1;
@@ -247,9 +247,9 @@ class AccountInvoice {
         return 0;
     }
 
-    private function invoicePaid($recepiant, $day, $amount, $debetPost) {
-        $prep = $this->db->prepare("select description, amount,credit_post_type, TY.invoice_type from " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_recepiant IR, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY," . AppConfig::pre() . "person P where IR.id = ? and IR.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and P.id = person_id");
-        $prep->bind_params("i", $recepiant);
+    private function invoicePaid($recipient, $day, $amount, $debetPost) {
+        $prep = $this->db->prepare("select description, amount, credit_post_type, TY.invoice_type from " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_recepiant IR, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY," . AppConfig::pre() . "person P where IR.id = ? and IR.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and P.id = person_id");
+        $prep->bind_params("i", $recipient);
         $res = $prep->execute();
 
         $invoiceInfo = array_shift($res);
@@ -260,6 +260,8 @@ class AccountInvoice {
             $accountingAmount = $amount;
         }
 
+
+        //TODO add membership registration
         switch ($invoiceInfo["invoice_type"]) {
             case 1:
                 //return SEMESTER;
@@ -278,16 +280,21 @@ class AccountInvoice {
         $active_year = $const[AccountStandard::CONST_YEAR];
         $active_month = $const[AccountStandard::CONST_MONTH];
 
+        $this->db->begin();
 
         $line = new AccountLine($this->db);
         $line->setNewLatest($invoiceInfo["description"] . ": " . $invoiceInfo["firstname"] . " " . $invoiceInfo["lastname"],
             $day, $active_year, $active_month);
         $line->store();
 
+        $line->addPostSingleAmount($line->getId(), "1", $debetPost, $amount);
+        $line->addPostSingleAmount($line->getId(), "-1", $invoiceInfo["credit_post_type"], $amount);
 
         $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recepiant set status = 4 where id = ?");
-        $prep->bind_params("i", $recepiant);
+        $prep->bind_params("i", $recipient);
         $prep->execute();
+
+        $this->db->commit();
 
     }
 

@@ -160,6 +160,8 @@ switch ($action) {
         $date = new eZDate();
         $charset = 'UTF-8';
 
+        $db->begin();
+
         foreach ($possibleInvoices as $one) {
             if (in_array($one["id"], $ids)) {
                 $article->setVarsSilent("firstname", $one["firstname"], 0, $charset);
@@ -171,14 +173,19 @@ switch ($action) {
                 $invoice = $one["template_id"]. Luhn::generateDigit($one["template_id"]) . "-" . $one["id"] . Luhn::generateDigit($one["id"]);
                 $article->setVarsSilent("invoice", $invoice, 0, $charset);
                 $article->setVarsSilent("amount", $one["amount"], 0, $charset);
-
                 $article->merge();
+
+                $accInvoice->changeInvoiceStatus($one["id"], 2);
             }
         }
+
+        $db->commit();
 
         $odf->mergeSegment($article);
 
         // We export the file
         $odf->exportAsAttachedFile();
+
+
 }
 ?>

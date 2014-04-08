@@ -181,6 +181,22 @@ class AccountInvoice {
             $values[] = $money;
         }
 
+        if($params["invoice"]) {
+            $sql[] = "R.id = ?";
+            $types .= "i";
+
+            $invoice = $params["invoice"];
+
+            $parts = explode($invoice, "-");
+
+            if(count($parts) == 2) {
+                $invoice = $parts[0];
+            }
+
+            $values[] = $invoice;
+
+        }
+
         if ($params["firstname"] && $params["lastname"]) {
             $sql[] = "P.id IN (select id from " . AppConfig::pre() . "person M where M.firstname like ? and M.lastname like ?)";
             $types .= "ss";

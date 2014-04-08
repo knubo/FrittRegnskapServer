@@ -135,6 +135,9 @@ switch ($action) {
         echo json_encode(array("status" => $res ? 1 : 0));
         break;
 
+    case "test_luhn":
+        echo "15-".Luhn::generateDigit("15");
+        break;
     case "invoice_paper":
         $ids = json_decode($_REQUEST["invoices"]);
         $invoice_template = $_REQUEST["invoice_template"];
@@ -170,7 +173,7 @@ switch ($action) {
                 $article->setVarsSilent("city", $one["city"], 0, $charset);
                 $article->setVarsSilent("zipcode", $one["postnmb"], 0, $charset);
 
-                $invoice = $one["template_id"]. Luhn::generateDigit($one["template_id"]) . "-" . $one["id"] . Luhn::generateDigit($one["id"]);
+                $invoice = $one["id"] . "-" . Luhn::generateDigit($one["id"]);
                 $article->setVarsSilent("invoice", $invoice, 0, $charset);
                 $article->setVarsSilent("amount", $one["amount"], 0, $charset);
                 $article->merge();

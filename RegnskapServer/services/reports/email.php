@@ -162,7 +162,7 @@ switch ($action) {
             $status = $emailer->sendEmail($subject, $email, $body, $sender, $attObjs, $prefix, $html);
 
             if($status) {
-                $prep = $db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = 2, sent_date = now() where id = ?");
+                $prep = $db->prepare("update " . AppConfig::pre() . "invoice_recipient set invoice_status = 2, sent_date = now() where id = ?");
                 $prep->bind_params("i", $invoice);
                 $prep->execute();
 

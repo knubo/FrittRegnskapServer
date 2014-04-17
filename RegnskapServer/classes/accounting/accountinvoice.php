@@ -13,7 +13,7 @@ class AccountInvoice {
     }
 
     public function getAll() {
-        $prep = $this->db->prepare("select id, description, invoice_type, split_type, email_from, invoice_due_day, default_amount, (case when char_length(email_subject) > 5 and char_length(email_body) > 15 then 'true' else 'false' end) as emailOK, credit_post_type, invoice_template from  " . AppConfig::pre() . "invoice_type");
+        $prep = $this->db->prepare("select id, description, split_type, email_from, invoice_due_day, (case when char_length(email_subject) > 5 and char_length(email_body) > 15 then 'true' else 'false' end) as emailOK, invoice_template from  " . AppConfig::pre() . "invoice_type");
         return $prep->execute();
     }
 
@@ -72,7 +72,7 @@ class AccountInvoice {
         $ezDate = new eZDate();
 
         $prep = $this->db->prepare("insert into  " . AppConfig::pre() . "invoice (invoice_top, amount, due_date) values (?,?,?)");
-        $prepRec = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_recepiant (person_id, invoice_status, invoice_id , changed_by_person_id) values (?,?,?,?)");
+        $prepRec = $this->db->prepare("insert into " . AppConfig::pre() . "invoice_recipient (person_id, invoice_status, invoice_id , changed_by_person_id) values (?,?,?,?)");
 
         foreach ($invoices as $invoice) {
             $ezDate->setTimeStamp($invoice->date / 1000);
@@ -90,12 +90,12 @@ class AccountInvoice {
     }
 
     public function invoicesNotSent() {
-        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "invoice where id in (select invoice_id from " . AppConfig::pre() . "invoice_recepiant where invoice_status = 1)");
+        $prep = $this->db->prepare("select * from " . AppConfig::pre() . "invoice where id in (select invoice_id from " . AppConfig::pre() . "invoice_recipient where invoice_status = 1)");
         return $prep->execute();
     }
 
     public function invoice($recevierId) {
-        $prep = $this->db->prepare("select firstname, lastname, email, TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+        $prep = $this->db->prepare("select firstname, lastname, email, TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id, I.credit_post_type from " . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
                 " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id and R.id = ?");
         $prep->bind_params("i", $recevierId);
 
@@ -108,7 +108,7 @@ class AccountInvoice {
 
     /* From one invoice, find template and return all that can match */
     public function invoicesForODF($invoice_template) {
-        $prep = $this->db->prepare("select firstname, lastname, address, postnmb, city, country, R.id, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+        $prep = $this->db->prepare("select firstname, lastname, address, postnmb, city, country, R.id, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
                 " where R.invoice_id = I.id and I.invoice_top = T.id and TY.invoice_template = ? and T.invoice_type = TY.id and R.invoice_status = 1 and person_id = P.id order by due_date limit 201");
 
         $prep->bind_params("s", $invoice_template);
@@ -119,7 +119,7 @@ class AccountInvoice {
     public function invoices($invoice, $dueDate) {
 
         if ($invoice) {
-            $prep = $this->db->prepare("select firstname, lastname, email, TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+            $prep = $this->db->prepare("select firstname, lastname, email, TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
                     " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and R.invoice_id = ? and person_id = P.id order by due_date limit 201");
             $prep->bind_params("i", $invoice);
 
@@ -127,18 +127,20 @@ class AccountInvoice {
             $ezDate = new eZDate();
             $ezDate->setDate($dueDate);
 
-            $prep = $this->db->prepare("select firstname, lastname, email,  TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+            $prep = $this->db->prepare("select firstname, lastname, email,  TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
                     " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and due_date < ? and person_id = P.id order by due_date limit 201");
             $prep->bind_params("s", $ezDate->mySQLDate());
         } else {
-            $prep = $this->db->prepare("select firstname, lastname, email,  TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
+            $prep = $this->db->prepare("select firstname, lastname, email,  TY.description, TY.invoice_template, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P " .
                     " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id order by due_date limit 201");
         }
         return $prep->execute();
     }
 
     public function search($params) {
-        $pre = "select firstname, lastname, email,  TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from " . AppConfig::pre() . "invoice_recepiant R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P ";
+        $pre = "select firstname, lastname, email,  TY.description, R.id,invoice_status, sent_date, deleted_date, person_id, amount, due_date, TY.id as template_id from "
+                . AppConfig::pre() . "invoice_recipient R, " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_top T, "
+                . AppConfig::pre() . "invoice_type TY, " . AppConfig::pre() . "person P ";
         $pre .= " where R.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and person_id = P.id ";
         $sql = array();
         $values = array();
@@ -227,7 +229,7 @@ class AccountInvoice {
     }
 
     public function changeInvoiceStatus($receiverId, $status) {
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recepiant set invoice_status = ? where id = ?");
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recipient set invoice_status = ? where id = ?");
         $prep->bind_params("ii", $status, $receiverId);
         $prep->execute();
 
@@ -248,7 +250,7 @@ class AccountInvoice {
     }
 
     private function invoicePaid($recipient, $day, $amount, $debetPost) {
-        $prep = $this->db->prepare("select description, amount, credit_post_type, TY.invoice_type from " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_recepiant IR, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY," . AppConfig::pre() . "person P where IR.id = ? and IR.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and P.id = person_id");
+        $prep = $this->db->prepare("select description, amount, credit_post_type, TY.invoice_type from " . AppConfig::pre() . "invoice I, " . AppConfig::pre() . "invoice_recipient IR, " . AppConfig::pre() . "invoice_top T, " . AppConfig::pre() . "invoice_type TY," . AppConfig::pre() . "person P where IR.id = ? and IR.invoice_id = I.id and I.invoice_top = T.id and T.invoice_type = TY.id and P.id = person_id");
         $prep->bind_params("i", $recipient);
         $res = $prep->execute();
 
@@ -290,7 +292,7 @@ class AccountInvoice {
         $line->addPostSingleAmount($line->getId(), "1", $debetPost, $amount);
         $line->addPostSingleAmount($line->getId(), "-1", $invoiceInfo["credit_post_type"], $amount);
 
-        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recepiant set status = 4 where id = ?");
+        $prep = $this->db->prepare("update " . AppConfig::pre() . "invoice_recipient set status = 4 where id = ?");
         $prep->bind_params("i", $recipient);
         $prep->execute();
 

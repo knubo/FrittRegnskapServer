@@ -394,8 +394,16 @@ create table if not exists XXX_invoice_type (
   email_footer int,
   email_header int,
   email_from varchar(255),
-  credit_post_type INTEGER(5) UNSIGNED NULL,
   invoice_template varchar(255)
+);
+
+create table if not exists XXX_invoice_amount (
+  id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  invoice_type INTEGER(8) UNSIGNED,
+  optional tinyint(1),
+  row_description varchar(255),
+  credit_post_type INTEGER(5) UNSIGNED NULL,
+  amount NUMERIC(8,2) UNSIGNED
 );
 
 create table if not exists XXX_invoice_top (
@@ -408,11 +416,10 @@ create table if not exists XXX_invoice_top (
 create table if not exists XXX_invoice (
   id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   invoice_top INTEGER(8) UNSIGNED,
-  amount NUMERIC(8,2) UNSIGNED,
   due_date DATE
 );
 
-create table if not exists XXX_invoice_recepiant (
+create table if not exists XXX_invoice_recipient (
   id INTEGER(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   invoice_id INTEGER(8) UNSIGNED,
   invoice_status int,

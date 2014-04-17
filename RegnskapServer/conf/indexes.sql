@@ -11,4 +11,4 @@ create INDEX XXX_Post_debet on XXX_post(debet);
 create INDEX XXX_Person_RequiredYear on XXX_person(year_membership_required);
 create INDEX XXX_Person_RequiredSemester on XXX_person(semester_membership_required);
 
-create INDEX XXX_Invoice_Receivers on XXX_invoice_recepiant (invoice_id);
+create INDEX XXX_Invoice_Receivers on XXX_invoice_recipient (invoice_id);

@@ -119,6 +119,16 @@ switch ($action) {
         echo json_encode($accInvoice->invoices($_REQUEST["invoice"], $_REQUEST["due_date"]));
         break;
 
+    case "posts":
+        $accStd = new AccountStandard($db);
+
+        echo json_encode($accStd->getValues(
+                        array(AccountStandard::CONST_BUDGET_COURSE_POST,
+                              AccountStandard::CONST_BUDGET_YOUTH_POST,
+                              AccountStandard::CONST_BUDGET_YEAR_POST,
+                              AccountStandard::CONST_BUDGET_TRAIN_POST)));
+
+        break;
     case "invoice_paid":
         $regnSession->checkWriteAccess();
 

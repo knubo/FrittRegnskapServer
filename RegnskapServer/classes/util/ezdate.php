@@ -43,44 +43,52 @@
  \sa eZDateTime eZTime eZLocale
  */
 
-class eZDate {
+class eZDate
+{
     /*!
      Constructs a new eZDate object. If the parameters are set the date
      is set accordingly. If not the current local time is used.
      */
-    function eZDate($year = 0, $month = 0, $day = 0, $year_add = 0, $month_add = 0, $day_add = 0) {
+    function eZDate( $year = 0, $month = 0, $day = 0, $year_add = 0, $month_add = 0, $day_add = 0 )
+    {
         date_default_timezone_set(AppConfig::TIMEZONE);
 
-        if (($year == 0) && ($month == 0) && ($day == 0)) {
+        if ( ( $year == 0 )  && ( $month == 0 ) && ( $day == 0 ) )
+        {
             $now = getdate();
-            $this->setYear($now["year"]);
-            $this->setMonth($now["mon"]);
-            $this->setDay($now["mday"]);
-        } else {
-            $this->setYear($year);
-            $this->setMonth($month);
-            $this->setDay($day);
+            $this->setYear( $now["year"] );
+            $this->setMonth( $now["mon"] );
+            $this->setDay( $now["mday"] );
         }
-        $this->move($year_add, $month_add, $day_add);
+        else
+        {
+            $this->setYear( $year );
+            $this->setMonth( $month );
+            $this->setDay( $day );
+        }
+        $this->move( $year_add, $month_add, $day_add );
     }
 
     /*!
      The year is returned in Y2K compatible format.
      */
-    function year() {
+    function year()
+    {
         return $this->Year;
     }
 
     /*!
      The month value is returned.
      */
-    function month() {
+    function month()
+    {
         return $this->Month;
     }
 
-    function month2() {
-        if ($this->Month < 10) {
-            return "0" . $this->Month;
+    function month2()
+    {
+        if($this->Month < 10) {
+            return "0".$this->Month;
         }
         return $this->Month;
     }
@@ -88,15 +96,17 @@ class eZDate {
     /*!
      Returns the day of the month.
      */
-    function day() {
+    function day()
+    {
         return $this->Day;
     }
 
-    function day2() {
-        if ($this->Day < 10) {
-            return "0" . $this->Day;
+    function day2()
+    {
+        if($this->Day < 10) {
+            return "0".$this->Day;
         }
-
+        
         return $this->Day;
     }
 
@@ -104,59 +114,66 @@ class eZDate {
     /*!
      Sets the year value.
      */
-    function setYear($value) {
+    function setYear( $value )
+    {
         $this->Year = $value;
-        setType($this->Year, "integer");
+        setType( $this->Year, "integer" );
     }
 
     /*!
      Sets the month value.
      */
-    function setMonth($value) {
+    function setMonth( $value )
+    {
         $this->Month = $value;
-        setType($this->Month, "integer");
+        setType( $this->Month, "integer" );
     }
 
     /*!
      Sets the day value;
      */
-    function setDay($value) {
+    function setDay( $value )
+    {
         $this->Day = $value;
-        setType($this->Day, "integer");
+        setType( $this->Day, "integer" );
     }
 
     function setDate($value) {
-        $valueArray = array();
-        if (preg_match("/([0-9]{2}).([0-9]{2}).([0-9]{4})/", $value, $valueArray)) {
-            $this->setDay($valueArray[1]);
-            $this->setMonth($valueArray[2]);
-            $this->setYear($valueArray[3]);
+        if ( preg_match( "/([0-9]{2}).([0-9]{2}).([0-9]{4})/", $value, $valueArray ) )
+        {
+            $this->setDay( $valueArray[1] );
+            $this->setMonth( $valueArray[2] );
+            $this->setYear( $valueArray[3] );
         } else {
             print("Expected dd.mm.yyyy got $value.");
         }
-
+         
     }
 
     /*!
      Sets the date according to the MySQL date given as parameter.
      If the parameter is invalid nothing is set and an error is printed.
      */
-    function setMySQLDate($value) {
-        $valueArray = array();
-
-        if (preg_match("/([0-9]{4})-([0-9]{2})-([0-9]{2})/", $value, $valueArray)) {
-            $this->setYear($valueArray[1]);
-            $this->setMonth($valueArray[2]);
-            $this->setDay($valueArray[3]);
-        } else {
-            print("<b>Error:</b> eZDate::setMySQLDate() received wrong MySQL date format. Got:>" . $value . "<.<br>");
+    function setMySQLDate( $value )
+    {
+        $orgval = $value;
+        if ( preg_match( "/([0-9]{4})-([0-9]{2})-([0-9]{2})/", $value, $valueArray ) )
+        {
+            $this->setYear( $valueArray[1] );
+            $this->setMonth( $valueArray[2] );
+            $this->setDay( $valueArray[3] );
+        }
+        else
+        {
+            print( "<b>Error:</b> eZDate::setMySQLDate() received wrong MySQL date format. Got:>".$orgval."<.<br>" );
         }
     }
 
     /*!
      Returns the date formatted for mySQL...
      */
-    function mySQLDate() {
+    function mySQLDate()
+    {
         $return = $this->Year;
         $return = $return . "-" . $this->Month;
         $return = $return . "-" . $this->Day;
@@ -167,17 +184,19 @@ class eZDate {
     /*!
      Sets the data according to the UNIX timestamp given as argument.
      */
-    function setTimeStamp($value) {
-        $formattedTime = date('Ymd', $value);
+    function setTimeStamp( $value )
+    {
+        $formattedTime =& date('Ymd', $value );
 
-        $valueArray = array();
-
-        if (preg_match("/([0-9]{4})([0-9]{2})([0-9]{2})/", $formattedTime, $valueArray)) {
-            $this->setYear($valueArray[1]);
-            $this->setMonth($valueArray[2]);
-            $this->setDay($valueArray[3]);
-        } else {
-            print("<b>Error:</b> eZDateTime::setMySQLTimeStamp() received wrong MySQL timestamp format.");
+        if ( preg_match( "/([0-9]{4})([0-9]{2})([0-9]{2})/", $formattedTime, $valueArray ) )
+        {
+            $this->setYear( $valueArray[1] );
+            $this->setMonth( $valueArray[2] );
+            $this->setDay( $valueArray[3] );
+        }
+        else
+        {
+            print( "<b>Error:</b> eZDateTime::setMySQLTimeStamp() received wrong MySQL timestamp format." );
         }
 
     }
@@ -188,37 +207,42 @@ class eZDate {
 
      If returnNow is set to true a timestamp of the current time is returned.
      */
-    function timeStamp($returnNow = false) {
-        if ($returnNow == true)
-            return mktime();
+    function timeStamp( $returnNow=false )
+    {
+        if ( $returnNow == true )
+        return mktime();
         else
-            return mktime(0, 0, 0,
-                $this->month(), $this->day(), $this->year());
+        return mktime( 0, 0, 0,
+        $this->month(), $this->day(), $this->year() );
     }
 
-    function week() {
-        return date("W", mktime(0, 0, 0,
-            $this->month(), $this->day(), $this->year()));
+    function week()
+    {
+        return date("W", mktime( 0, 0, 0,
+        $this->month(), $this->day(), $this->year() ) );
 
     }
 
     /*!
      Returns the number of days in the current month.
      */
-    function daysInMonth() {
-        $lastday = mktime(2, 0, 0, $this->Month + 1, 0, $this->Year);
+    function daysInMonth()
+    {
+        $lastday = mktime( 2, 0, 0, $this->Month + 1, 0, $this->Year );
 
-        return strftime("%d", $lastday);
+        return strftime( "%d", $lastday );
     }
 
 
     /*!
      Adds a "0" infront of the value if it's below 10.
      */
-    function addZero($value) {
+    function addZero( $value )
+    {
         $ret = $value;
-        if ($ret < 10) {
-            $ret = "0" . $ret;
+        if ( $ret < 10 )
+        {
+            $ret = "0". $ret;
         }
 
         return $ret;
@@ -228,13 +252,17 @@ class eZDate {
      Returns the day of week. ( 1..7 )
      If mondayFirst is true, the week starts on Monday, else on Sunday.
      */
-    function dayOfWeek($mondayFirst = true) {
-        $weekday = date("w", mktime(1, 0, 0, $this->Month, $this->Day, $this->Year));
+    function dayOfWeek( $mondayFirst = true )
+    {
+        $weekday = date( "w", mktime( 1, 0, 0, $this->Month, $this->Day, $this->Year ) );
 
-        if ($mondayFirst == true) {
-            if ($weekday == 0)
-                $weekday = 7;
-        } else {
+        if ( $mondayFirst == true )
+        {
+            if ( $weekday == 0 )
+            $weekday = 7;
+        }
+        else
+        {
             $weekday = $weekday + 1;
         }
 
@@ -245,94 +273,100 @@ class eZDate {
      Returns the name of the weekday in three letters.
      If mondayFirst is true, the week starts on Monday, else on Sunday.
      */
-    function dayName($mondayFirst) {
+    function dayName( $mondayFirst )
+    {
         $day = "unknown";
 
-        if ($mondayFirst == true) {
-            switch ($this->dayOfWeek($mondayFirst)) {
+        if ( $mondayFirst == true )
+        {
+            switch( $this->dayOfWeek( $mondayFirst ) )
+            {
                 case 1 :
                     {
-                    $day = "mon";
+                        $day = "mon";
                     }
                     break;
 
                 case 2 :
                     {
-                    $day = "tue";
+                        $day = "tue";
                     }
                     break;
 
                 case 3 :
                     {
-                    $day = "wed";
+                        $day = "wed";
                     }
                     break;
 
                 case 4 :
                     {
-                    $day = "thu";
+                        $day = "thu";
                     }
                     break;
 
                 case 5 :
                     {
-                    $day = "fri";
+                        $day = "fri";
                     }
                     break;
 
                 case 6 :
                     {
-                    $day = "sat";
+                        $day = "sat";
                     }
                     break;
 
                 case 7 :
                     {
-                    $day = "sun";
+                        $day = "sun";
                     }
                     break;
             }
-        } else {
-            switch ($this->dayOfWeek($mondayFirst)) {
+        }
+        else
+        {
+            switch( $this->dayOfWeek( $mondayFirst ) )
+            {
                 case 1 :
                     {
-                    $day = "sun";
+                        $day = "sun";
                     }
                     break;
 
                 case 2 :
                     {
-                    $day = "mon";
+                        $day = "mon";
                     }
                     break;
 
                 case 3 :
                     {
-                    $day = "tue";
+                        $day = "tue";
                     }
                     break;
 
                 case 4 :
                     {
-                    $day = "wed";
+                        $day = "wed";
                     }
                     break;
 
                 case 5 :
                     {
-                    $day = "thu";
+                        $day = "thu";
                     }
                     break;
 
                 case 6 :
                     {
-                    $day = "fri";
+                        $day = "fri";
                     }
                     break;
 
                 case 7 :
                     {
-                    $day = "sat";
+                        $day = "sat";
                     }
                     break;
             }
@@ -345,79 +379,81 @@ class eZDate {
     /*!
      Returns the name of the month in three letters.
      */
-    function monthName() {
+    function monthName( )
+    {
         $month = "unknown";
 
-        switch ($this->Month) {
+        switch( $this->Month )
+        {
             case 1 :
                 {
-                $month = "jan";
+                    $month = "jan";
                 }
                 break;
 
             case 2 :
                 {
-                $month = "feb";
+                    $month = "feb";
                 }
                 break;
 
             case 3 :
                 {
-                $month = "mar";
+                    $month = "mar";
                 }
                 break;
 
             case 4 :
                 {
-                $month = "apr";
+                    $month = "apr";
                 }
                 break;
 
             case 5 :
                 {
-                $month = "may";
+                    $month = "may";
                 }
                 break;
 
             case 6 :
                 {
-                $month = "jun";
+                    $month = "jun";
                 }
                 break;
 
             case 7 :
                 {
-                $month = "jul";
+                    $month = "jul";
                 }
                 break;
 
             case 8 :
                 {
-                $month = "aug";
+                    $month = "aug";
                 }
                 break;
 
             case 9 :
                 {
-                $month = "sep";
+                    $month = "sep";
                 }
                 break;
 
             case 10 :
                 {
-                $month = "oct";
+                    $month = "oct";
                 }
                 break;
 
             case 11 :
                 {
-                $month = "nov";
+                    $month = "nov";
                 }
                 break;
 
             case 12 :
                 {
-                $month = "dec";
+                    $month = "dec";
                 }
                 break;
         }
@@ -427,20 +463,24 @@ class eZDate {
     /*!
      Returns true if the current date is valid.
      */
-    function isValid() {
-        return checkdate($this->Month(), $this->Day(), $this->Year());
+    function isValid()
+    {
+        return checkdate( $this->Month(), $this->Day(), $this->Year() );
     }
 
     /*!
      Returns true if the current date equals the supplied date.
      */
-    function equals($date) {
-        if ($this->Year == $date->year() &&
-                $this->Month == $date->month() &&
-                $this->Day == $date->day()
-        ) {
+    function equals( $date )
+    {
+        if ( $this->Year == $date->year() &&
+        $this->Month == $date->month() &&
+        $this->Day == $date->day() )
+        {
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
@@ -454,26 +494,37 @@ class eZDate {
 
      Returns false is the object is not a eZDate object.
      */
-    function isGreater($date, $equal = false) {
+    function isGreater( &$date, $equal=false )
+    {
         $ret = false;
 
-        if (get_class($date) == "eZDate") {
-            if ($date->year() < $this->Year) {
+        if ( get_class( $date ) == "eZDate" )
+        {
+            if ( $date->year() < $this->Year ) {
                 $ret = false;
-            } else if ($date->year() > $this->Year) {
+            }
+            else if ( $date->year() > $this->Year ) {
                 $ret = true;
-            } else {
-                if ($date->month() < $this->Month)
-                    $ret = false;
-                else if ($date->month() > $this->Month)
-                    $ret = true;
-                else {
-                    if ($equal == false) {
-                        if ($date->day() > $this->Day) {
+            }
+            else
+            {
+                if ( $date->month() < $this->Month )
+                $ret = false;
+                else if ( $date->month() > $this->Month )
+                $ret = true;
+                else
+                {
+                    if ( $equal == false )
+                    {
+                        if ( $date->day() > $this->Day )
+                        {
                             $ret = true;
                         }
-                    } else {
-                        if ($date->day() >= $this->Day) {
+                    }
+                    else
+                    {
+                        if ( $date->day() >= $this->Day )
+                        {
                             $ret = true;
                         }
                     }
@@ -486,53 +537,54 @@ class eZDate {
     /*!
      Moves the current date n days, m months and o years forward, or backward if negative.
      */
-    function move($year_num, $month_num, $day_num) {
-        $date = getdate(mktime(0, 0, 0,
-                $this->Month + $month_num,
-                $this->Day + $day_num,
-                $this->Year + $year_num));
+    function move( $year_num, $month_num, $day_num )
+    {
+        $date = getdate( mktime( 0, 0, 0,
+        $this->Month + $month_num,
+        $this->Day + $day_num,
+        $this->Year + $year_num ) );
         $this->Year = $date["year"];
         $this->Month = $date["mon"];
         $this->Day = $date["mday"];
     }
 
     function copy() {
-        return new EZDate($this->Year, $this->Month, $this->Day);
+        return new EZDate($this->Year, $this->Month,$this->Day);
     }
 
     // DOES NOT WORK IN THE YEARCHANGE
     function firstDayInWeek() {
         $runner = $this->clone();
 
-        while ($runner->week() == $this->week()) {
-            $runner->move(0, 0, -1);
-        }
+   	    while($runner->week() == $this->week()) {
+   	        $runner->move(0,0,-1);
+   	    }
 
-        $runner->move(0, 0, 1);
+   	    $runner->move(0,0,1);
 
-        return $runner;
+   	    return $runner;
     }
 
     function displayAccount() {
         $d = $this->Day;
 
-        if ($d < 10) {
+        if($d < 10) {
             $d = "0$d";
         }
         $m = $this->Month;
 
-        if ($m < 10) {
+        if($m < 10) {
             $m = "0$m";
         }
-        return "$d.$m." . $this->Year;
+        return "$d.$m.".$this->Year;
     }
 
     function display() {
-        return $this->Day . "/" . $this->Month . "-" . $this->Year;
+        return $this->Day."/".$this->Month."-".$this->Year;
     }
 
     function monthNameNor($month) {
-        $months = array("", "januar", "februar", "mars", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "desember");
+        $months = array("","januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember");
 
         return $months[$month];
     }
@@ -540,6 +592,8 @@ class eZDate {
     private $Year;
     private $Month;
     private $Day;
+
+
 }
 
 
